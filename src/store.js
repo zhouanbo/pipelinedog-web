@@ -1,21 +1,21 @@
-import alt from './alt';
-import Actions from './actions';
+import alt from './alt'
+import Actions from './actions'
 
 class Store {
   constructor() {
     this.bindListeners({
-      onAction: Actions.ACTION
-    });
+      onAction: Actions.myAction
+    })
 
     this.state = {
 
-    };
+    }
   }
 
   onAction() {
-    
+
   }
 
 }
 
-export default alt.createStore(Store, 'Store');
+export default alt.createStore(Store, 'Store')

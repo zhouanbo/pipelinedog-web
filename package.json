@@ -4,7 +4,8 @@
   "description": "A web interface of pipelinedog",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "browserify -t babelify src/app.jsx -o build/bundle.js",
+    "start": "open index.html"
   },
   "babel": {
     "presets": [
@@ -25,8 +26,12 @@
   "homepage": "https://github.com/zhouanbo/pipelinedog-web#readme",
   "dependencies": {
     "alt": "^0.18.5",
+    "alt-container": "^1.0.2",
+    "brace": "^0.8.0",
+    "js-yaml": "^3.6.1",
     "material-ui": "^0.15.3",
     "react": "^15.3.0",
+    "react-ace": "^3.5.0",
     "react-dom": "^15.3.0",
     "react-tap-event-plugin": "^1.0.0"
   },
