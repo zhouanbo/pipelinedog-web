@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "browserify -t babelify src/app.jsx -o build/bundle.js",
+    "watch": "watchify -t babelify src/app.jsx -o build/bundle.js",
     "start": "open index.html"
   },
   "babel": {

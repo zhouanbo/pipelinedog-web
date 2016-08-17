@@ -1,77 +1,71 @@
 import React from 'react'
+import Actions from '../actions'
 import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
-import FontIcon from 'material-ui/FontIcon';
 import {Tabs, Tab} from 'material-ui/Tabs';
+import Paper from 'material-ui/Paper';
+import Subheader from 'material-ui/Subheader';
 
 import PdAppBar from './pdAppBar.jsx'
-import PdToolBar from './pdToolBar.jsx'
 import PdEditor from './pdEditor.jsx'
+import PdEditorToolBar from './pdEditorToolBar.jsx'
+import PdStepList from './pdStepList.jsx'
 
 class Main extends React.Component {
   
+  updateText() {
+
+    Actions.updateText("Bye W")
+  }
+
+  componentDidMount() {
+    //Set edior height
+    const setEditorSize = () => {
+      document.getElementById('editor').style.height=Number(document.getElementById('container').offsetHeight-168-50)+"px"
+    }
+    setEditorSize();
+    window.addEventListener("resize", setEditorSize);
+  }
+
   render() {
     return (
-      <div>
-        <div id="header" style={{position: "absolute", top: 0, left: 0, width: "100%"}}>
+      <div id="container" style={{display: "flex", flexDirection: "column", alignItems: "stretch"}}>
+
+        <div id="header" style={{flex: "0 0 auto", zIndex: 99}}>
           <PdAppBar />
-          <PdToolBar />
+          
         </div>
 
-        <div id="content" style={{marginTop: 128}}>
-            <Tabs initialSelectedIndex={1}>
-              <Tab
-                label="MAP"
-                value="map"
-              >
-                <Card>
-                  <CardHeader
-                    title="Map"
-                    subtitle="Connection among steps"
+        <div id="content" style={{flex: "1 1 auto", display: "flex", alignItems: "stretch"}}>
+          <Paper style={{flex: "0 0 25%"}} zDepth={0}>
+            <PdStepList />
+          </Paper>
+
+          <Paper style={{flex: "1 1 auto"}} zDepth={2}>
+            <Tabs>
+              <Tab label="Editor">
+                <PdEditorToolBar />
+                <div id="editor" style={{overflow: "scroll"}}>
+                  <PdEditor
+                    value="Hello" 
+                    onChange={function(){}} 
                   />
-                  
-                </Card>
-              </Tab>
-              <Tab
-                label="EDITOR"
-                value="editor"
-              >
-                <div style={{display: "flex"}}>
-                  <Card style={{flex: "1 1 auto"}}>
-                    <CardHeader
-                      title="Editor"
-                      subtitle="Define a step using YAML format"
-                    />
-                      <PdEditor  
-                        value="Hello" 
-                        onChange={function(){}} 
-                      />
-                  </Card>
-                  <Card style={{flex: "1 1 auto"}} >
-                    <CardHeader
-                      title="Preview"
-                      subtitle="A preview of the parsed command"
-                    />
-                    <CardText style={{fontSize: 16}}>
-                      Bye
-                    </CardText>  
-                  </Card>
                 </div>
               </Tab>
-              <Tab
-                label="FILES"
-                value="files"
-              >
-                <Card>
-                  <CardHeader
-                    title="Files"
-                    subtitle="Inputs and outputs of steps"
-                  />
-                </Card>
+              <Tab label="Command" >
+                  
+              </Tab>
+              <Tab label="Output" >
+                  {this.props.text}
               </Tab>
             </Tabs>
-                    
+          </Paper>         
         </div>
-          
+        
+        <Paper id="footer" style={{height: 50, background: "#F5F5F5"}}>
+          <Subheader>
+            2016 Anbo Zhou
+          </Subheader>
+        </Paper>
       </div>
     )
   }

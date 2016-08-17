@@ -2,7 +2,12 @@ import alt from './alt'
 
 class Actions {
   constructor() {
-    this.generateActions('myAction')
+    this.generateActions(
+      'uploadFile',
+      'createStep',
+      'deleteStep',
+      'editorChange'
+      )
   }
 }
 
