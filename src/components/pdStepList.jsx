@@ -10,7 +10,36 @@ class PdStepList extends React.Component {
   render() {
     return (
       <List>
+        <Subheader>Tabs</Subheader>
+
+        <ListItem
+          leftIcon={
+            <IconButton 
+              iconClassName="material-icons" 
+              style={{marginTop: 5}}
+            >
+              input
+            </IconButton>
+          }
+          primaryText="Inputlist"
+          secondaryText="Name: aaa.txt"
+        />
+        <ListItem
+          leftIcon={
+            <IconButton 
+              iconClassName="material-icons" 
+              style={{marginTop: 5}}
+            >
+              language
+            </IconButton>
+          }
+          primaryText="Global Variables"
+          secondaryText="Pipeline specific variables"
+        />
+        <Divider inset={true} />
+
         <Subheader>Steps</Subheader>
+
         <ListItem
           leftIcon={
             <IconButton 
@@ -20,10 +49,9 @@ class PdStepList extends React.Component {
               assignment
             </IconButton>
           }
-          primaryText="Start"
-          secondaryText="Input: aaa.txt"
+          primaryText="Sample Step"
+          secondaryText="Name: Sample"
         />
-        <Divider inset={true} />
       </List>
     )
   }

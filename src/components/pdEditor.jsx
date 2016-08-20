@@ -22,6 +22,7 @@ class PdEditor extends React.Component {
           onChange={this.props.onChange}
           showPrintMargin={false} 
           showGutter={true}
+          editorProps={{$blockScrolling: Infinity}}
         />
       </div>
     )

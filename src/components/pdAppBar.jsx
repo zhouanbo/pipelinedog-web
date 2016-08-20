@@ -1,22 +1,40 @@
 import React from 'react'
 import AppBar from 'material-ui/AppBar'
-import IconButton from 'material-ui/IconButton'
+import Drawer from 'material-ui/Drawer'
+import MenuItem from 'material-ui/MenuItem'
+import Subheader from 'material-ui/Subheader'
 
 class PdAppBar extends React.Component { 
+
+  constructor(props) {
+    super(props)
+    this.state = {open: false}
+    this.handleToggle = this.handleToggle.bind(this);
+  }
+
+  handleToggle() {
+    this.setState({open: !this.state.open})
+  }
+
   render() {
     return (
-      <AppBar
-        title="PipelineDog"
-        iconElementRight={
-          <IconButton 
-            iconClassName="material-icons" 
-            onTouchTap={function(){alert("hello")}} 
-            tooltip="Upload"
+      <div>
+        <AppBar
+          title="PipelineDog"
+          onLeftIconButtonTouchTap={this.handleToggle.bind(this)}
+        />
+        <Drawer
+            docked={false}
+            open={this.state.open}
+            onRequestChange={(open) => this.setState({open})}
           >
-            file_upload
-          </IconButton>
-        }
-      />
+            <Subheader>PipelineDog</Subheader>
+            <MenuItem onTouchTap={()=>{this.handleToggle()}}>Export Project</MenuItem>
+            <MenuItem onTouchTap={()=>{this.handleToggle()}}>Github Repository</MenuItem>
+            <MenuItem onTouchTap={()=>{this.handleToggle()}}>About PipelineDog</MenuItem>
+            
+        </Drawer>
+      </div>
     )
   }
 }
