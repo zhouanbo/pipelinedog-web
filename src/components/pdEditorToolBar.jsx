@@ -7,11 +7,12 @@ import DropDownMenu from 'material-ui/DropDownMenu'
 import RaisedButton from 'material-ui/RaisedButton'
 import MenuItem from 'material-ui/MenuItem'
 
-class PdEditorToolBar extends React.Component {
+export default class PdEditorToolBar extends React.Component {
   render() {
     return (
       <Toolbar>
-        <ToolbarGroup firstChild={true}>     
+        <ToolbarGroup firstChild={true}>
+          <h4 style={{marginLeft: 16, color: "#757575"}}>{this.props.name}</h4>
         </ToolbarGroup>
         <ToolbarGroup lastChild={true}>
           <RaisedButton 
@@ -33,5 +34,3 @@ class PdEditorToolBar extends React.Component {
     )
   }
 }
-
-export default PdEditorToolBar

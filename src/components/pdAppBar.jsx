@@ -4,7 +4,7 @@ import Drawer from 'material-ui/Drawer'
 import MenuItem from 'material-ui/MenuItem'
 import Subheader from 'material-ui/Subheader'
 
-class PdAppBar extends React.Component { 
+export default class PdAppBar extends React.Component { 
 
   constructor(props) {
     super(props)
@@ -13,7 +13,9 @@ class PdAppBar extends React.Component {
   }
 
   handleToggle() {
-    this.setState({open: !this.state.open})
+    if (this.props.init) {
+      this.setState({open: !this.state.open})
+    }
   }
 
   render() {
@@ -43,5 +45,3 @@ class PdAppBar extends React.Component {
     )
   }
 }
-
-export default PdAppBar

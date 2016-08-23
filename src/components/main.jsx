@@ -11,6 +11,7 @@ import PdAppBar from './pdAppBar.jsx'
 import PdEditor from './pdEditor.jsx'
 import PdEditorToolBar from './pdEditorToolBar.jsx'
 import PdStepList from './pdStepList.jsx'
+import PdAlert from './pdAlert.jsx'
 
 class Main extends React.Component {
   
@@ -18,12 +19,46 @@ class Main extends React.Component {
     super(props)
   }
 
-  updateText() {
-    Actions.updateText("Bye W")
+  getEditorText(index) {
+    if (index === -2) {
+      return this.props.list
+    } else if (index === -1) {
+      return this.props.gvar
+    } else {
+      return 'code' in this.props.steps[index] ? this.props.steps[index].code : ""
+    }
+  }
+  getEditorName(index) {
+    if (index === -2) {
+      return "List File"
+    } else if (index === -1) {
+      return "Global Variables"
+    } else {
+      return this.props.steps[index].name === "" ? this.props.steps[index].name : "Unnamed Step"
+    }
   }
 
-  setInit() {
-    Actions.setInit();
+  dispatchInit() {
+    Actions.init()
+  }
+  dispatchSessionUpload(file) {
+    Actions.sessionUpload(file)
+  }
+  dispatchListUpload(file) {
+    Actions.listUpload(file)
+  }
+  dispatchStepChange(index) {
+    Actions.stepChange(index)
+  }
+  dispatchCreateStep() {
+    Actions.createStep()
+  }
+  dispatchDeleteStep(index) {
+    console.log("delete")
+    let r = confirm("A step will be deleted.")
+    if (r) {
+        Actions.deleteStep(index)
+    }
   }
 
   render() {
@@ -39,7 +74,13 @@ class Main extends React.Component {
         <div id="content" style={{flex: "1 1 auto", display: "flex", alignItems: "stretch"}}>
           
           <Paper style={{flex: "0 0 25%"}} zDepth={0}>
-            <PdStepList />
+            <PdStepList
+              steps={this.props.steps}
+              dispatchStepChange={this.dispatchStepChange}
+              dispatchCreateStep={this.dispatchCreateStep}
+              dispatchDeleteStep={this.dispatchDeleteStep}
+              editing={this.props.editing}
+            />
           </Paper>
 
           <Paper style={{flex: "1 1 auto"}} zDepth={1}>
@@ -49,10 +90,12 @@ class Main extends React.Component {
                 icon={<FontIcon className="material-icons">edit</FontIcon>}
                 label="Editor"
               >
-                <PdEditorToolBar />
+                <PdEditorToolBar 
+                  name={this.getEditorName(this.props.editing)}
+                />
                 <div id="editor" style={{overflow: "scroll"}}>
                   <PdEditor
-                    value="Hello" 
+                    text={this.getEditorText(this.props.editing)} 
                     onChange={function(){}} 
                   />
                 </div>
@@ -79,7 +122,9 @@ class Main extends React.Component {
 
         <Paper id="welcome" style={{flex: "1 1 auto", display: "flex", alignItems: "stretch"}}>
           <PdWelcome 
-            setInit={this.setInit}
+            dispatchInit={this.dispatchInit}
+            dispatchSessionUpload={this.dispatchSessionUpload}
+            dispatchListUpload={this.dispatchListUpload}
           />
         </Paper>
         }

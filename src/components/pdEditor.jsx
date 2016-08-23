@@ -6,7 +6,11 @@ import AceEditor from 'react-ace'
 import 'brace/mode/yaml'
 import 'brace/theme/chrome'
 
-class PdEditor extends React.Component {
+export default class PdEditor extends React.Component {
+
+  constructor(props) {
+    super(props)
+  }
 
   componentDidMount() {
     //Set editor height
@@ -27,7 +31,7 @@ class PdEditor extends React.Component {
           width="100%"
           maxLines={200}
           fontSize={16}
-          value={this.props.value} 
+          value={this.props.text} 
           onChange={this.props.onChange}
           showPrintMargin={false} 
           showGutter={true}
@@ -37,4 +41,3 @@ class PdEditor extends React.Component {
     )
   }
 }
-export default PdEditor

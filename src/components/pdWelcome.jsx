@@ -10,7 +10,7 @@ import Paper from 'material-ui/Paper';
 import RaisedButton from 'material-ui/RaisedButton'
 import FlatButton from 'material-ui/FlatButton'
 
-class PdWelcome extends React.Component {
+export default class PdWelcome extends React.Component {
 
   constructor(props) {
     super(props)
@@ -28,7 +28,7 @@ class PdWelcome extends React.Component {
       stepIndex: stepIndex + 1,
     })
     if (stepIndex >= 2) {
-      this.props.setInit()
+      this.props.dispatchInit()
     }
   }
 
@@ -48,7 +48,7 @@ class PdWelcome extends React.Component {
             <h4>You can continue as a new project or upload a session file. </h4>
             <DropZone 
               multiple={false} 
-              onDrop={(files)=>{console.log(files[0])}}
+              onDrop={this.props.dispatchSessionUpload}
             >
               <div style={{padding: 16, textAlign: "center", }}>Drop your session file or click to select.</div>
             </DropZone>
@@ -61,7 +61,7 @@ class PdWelcome extends React.Component {
             <h4>You can upload a list file or type it later on. </h4>
             <DropZone 
               multiple={false} 
-              onDrop={(files)=>{console.log(files[0])}}
+              onDrop={this.props.dispatchListUpload}
             >
               <div style={{padding: 16, textAlign: "center", }}>Drop your list file or click to select.</div>
             </DropZone>
@@ -118,5 +118,3 @@ class PdWelcome extends React.Component {
     );
   }
 }
-
-export default PdWelcome;

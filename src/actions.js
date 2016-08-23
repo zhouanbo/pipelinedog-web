@@ -7,7 +7,10 @@ class Actions {
       'createStep',
       'deleteStep',
       'editorChange',
-      'setInit'
+      'init',
+      'sessionUpload',
+      'listUpload',
+      'stepChange'
       )
   }
 }
