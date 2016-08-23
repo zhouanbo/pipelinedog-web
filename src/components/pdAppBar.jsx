@@ -3,6 +3,7 @@ import AppBar from 'material-ui/AppBar'
 import Drawer from 'material-ui/Drawer'
 import MenuItem from 'material-ui/MenuItem'
 import Subheader from 'material-ui/Subheader'
+import FlatButton from 'material-ui/FlatButton'
 
 export default class PdAppBar extends React.Component { 
 
@@ -24,6 +25,11 @@ export default class PdAppBar extends React.Component {
         <AppBar
           title="PipelineDog"
           onLeftIconButtonTouchTap={this.handleToggle.bind(this)}
+          iconElementRight={
+            <FlatButton 
+              label="Save Session" 
+              onTouchTap={this.props.dispatchSaveSession}  
+            />}
         />
         {this.props.init ?
           <Drawer

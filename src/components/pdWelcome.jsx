@@ -1,11 +1,7 @@
 import React from 'react'
 import DropZone from 'react-dropzone'
 
-import {
-  Step,
-  Stepper,
-  StepButton,
-} from 'material-ui/Stepper'
+import { Step, Stepper, StepButton } from 'material-ui/Stepper'
 import Paper from 'material-ui/Paper';
 import RaisedButton from 'material-ui/RaisedButton'
 import FlatButton from 'material-ui/FlatButton'
@@ -16,10 +12,14 @@ export default class PdWelcome extends React.Component {
     super(props)
     this.state = {
       stepIndex: 0,
+      listDropText: "Drop your list file or click to select.",
+      sessionDropText: "Drop your session file or click to select."
     }
     this.handleNext = this.handleNext.bind(this)
     this.handlePrev = this.handlePrev.bind(this) 
-    this.getStepContent = this.getStepContent.bind(this)
+    this.handleListDrop = this.handleListDrop.bind(this)
+    this.handleSessionDrop = this.handleSessionDrop.bind(this)
+    this.getStepContent = this.getContent.bind(this)
   }
 
   handleNext() {
@@ -32,25 +32,33 @@ export default class PdWelcome extends React.Component {
     }
   }
 
-  handlePrev(){
+  handlePrev() {
     const {stepIndex} = this.state
     if (stepIndex > 0) {
       this.setState({stepIndex: stepIndex - 1})
     }
   }
 
-  getStepContent(stepIndex) {
+  handleListDrop(files) {
+    this.setState({listDropText: "Uploaded Sucessfully: "+files[0].name})
+  }
+
+  handleSessionDrop(files) {
+    this.setState({sessionDropText: "Uploaded Sucessfully: "+files[0].name})
+  }
+
+  getContent(stepIndex) {
     switch (stepIndex) {
       case 0:
         return (
           <Paper zDepth={0}>
             <h2>Welcome to PipelineDog!</h2>
-            <h4>You can continue as a new project or upload a session file. </h4>
+            <h4>You can continue as a new project or upload a session file.</h4>
             <DropZone 
               multiple={false} 
-              onDrop={this.props.dispatchSessionUpload}
+              onDrop={(files)=>{this.props.dispatchSessionUpload(files);this.handleSessionDrop(files)}}
             >
-              <div style={{padding: 16, textAlign: "center", }}>Drop your session file or click to select.</div>
+              <div style={{padding: 16, textAlign: "center", }}>{this.state.sessionDropText}</div>
             </DropZone>
           </Paper>
         )
@@ -58,12 +66,12 @@ export default class PdWelcome extends React.Component {
         return (
           <Paper zDepth={0}>
             <h2>Upload a List File</h2>
-            <h4>You can upload a list file or type it later on. </h4>
+            <h4>You can upload a list file or type it later on.</h4>
             <DropZone 
               multiple={false} 
-              onDrop={this.props.dispatchListUpload}
+              onDrop={(files)=>{this.props.dispatchListUpload(files);this.handleListDrop(files)}}
             >
-              <div style={{padding: 16, textAlign: "center", }}>Drop your list file or click to select.</div>
+              <div style={{padding: 16, textAlign: "center", }}>{this.state.listDropText}</div>
             </DropZone>
           </Paper>
         )
@@ -98,7 +106,7 @@ export default class PdWelcome extends React.Component {
         </Stepper>
         <div style={contentStyle}>
           <div>
-            <div>{this.getStepContent(stepIndex)}</div>
+            <div>{this.getContent(stepIndex)}</div>
             <div style={{marginTop: 36}}>
               <FlatButton
                 label="Back"

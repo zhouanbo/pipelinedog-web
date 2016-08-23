@@ -33,7 +33,7 @@ export default class PdStepList extends React.Component {
 
   render() {
 
-    const actions = [
+    const alertActions = [
       <FlatButton
         label="Cancel"
         primary={true}
@@ -42,7 +42,7 @@ export default class PdStepList extends React.Component {
       <FlatButton
         label="OK"
         primary={true}
-        onTouchTap={()=>{this.props.dispatchDeleteStep(this.state.index); this.handleAlertClose()}}
+        onTouchTap={()=>{this.props.dispatchDeleteStep(this.state.alertIndex); this.handleAlertClose()}}
       />
     ];
 
@@ -53,12 +53,12 @@ export default class PdStepList extends React.Component {
 
         <div>
           <Dialog
-            actions={actions}
+            actions={alertActions}
             modal={false}
             open={this.state.alertOpen}
             onRequestClose={this.handleAlertClose}
           >
-            Are you sure to delete step {this.state.alertStep.name === "" ? "Unnamed Step" : this.state.alertStep.name}?
+            Are you sure to delete step "{this.state.alertStep.name === "" ? "Unnamed Step" : this.state.alertStep.name}"?
           </Dialog>
         </div>
 
@@ -94,7 +94,7 @@ export default class PdStepList extends React.Component {
         <IconButton
           onTouchTap={this.props.dispatchCreateStep}
           iconClassName="material-icons" 
-          style={{marginTop: -48, float: "right"}}
+          style={{marginTop: -50, float: "right"}}
           tooltip="Add Step"
         >
           note_add
@@ -105,8 +105,8 @@ export default class PdStepList extends React.Component {
             <ListItem
               key={index}
               onTouchTap={this.props.dispatchStepChange.bind(this, index)}
-              onMouseOver={()=>{document.getElementsByClassName("delete-icon")[0].style.display="inline"}}
-              onMouseLeave={()=>{document.getElementsByClassName("delete-icon")[0].style.display="none"}}
+              onMouseOver={()=>{document.getElementsByClassName("delete-icon-"+index)[0].style.display="inline"}}
+              onMouseLeave={()=>{document.getElementsByClassName("delete-icon-"+index)[0].style.display="none"}}
               leftIcon={
                 <IconButton
                   iconClassName="material-icons" 
@@ -117,7 +117,7 @@ export default class PdStepList extends React.Component {
               }
               rightIcon={
                 <IconButton
-                  className="delete-icon"
+                  className={"delete-icon-"+index}
                   iconClassName="material-icons" 
                   style={{marginTop: 5, marginRight: 21, display: "none"}}
                   onTouchTap={this.handleAlertOpen.bind(this, step, index)}

@@ -12,6 +12,7 @@ class Store {
       onStepChange: Actions.stepChange,
       onCreateStep: Actions.createStep,
       onDeleteStep: Actions.deleteStep,
+      onSaveSession: Actions.saveSession
     })
 
     this.state = {
@@ -41,15 +42,25 @@ class Store {
       valid: true, //if the JSON is valid
       outputlist: [] //the array of predicted output files path
     })
-    this.setState({steps: steps})
+    this.setState({steps})
   }
 
   onDeleteStep(index) {
-
+    let steps = this.state.steps
+    let editing = this.state.editing
+    steps.splice(index, 1)
+    if (editing === index) {
+      editing = -2
+    }
+    this.setState({steps, editing})
   }
 
   onInit() {
     this.setState({init: 1})
+  }
+
+  onSaveSession() {
+    
   }
   onSessionUpload(files) {
     const reader = new FileReader()

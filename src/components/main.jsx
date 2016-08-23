@@ -11,7 +11,6 @@ import PdAppBar from './pdAppBar.jsx'
 import PdEditor from './pdEditor.jsx'
 import PdEditorToolBar from './pdEditorToolBar.jsx'
 import PdStepList from './pdStepList.jsx'
-import PdAlert from './pdAlert.jsx'
 
 class Main extends React.Component {
   
@@ -34,7 +33,7 @@ class Main extends React.Component {
     } else if (index === -1) {
       return "Global Variables"
     } else {
-      return this.props.steps[index].name === "" ? this.props.steps[index].name : "Unnamed Step"
+      return this.props.steps[index].name
     }
   }
 
@@ -43,6 +42,9 @@ class Main extends React.Component {
   }
   dispatchSessionUpload(file) {
     Actions.sessionUpload(file)
+  }
+  dispatchSaveSession() {
+    Actions.saveSession()
   }
   dispatchListUpload(file) {
     Actions.listUpload(file)
@@ -54,11 +56,7 @@ class Main extends React.Component {
     Actions.createStep()
   }
   dispatchDeleteStep(index) {
-    console.log("delete")
-    let r = confirm("A step will be deleted.")
-    if (r) {
-        Actions.deleteStep(index)
-    }
+    Actions.deleteStep(index)
   }
 
   render() {
@@ -66,7 +64,7 @@ class Main extends React.Component {
       <div id="container" style={{display: "flex", flexDirection: "column", alignItems: "stretch"}}>
 
         <div id="header" style={{flex: "0 0 auto", zIndex: 99}}>
-          <PdAppBar init={this.props.init} />
+          <PdAppBar init={this.props.init} dispatchSaveSession={this.dispatchSaveSession}/>
         </div>
 
         {this.props.init ? 

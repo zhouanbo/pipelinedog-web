@@ -10,7 +10,8 @@ class Actions {
       'init',
       'sessionUpload',
       'listUpload',
-      'stepChange'
+      'stepChange',
+      'saveSession'
       )
   }
 }
