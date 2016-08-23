@@ -6,6 +6,7 @@ import {Tabs, Tab} from 'material-ui/Tabs';
 import Paper from 'material-ui/Paper';
 import Subheader from 'material-ui/Subheader';
 
+import PdWelcome from './pdWelcome.jsx'
 import PdAppBar from './pdAppBar.jsx'
 import PdEditor from './pdEditor.jsx'
 import PdEditorToolBar from './pdEditorToolBar.jsx'
@@ -18,17 +19,11 @@ class Main extends React.Component {
   }
 
   updateText() {
-
     Actions.updateText("Bye W")
   }
 
-  componentDidMount() {
-    //Set editor height
-    const setEditorSize = () => {
-      document.getElementById('editor').style.height=Number(document.getElementById('container').offsetHeight-64-56-72-50)+"px"
-    }
-    setEditorSize();
-    window.addEventListener("resize", setEditorSize);
+  setInit() {
+    Actions.setInit();
   }
 
   render() {
@@ -36,8 +31,10 @@ class Main extends React.Component {
       <div id="container" style={{display: "flex", flexDirection: "column", alignItems: "stretch"}}>
 
         <div id="header" style={{flex: "0 0 auto", zIndex: 99}}>
-          <PdAppBar />      
+          <PdAppBar init={this.props.init} />
         </div>
+
+        {this.props.init ? 
 
         <div id="content" style={{flex: "1 1 auto", display: "flex", alignItems: "stretch"}}>
           
@@ -77,10 +74,19 @@ class Main extends React.Component {
             </Tabs>
           </Paper>         
         </div>
+
+        :
+
+        <Paper id="welcome" style={{flex: "1 1 auto", display: "flex", alignItems: "stretch"}}>
+          <PdWelcome 
+            setInit={this.setInit}
+          />
+        </Paper>
+        }
         
         <Paper id="footer" style={{height: 50, background: "#F5F5F5"}} zDepth={2}>
           <Subheader>
-            2016 Coded by Anbo Zhou
+            2016 PipelineDog
           </Subheader>
         </Paper>
       </div>

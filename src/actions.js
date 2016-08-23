@@ -6,7 +6,8 @@ class Actions {
       'uploadFile',
       'createStep',
       'deleteStep',
-      'editorChange'
+      'editorChange',
+      'setInit'
       )
   }
 }

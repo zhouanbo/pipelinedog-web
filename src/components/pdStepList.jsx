@@ -21,7 +21,7 @@ class PdStepList extends React.Component {
               input
             </IconButton>
           }
-          primaryText="Inputlist"
+          primaryText="List File"
           secondaryText="Name: aaa.txt"
         />
         <ListItem

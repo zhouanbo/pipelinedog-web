@@ -9,7 +9,7 @@ class PdAppBar extends React.Component {
   constructor(props) {
     super(props)
     this.state = {open: false}
-    this.handleToggle = this.handleToggle.bind(this);
+    this.handleToggle = this.handleToggle.bind(this)
   }
 
   handleToggle() {
@@ -23,17 +23,22 @@ class PdAppBar extends React.Component {
           title="PipelineDog"
           onLeftIconButtonTouchTap={this.handleToggle.bind(this)}
         />
-        <Drawer
-            docked={false}
-            open={this.state.open}
-            onRequestChange={(open) => this.setState({open})}
-          >
-            <Subheader>PipelineDog</Subheader>
-            <MenuItem onTouchTap={()=>{this.handleToggle()}}>Export Project</MenuItem>
-            <MenuItem onTouchTap={()=>{this.handleToggle()}}>Github Repository</MenuItem>
-            <MenuItem onTouchTap={()=>{this.handleToggle()}}>About PipelineDog</MenuItem>
-            
-        </Drawer>
+        {this.props.init ?
+          <Drawer
+              docked={false}
+              open={this.state.open}
+              onRequestChange={(open) => this.setState({open})}
+            >
+              <Subheader>PipelineDog</Subheader>
+              <MenuItem onTouchTap={()=>{this.handleToggle()}}>Export Project</MenuItem>
+              <MenuItem onTouchTap={()=>{this.handleToggle()}}>Upload List File</MenuItem>
+              <MenuItem onTouchTap={()=>{this.handleToggle()}}>Github Repository</MenuItem>
+              <MenuItem onTouchTap={()=>{this.handleToggle()}}>About PipelineDog</MenuItem>
+              
+          </Drawer> :
+          <div></div>
+        }
+        
       </div>
     )
   }

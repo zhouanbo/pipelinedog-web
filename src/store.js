@@ -4,14 +4,18 @@ import Actions from './actions'
 class Store {
   constructor() {
     this.bindListeners({
-      onEditorChange: Actions.editorChange
+      onEditorChange: Actions.editorChange,
+      onSetInit: Actions.setInit
     })
 
     this.state = {
       tools: [],
-      lastId: 0,
-      files: [],
-      editing: 0,
+      init: 0,
+      list: "",
+      gvar: "",
+      //lastId: 0,
+      //files: [],
+      //editing: 0,
       command: "",
     }
   }
@@ -32,6 +36,9 @@ class Store {
     }
   }
 
+  onSetInit() {
+    this.setState({init: 1})
+  }
   onEditorChange(newText) {
     this.setState({text: newText});
   }
