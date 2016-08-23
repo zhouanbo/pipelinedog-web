@@ -77,8 +77,19 @@ class Store {
     }
     reader.readAsText(files[0])
   }
-  onEditorChange() {
-
+  onEditorChange(newText) {
+    let editing = this.state.editing
+    if (editing === -2) {
+      this.setState({list: newText})
+    } else if (editing === -1) {
+      this.setState({gvar: newText})
+    } else {
+      let steps = this.state.steps
+      steps[editing].code = newText
+      //parsing code there
+      this.setState({steps})
+    }
+    
   }
   onStepChange(index) {
     this.setState({editing: index})

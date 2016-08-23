@@ -58,6 +58,9 @@ class Main extends React.Component {
   dispatchDeleteStep(index) {
     Actions.deleteStep(index)
   }
+  dispatchEditorChange(newText) {
+    Actions.editorChange(newText)
+  }
 
   render() {
     return (
@@ -93,8 +96,8 @@ class Main extends React.Component {
                 />
                 <div id="editor" style={{overflow: "scroll"}}>
                   <PdEditor
-                    text={this.getEditorText(this.props.editing)} 
-                    onChange={function(){}} 
+                    text={this.getEditorText(this.props.editing)}
+                    onChange={this.dispatchEditorChange} 
                   />
                 </div>
               </Tab>

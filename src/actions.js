@@ -11,7 +11,8 @@ class Actions {
       'sessionUpload',
       'listUpload',
       'stepChange',
-      'saveSession'
+      'saveSession',
+      'editorChange'
       )
   }
 }

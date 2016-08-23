@@ -68563,7 +68563,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var Actions = function Actions() {
   _classCallCheck(this, Actions);
 
-  this.generateActions('uploadFile', 'createStep', 'deleteStep', 'editorChange', 'init', 'sessionUpload', 'listUpload', 'stepChange', 'saveSession');
+  this.generateActions('uploadFile', 'createStep', 'deleteStep', 'editorChange', 'init', 'sessionUpload', 'listUpload', 'stepChange', 'saveSession', 'editorChange');
 };
 
 exports.default = _alt2.default.createActions(Actions);
@@ -68758,6 +68758,11 @@ var Main = function (_React$Component) {
       _actions2.default.deleteStep(index);
     }
   }, {
+    key: 'dispatchEditorChange',
+    value: function dispatchEditorChange(newText) {
+      _actions2.default.editorChange(newText);
+    }
+  }, {
     key: 'render',
     value: function render() {
       return _react2.default.createElement(
@@ -68806,7 +68811,7 @@ var Main = function (_React$Component) {
                   { id: 'editor', style: { overflow: "scroll" } },
                   _react2.default.createElement(_pdEditor2.default, {
                     text: this.getEditorText(this.props.editing),
-                    onChange: function onChange() {}
+                    onChange: this.dispatchEditorChange
                   })
                 )
               ),
@@ -69752,7 +69757,19 @@ var Store = function () {
     }
   }, {
     key: 'onEditorChange',
-    value: function onEditorChange() {}
+    value: function onEditorChange(newText) {
+      var editing = this.state.editing;
+      if (editing === -2) {
+        this.setState({ list: newText });
+      } else if (editing === -1) {
+        this.setState({ gvar: newText });
+      } else {
+        var steps = this.state.steps;
+        steps[editing].code = newText;
+        //parsing code there
+        this.setState({ steps: steps });
+      }
+    }
   }, {
     key: 'onStepChange',
     value: function onStepChange(index) {

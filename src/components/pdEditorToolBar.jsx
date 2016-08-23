@@ -8,6 +8,7 @@ import RaisedButton from 'material-ui/RaisedButton'
 import MenuItem from 'material-ui/MenuItem'
 
 export default class PdEditorToolBar extends React.Component {
+  
   render() {
     return (
       <Toolbar>
