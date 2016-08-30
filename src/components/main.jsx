@@ -20,7 +20,7 @@ class Main extends React.Component {
 
   getEditorText(index) {
     if (index === -2) {
-      return this.props.list
+      return this.props.flist
     } else if (index === -1) {
       return this.props.gvar
     } else {

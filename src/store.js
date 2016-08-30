@@ -1,6 +1,8 @@
 import alt from './alt'
-import Actions from './actions'
 import yaml from 'js-yaml'
+
+import Actions from './actions'
+import Parser from './parser'
 
 class Store {
   constructor() {
@@ -18,8 +20,9 @@ class Store {
     this.state = {
       steps: [],
       init: 0,
-      list: "yes",
-      gvar: "${INPUT_DIRECTORY}: \"\"\n${OUTPUT_DIRECTORY}: \"\"\n",
+      flist: "yes",
+      flistArr: [],
+      gvar: "IN_DIR: \nOUT_DIR: \n",
       //lastId: 0,
       //files: [],
       editing: -2,
@@ -33,14 +36,14 @@ class Store {
     steps.push({
       name: "",
       code: "", //code
-      codeobj: {}, //JSON object parsed from the code
+      codeObj: {}, //JSON object parsed from the code
       parsedOptions: {}, //LEASH converted options of the tool
       //looping: false, //if the command is to run as a loop, or the values to loop
       expressions: [], //direct LEASH parsing result
       options: [], //keys for options
       parsedCommand: "", //the command to finally run
       valid: true, //if the JSON is valid
-      outputlist: [] //the array of predicted output files path
+      out: [] //the output array
     })
     this.setState({steps})
   }
@@ -80,18 +83,23 @@ class Store {
   onEditorChange(newText) {
     let editing = this.state.editing
     if (editing === -2) {
-      this.setState({list: newText})
+      this.setState({flist: newText})
     } else if (editing === -1) {
       this.setState({gvar: newText})
     } else {
       let steps = this.state.steps
       steps[editing].code = newText
-      //parsing code there
+      
+      //call parser
+      let parser = new Parser()
+      parser.parseStep(newText, this.state.gvar, this.state.flist, this.state.steps)
+
       this.setState({steps})
     }
     
   }
   onStepChange(index) {
+    //add onEditorChange later to refresh output
     this.setState({editing: index})
   }
 
