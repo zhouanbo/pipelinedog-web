@@ -69802,7 +69802,41 @@ var Parser = function () {
     _classCallCheck(this, Parser);
   }
 
+  //Entry func
+
+
   _createClass(Parser, [{
+    key: 'parseStep',
+    value: function parseStep(text, gvar, flist, steps) {
+      //concat global vars with the step code
+      var parseText = gvar + "\n" + text;
+      //read raw step obj
+      var rawObj = {};
+      try {
+        rawObj = _jsYaml2.default.safeLoad(parseText, null, 'FAILSAFE_SCHEMA');
+      } catch (e) {
+        console.log(e);
+        return;
+      }
+      //replace vars
+      var rvObj = this.replaceVars(rawObj);
+      //get only the keys inside step
+      var stepObj = rvObj[Object.keys(rvObj)[0]];
+      if (!stepObj) return;
+      //set step ID
+      stepObj['id'] = Object.keys(rvObj)[0];
+      //process input lines
+      var lines = this.processInArr(stepObj, flist, steps);
+      //count loops for this step
+      var loopNum = this.countLoop(stepObj, lines);
+      //parse the LEASH expressions
+      //parseLEASH(stepObj, lines, loopNum)
+      console.log(stepObj);
+    }
+  }, {
+    key: 'combineSteps',
+    value: function combineSteps(stepsObj) {}
+  }, {
     key: 'replaceVars',
     value: function replaceVars(rawObj) {
       var varObj = {};
@@ -69841,6 +69875,14 @@ var Parser = function () {
           if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
         }
       };
+
+      var flatObj = (0, _flat.flatten)(rObj, { safe: true });
+
+      //change numbers to strings
+      Object.keys(flatObj).map(function (key) {
+        if (typeof flatObj[key] === 'number') flatObj[key] = flatObj[key].toString();
+      });
+
       //get vars
       Object.keys(rObj).map(function (key) {
         if (rObj[key] && typeof rObj[key] !== 'string' && isStep(rObj[key])) {
@@ -69855,7 +69897,6 @@ var Parser = function () {
         }
       });
 
-      var flatObj = (0, _flat.flatten)(rObj, { safe: true });
       var flatVarObj = (0, _flat.flatten)(varObj, { safe: true });
 
       //replace keys
@@ -69950,7 +69991,7 @@ var Parser = function () {
           if (stepObj[key]['file']) {
             var _ref2;
 
-            flatLines = (_ref2 = []).concat.apply(_ref2, _toConsumableArray(stepObj[key]['file']));
+            flatLines = (_ref2 = []).concat.apply(_ref2, _toConsumableArray(lines.slice.apply(lines, _toConsumableArray(_this.parseRange(stepObj[key]['file'], stepObj['in']) - 1))));
           } else {
             var _ref3;
 
@@ -69965,47 +70006,28 @@ var Parser = function () {
             }
           }
         }
+        console.log(flatLines);
       });
       return loopNum;
-    }
-
-    //Entry func
-
-  }, {
-    key: 'parseStep',
-    value: function parseStep(text, gvar, flist, steps) {
-      //concat global vars with the step code
-      var parseText = gvar + "\n" + text;
-      //read raw step obj
-      var rawObj = {};
-      try {
-        rawObj = _jsYaml2.default.safeLoad(parseText);
-      } catch (e) {
-        console.log(e);
-        return;
-      }
-      //replace vars
-      var rvObj = this.replaceVars(rawObj);
-      //get only the keys inside step
-      var stepObj = rvObj[Object.keys(rvObj)[0]];
-      if (!stepObj) return;
-      var stepID = Object.keys(rvObj)[0];
-      var lines = this.processInArr(stepObj, flist, steps);
-      var loopNum = this.countLoop(stepObj, lines);
-      //parseLEASH(stepObj, loopNum)
-      console.log(lines);
-      console.log(stepObj);
     }
   }, {
     key: 'parseLEASH',
     value: function parseLEASH(stepObj, lines, loopNum) {
-      if (stepObj.file) {}
-      if (stepObj.line) {}
-      if (stepObj.mods) {}
+      var LEASH = function LEASH(LEASHObj) {
+        var flatLines = [];
+        if (LEASHObj.file) {
+          var _ref4;
+
+          flatLines = (_ref4 = []).concat.apply(_ref4, _toConsumableArray(LEASHObj['file']));
+        } else {
+          var _ref5;
+
+          flatLines = (_ref5 = []).concat.apply(_ref5, _toConsumableArray(lines));
+        }
+        if (stepObj.line) {}
+        if (stepObj.mods) {}
+      };
     }
-  }, {
-    key: 'combineSteps',
-    value: function combineSteps(stepsObj) {}
   }, {
     key: 'parseRange',
     value: function parseRange(s, arr) {

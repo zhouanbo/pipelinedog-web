@@ -8,6 +8,39 @@ export default class Parser {
 
   }
 
+  //Entry func
+  parseStep(text, gvar, flist, steps) {
+    //concat global vars with the step code
+    let parseText = gvar + "\n" + text
+    //read raw step obj
+    let rawObj = {}
+    try {
+      rawObj = yaml.safeLoad(parseText, null, 'FAILSAFE_SCHEMA')
+    } catch (e) {
+      console.log(e)
+      return
+    }
+    //replace vars
+    let rvObj = this.replaceVars(rawObj)
+    //get only the keys inside step
+    let stepObj = rvObj[Object.keys(rvObj)[0]]
+    if (!stepObj) return
+    //set step ID
+    stepObj['id'] = Object.keys(rvObj)[0]
+    //process input lines
+    let lines = this.processInArr(stepObj, flist, steps)
+    //count loops for this step
+    let loopNum = this.countLoop(stepObj, lines)
+    //parse the LEASH expressions
+    //parseLEASH(stepObj, lines, loopNum)
+    console.log(stepObj)
+
+  }
+
+  combineSteps(stepsObj) {
+
+  }
+
   replaceVars(rawObj) {
     let varObj = {}
     let rObj = rawObj
@@ -39,6 +72,14 @@ export default class Parser {
         return value
       }
     }
+
+    let flatObj = flatten(rObj, {safe: true})
+     
+    //change numbers to strings
+    Object.keys(flatObj).map((key) => {
+      if (typeof(flatObj[key]) === 'number') flatObj[key] = flatObj[key].toString()
+    })
+
     //get vars
     Object.keys(rObj).map((key) => {
       if (rObj[key] && typeof(rObj[key]) !== 'string' && isStep(rObj[key])) {
@@ -51,9 +92,8 @@ export default class Parser {
       }
     })
 
-    let flatObj = flatten(rObj, {safe: true})
     let flatVarObj = flatten(varObj, {safe: true})
-
+    
     //replace keys
     Object.keys(flatObj).map((key) => {
       let processedKey = processValue(key)
@@ -135,7 +175,7 @@ export default class Parser {
     Object.keys(stepObj).map((key) => {
       if (key.indexOf('~') === 0) {
         if (stepObj[key]['file']) {
-          flatLines = [].concat(...stepObj[key]['file'])
+          flatLines = [].concat(...lines.slice(...(this.parseRange(stepObj[key]['file'], stepObj['in'])-1)))
         } else {
           flatLines = [].concat(...lines)
         }
@@ -148,50 +188,26 @@ export default class Parser {
           }
         }
       }
+      console.log(flatLines)
     })
     return loopNum
   }
 
-  //Entry func
-  parseStep(text, gvar, flist, steps) {
-    //concat global vars with the step code
-    let parseText = gvar + "\n" + text
-    //read raw step obj
-    let rawObj = {}
-    try {
-      rawObj = yaml.safeLoad(parseText)
-    } catch (e) {
-      console.log(e)
-      return
-    }
-    //replace vars
-    let rvObj = this.replaceVars(rawObj)
-    //get only the keys inside step
-    let stepObj = rvObj[Object.keys(rvObj)[0]]
-    if (!stepObj) return
-    let stepID = Object.keys(rvObj)[0]
-    let lines = this.processInArr(stepObj, flist, steps)
-    let loopNum = this.countLoop(stepObj, lines)
-    //parseLEASH(stepObj, loopNum)
-    console.log(lines)
-    console.log(stepObj)
-
-  }
-
   parseLEASH(stepObj, lines, loopNum) {
-    if (stepObj.file) {
+    const LEASH = (LEASHObj) => {
+      let flatLines = []
+      if (LEASHObj.file) {
+        flatLines = [].concat(...LEASHObj['file'])
+      } else {
+        flatLines = [].concat(...lines)
+      }
+      if (stepObj.line) {
 
+      }
+      if (stepObj.mods) {
+
+      }
     }
-    if (stepObj.line) {
-
-    }
-    if (stepObj.mods) {
-
-    }
-  }
-
-  combineSteps(stepsObj) {
-
   }
 
   parseRange(s, arr) {
