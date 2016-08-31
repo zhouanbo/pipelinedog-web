@@ -69821,11 +69821,15 @@ var Parser = function () {
       var processValue = function processValue(value) {
         if (typeof value === 'string') {
           var _ret = function () {
-            var flatVarObj = (0, _flat.flatten)(varObj);
+            var flatVarObj = (0, _flat.flatten)(varObj, { safe: true });
             Object.keys(flatVarObj).map(function (processKey) {
               var pos = value.indexOf('$' + processKey);
               while (pos !== -1) {
-                value = value.replace('$' + processKey, flatVarObj[processKey]);
+                if (typeof flatVarObj[processKey] === 'string') {
+                  value = value.replace('$' + processKey, flatVarObj[processKey]);
+                } else {
+                  value = flatVarObj[processKey];
+                }
                 pos = value.indexOf('$' + processKey, pos + 1);
               }
             });
@@ -69841,7 +69845,7 @@ var Parser = function () {
       Object.keys(rObj).map(function (key) {
         if (rObj[key] && typeof rObj[key] !== 'string' && isStep(rObj[key])) {
           (function () {
-            var flatStepObj = (0, _flat.flatten)(rObj[key]);
+            var flatStepObj = (0, _flat.flatten)(rObj[key], { safe: true });
             Object.keys(flatStepObj).map(function (stepKey) {
               varObj[stepKey] = flatStepObj[stepKey];
             });
@@ -69851,8 +69855,8 @@ var Parser = function () {
         }
       });
 
-      var flatObj = (0, _flat.flatten)(rObj);
-      var flatVarObj = (0, _flat.flatten)(varObj);
+      var flatObj = (0, _flat.flatten)(rObj, { safe: true });
+      var flatVarObj = (0, _flat.flatten)(varObj, { safe: true });
 
       //replace keys
       Object.keys(flatObj).map(function (key) {
@@ -69891,14 +69895,67 @@ var Parser = function () {
       return rObj;
     }
   }, {
+    key: 'processInArr',
+    value: function processInArr(stepObj, flist, steps) {
+      //process in array
+      var inArr = [];
+      if (stepObj['in']) {
+        if (typeof stepObj['in'] === 'string') {
+          inArr.push(stepObj['in']);
+        } else {
+          stepObj['in'].map(function (input) {
+            inArr.push(input);
+          });
+        }
+      } else {
+        return;
+      }
+      //concat in content
+      var lines = [];
+      inArr.map(function (inFile) {
+        if (inFile === "$LIST_FILE") {
+          (function () {
+            var subLine = [];
+            flist.split('\n').map(function (line) {
+              subLine.push(line);
+            });
+            lines.push(subLine);
+          })();
+        } else {
+          steps.map(function (step) {
+            if (inFile === "$" + step.id + ".out") {
+              (function () {
+                var subLine = [];
+                step.out.split('\n').map(function (line) {
+                  subLine.push(line);
+                });
+                lines.push(subLine);
+              })();
+            }
+          });
+        }
+      });
+      return lines;
+    }
+  }, {
     key: 'countLoop',
     value: function countLoop(stepObj, lines) {
-      var _this = this;
+      var _ref,
+          _this = this;
 
-      var flatLines = [].concat.apply([], lines);
+      var flatLines = (_ref = []).concat.apply(_ref, _toConsumableArray(lines));
       var loopNum = flatLines.length;
       Object.keys(stepObj).map(function (key) {
         if (key.indexOf('~') === 0) {
+          if (stepObj[key]['file']) {
+            var _ref2;
+
+            flatLines = (_ref2 = []).concat.apply(_ref2, _toConsumableArray(stepObj[key]['file']));
+          } else {
+            var _ref3;
+
+            flatLines = (_ref3 = []).concat.apply(_ref3, _toConsumableArray(lines));
+          }
           if (stepObj[key]['line']) {
             var lineStr = stepObj[key]['line'];
             if (lineStr.indexOf(':') > -1) {
@@ -69932,44 +69989,19 @@ var Parser = function () {
       //get only the keys inside step
       var stepObj = rvObj[Object.keys(rvObj)[0]];
       if (!stepObj) return;
-      var stepNum = Object.keys(rvObj)[0];
-
-      //process in array
-      var inArr = [];
-      if (stepObj['in']) {
-        if (typeof stepObj['in'] === 'string') {
-          inArr.push(stepObj['in']);
-        } else {
-          stepObj['in'].map(function (input) {
-            inArr.push(input);
-          });
-        }
-      } else {
-        return;
-      }
-      //concat in content
-      var lines = [];
-      inArr.map(function (inFile) {
-        if (inFile === "$LIST_FILE") {
-          (function () {
-            var subLine = [];
-            flist.split('\n').map(function (line) {
-              subLine.push(line);
-            });
-            lines.push(subLine);
-          })();
-        }
-      });
+      var stepID = Object.keys(rvObj)[0];
+      var lines = this.processInArr(stepObj, flist, steps);
       var loopNum = this.countLoop(stepObj, lines);
-      console.log(loopNum);
-      //parseLEASH(rvObj, loopNum)
+      //parseLEASH(stepObj, loopNum)
+      console.log(lines);
+      console.log(stepObj);
     }
   }, {
     key: 'parseLEASH',
-    value: function parseLEASH(obj, loopNum) {
-      if (obj.file) {}
-      if (obj.line) {}
-      if (obj.mods) {}
+    value: function parseLEASH(stepObj, lines, loopNum) {
+      if (stepObj.file) {}
+      if (stepObj.line) {}
+      if (stepObj.mods) {}
     }
   }, {
     key: 'combineSteps',
@@ -69980,7 +70012,7 @@ var Parser = function () {
       var length = arr.length;
       var r = [];
       if (s.indexOf('/') > -1) {
-        var _ret4 = function () {
+        var _ret5 = function () {
           //parse regex range
           var regex = new RegExp(s.slice(1, -1));
           arr.map(function (string, i) {
@@ -69993,7 +70025,7 @@ var Parser = function () {
           };
         }();
 
-        if ((typeof _ret4 === 'undefined' ? 'undefined' : _typeof(_ret4)) === "object") return _ret4.v;
+        if ((typeof _ret5 === 'undefined' ? 'undefined' : _typeof(_ret5)) === "object") return _ret5.v;
       } else {
         //parse numeric range
         var a = s.split(',');
@@ -70071,7 +70103,7 @@ var Store = function () {
     });
 
     this.state = {
-      steps: [],
+      steps: [{ id: '1-2', out: "aaa\nbbb\nccc" }],
       init: 0,
       flist: "/home/usr/b1.bam\n/home/usr/b2.bam\n/home/usr/b3.bam",
       flistArr: [],
@@ -70089,6 +70121,7 @@ var Store = function () {
     value: function onCreateStep() {
       var steps = this.state.steps;
       steps.push({
+        id: "",
         name: "",
         code: "", //code
         codeObj: {}, //JSON object parsed from the code
@@ -70098,7 +70131,7 @@ var Store = function () {
         options: [], //keys for options
         parsedCommand: "", //the command to finally run
         valid: true, //if the JSON is valid
-        out: [] //the output array
+        out: "" //the output array
       });
       this.setState({ steps: steps });
     }

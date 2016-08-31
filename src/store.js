@@ -18,7 +18,7 @@ class Store {
     })
 
     this.state = {
-      steps: [],
+      steps: [{id:'1-2', out:"aaa\nbbb\nccc"}],
       init: 0,
       flist: "/home/usr/b1.bam\n/home/usr/b2.bam\n/home/usr/b3.bam",
       flistArr: [],
@@ -34,6 +34,7 @@ class Store {
   onCreateStep() {
     let steps = this.state.steps
     steps.push({
+      id: "",
       name: "",
       code: "", //code
       codeObj: {}, //JSON object parsed from the code
@@ -43,7 +44,7 @@ class Store {
       options: [], //keys for options
       parsedCommand: "", //the command to finally run
       valid: true, //if the JSON is valid
-      out: [] //the output array
+      out: "" //the output array
     })
     this.setState({steps})
   }

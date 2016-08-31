@@ -24,11 +24,15 @@ export default class Parser {
     //switch vars in a string
     const processValue = (value) => {
       if (typeof(value) === 'string') {
-        let flatVarObj = flatten(varObj)
+        let flatVarObj = flatten(varObj, {safe: true})
         Object.keys(flatVarObj).map((processKey) => { 
           let pos = value.indexOf('$'+processKey)
           while (pos !== -1) {
-            value = value.replace('$'+processKey, flatVarObj[processKey])
+            if (typeof(flatVarObj[processKey]) === 'string') {
+              value = value.replace('$'+processKey, flatVarObj[processKey])
+            } else {
+              value = flatVarObj[processKey]
+            }
             pos = value.indexOf('$'+processKey, pos + 1)
           }      
         })
@@ -38,17 +42,17 @@ export default class Parser {
     //get vars
     Object.keys(rObj).map((key) => {
       if (rObj[key] && typeof(rObj[key]) !== 'string' && isStep(rObj[key])) {
-        let flatStepObj = flatten(rObj[key])
+        let flatStepObj = flatten(rObj[key], {safe: true})
         Object.keys(flatStepObj).map((stepKey) => {
-          varObj[stepKey] = flatStepObj[stepKey]
+            varObj[stepKey] = flatStepObj[stepKey]
         })
       } else {
         varObj[key] = rObj[key]
       }
     })
 
-    let flatObj = flatten(rObj)
-    let flatVarObj = flatten(varObj)
+    let flatObj = flatten(rObj, {safe: true})
+    let flatVarObj = flatten(varObj, {safe: true})
 
     //replace keys
     Object.keys(flatObj).map((key) => {
@@ -87,11 +91,54 @@ export default class Parser {
     return rObj
   }
 
+  processInArr(stepObj, flist, steps) {
+    //process in array
+    let inArr = []
+    if (stepObj['in']) {
+      if (typeof(stepObj['in']) === 'string') {
+        inArr.push(stepObj['in'])
+      } else {
+        stepObj['in'].map((input) => {
+          inArr.push(input)
+        })
+      }
+    } else {
+      return
+    }
+    //concat in content
+    let lines = []
+    inArr.map((inFile) => {
+      if (inFile === "$LIST_FILE") {
+        let subLine = []
+        flist.split('\n').map((line) => {
+          subLine.push(line)
+        })
+        lines.push(subLine)
+      } else {
+        steps.map((step) => { 
+          if (inFile === "$"+step.id+".out") {
+            let subLine = []
+            step.out.split('\n').map((line) => {
+              subLine.push(line)
+            })
+            lines.push(subLine)
+          }
+        })
+      }
+    })
+    return lines
+  }
+
   countLoop(stepObj, lines) {
-    let flatLines = [].concat.apply([], lines)
+    let flatLines = [].concat(...lines)
     let loopNum = flatLines.length
     Object.keys(stepObj).map((key) => {
       if (key.indexOf('~') === 0) {
+        if (stepObj[key]['file']) {
+          flatLines = [].concat(...stepObj[key]['file'])
+        } else {
+          flatLines = [].concat(...lines)
+        }
         if (stepObj[key]['line']) {
           let lineStr = stepObj[key]['line']
           if (lineStr.indexOf(':') > -1) {
@@ -122,46 +169,23 @@ export default class Parser {
     //get only the keys inside step
     let stepObj = rvObj[Object.keys(rvObj)[0]]
     if (!stepObj) return
-    let stepNum = Object.keys(rvObj)[0]
-
-    //process in array
-    let inArr = []
-    if (stepObj['in']) {
-      if (typeof(stepObj['in']) === 'string') {
-        inArr.push(stepObj['in'])
-      } else {
-        stepObj['in'].map((input) => {
-          inArr.push(input)
-        })
-      }
-    } else {
-      return
-    }
-    //concat in content
-    let lines = []
-    inArr.map((inFile) => {
-      if (inFile === "$LIST_FILE") {
-        let subLine = []
-        flist.split('\n').map((line) => {
-          subLine.push(line)
-        })
-        lines.push(subLine)
-      }
-    })
+    let stepID = Object.keys(rvObj)[0]
+    let lines = this.processInArr(stepObj, flist, steps)
     let loopNum = this.countLoop(stepObj, lines)
-    console.log(loopNum)
-    //parseLEASH(rvObj, loopNum)
+    //parseLEASH(stepObj, loopNum)
+    console.log(lines)
+    console.log(stepObj)
 
   }
 
-  parseLEASH(obj, loopNum) {
-    if (obj.file) {
+  parseLEASH(stepObj, lines, loopNum) {
+    if (stepObj.file) {
 
     }
-    if (obj.line) {
+    if (stepObj.line) {
 
     }
-    if (obj.mods) {
+    if (stepObj.mods) {
 
     }
   }
