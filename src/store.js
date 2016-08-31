@@ -20,7 +20,7 @@ class Store {
     this.state = {
       steps: [],
       init: 0,
-      flist: "yes",
+      flist: "/home/usr/b1.bam\n/home/usr/b2.bam\n/home/usr/b3.bam",
       flistArr: [],
       gvar: "IN_DIR: \nOUT_DIR: \n",
       //lastId: 0,

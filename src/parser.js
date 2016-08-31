@@ -88,21 +88,16 @@ export default class Parser {
   }
 
   countLoop(stepObj, lines) {
-    let flatLines = lines.reduce((a, b) => {
-      a.concat(b);
-    }, [])
+    let flatLines = [].concat.apply([], lines)
     let loopNum = flatLines.length
     Object.keys(stepObj).map((key) => {
-      if (obj[key][stepKey].indexOf('~') === 0) {
-        if (obj[key][stepKey][line]) {
-          let lineStr = obj[key][stepKey][line]
+      if (key.indexOf('~') === 0) {
+        if (stepObj[key]['line']) {
+          let lineStr = stepObj[key]['line']
           if (lineStr.indexOf(':') > -1) {
             let lineArr = lineStr.split(':')
-            if (typeof(lineArr[1]) === 'number') {
-              let range = lineArr[0]
-            } else {
-              console.log("Loop not specified as a number.")
-            }
+            let newNum = Math.floor(this.parseRange(lineArr[0], flatLines).length / lineArr[1])
+            loopNum = newNum < loopNum ? newNum : loopNum
           }
         }
       }
@@ -126,7 +121,9 @@ export default class Parser {
     let rvObj = this.replaceVars(rawObj)
     //get only the keys inside step
     let stepObj = rvObj[Object.keys(rvObj)[0]]
+    if (!stepObj) return
     let stepNum = Object.keys(rvObj)[0]
+
     //process in array
     let inArr = []
     if (stepObj['in']) {
@@ -152,7 +149,7 @@ export default class Parser {
       }
     })
     let loopNum = this.countLoop(stepObj, lines)
-    console.log(lines)
+    console.log(loopNum)
     //parseLEASH(rvObj, loopNum)
 
   }

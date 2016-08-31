@@ -69893,21 +69893,18 @@ var Parser = function () {
   }, {
     key: 'countLoop',
     value: function countLoop(stepObj, lines) {
-      var flatLines = lines.reduce(function (a, b) {
-        a.concat(b);
-      }, []);
+      var _this = this;
+
+      var flatLines = [].concat.apply([], lines);
       var loopNum = flatLines.length;
       Object.keys(stepObj).map(function (key) {
-        if (obj[key][stepKey].indexOf('~') === 0) {
-          if (obj[key][stepKey][line]) {
-            var lineStr = obj[key][stepKey][line];
+        if (key.indexOf('~') === 0) {
+          if (stepObj[key]['line']) {
+            var lineStr = stepObj[key]['line'];
             if (lineStr.indexOf(':') > -1) {
               var lineArr = lineStr.split(':');
-              if (typeof lineArr[1] === 'number') {
-                var range = lineArr[0];
-              } else {
-                console.log("Loop not specified as a number.");
-              }
+              var newNum = Math.floor(_this.parseRange(lineArr[0], flatLines).length / lineArr[1]);
+              loopNum = newNum < loopNum ? newNum : loopNum;
             }
           }
         }
@@ -69934,7 +69931,9 @@ var Parser = function () {
       var rvObj = this.replaceVars(rawObj);
       //get only the keys inside step
       var stepObj = rvObj[Object.keys(rvObj)[0]];
+      if (!stepObj) return;
       var stepNum = Object.keys(rvObj)[0];
+
       //process in array
       var inArr = [];
       if (stepObj['in']) {
@@ -69962,7 +69961,7 @@ var Parser = function () {
         }
       });
       var loopNum = this.countLoop(stepObj, lines);
-      console.log(lines);
+      console.log(loopNum);
       //parseLEASH(rvObj, loopNum)
     }
   }, {
@@ -70074,7 +70073,7 @@ var Store = function () {
     this.state = {
       steps: [],
       init: 0,
-      flist: "yes",
+      flist: "/home/usr/b1.bam\n/home/usr/b2.bam\n/home/usr/b3.bam",
       flistArr: [],
       gvar: "IN_DIR: \nOUT_DIR: \n",
       //lastId: 0,
