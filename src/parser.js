@@ -174,10 +174,11 @@ export default class Parser {
     let loopNum = flatLines.length
     Object.keys(stepObj).map((key) => {
       if (key.indexOf('~') === 0) {
-        if (stepObj[key]['file']) {
-          flatLines = [].concat(...lines.slice(...(this.parseRange(stepObj[key]['file'], stepObj['in'])-1)))
-        } else {
-          flatLines = [].concat(...lines)
+        if (stepObj[key]['file'] && stepObj['in']) {
+          let fileArr = this.parseRange(stepObj[key]['file'], stepObj['in']).map((v) => v-1)
+          let concatArr = lines.filter((v, i) => {return fileArr.includes(i)})
+          flatLines = [].concat(...concatArr)
+          console.log(concatArr)
         }
         if (stepObj[key]['line']) {
           let lineStr = stepObj[key]['line']
@@ -188,7 +189,6 @@ export default class Parser {
           }
         }
       }
-      console.log(flatLines)
     })
     return loopNum
   }

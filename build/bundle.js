@@ -69988,14 +69988,19 @@ var Parser = function () {
       var loopNum = flatLines.length;
       Object.keys(stepObj).map(function (key) {
         if (key.indexOf('~') === 0) {
-          if (stepObj[key]['file']) {
-            var _ref2;
+          if (stepObj[key]['file'] && stepObj['in']) {
+            (function () {
+              var _ref2;
 
-            flatLines = (_ref2 = []).concat.apply(_ref2, _toConsumableArray(lines.slice.apply(lines, _toConsumableArray(_this.parseRange(stepObj[key]['file'], stepObj['in']) - 1))));
-          } else {
-            var _ref3;
-
-            flatLines = (_ref3 = []).concat.apply(_ref3, _toConsumableArray(lines));
+              var fileArr = _this.parseRange(stepObj[key]['file'], stepObj['in']).map(function (v) {
+                return v - 1;
+              });
+              var concatArr = lines.filter(function (v, i) {
+                return fileArr.includes(i);
+              });
+              flatLines = (_ref2 = []).concat.apply(_ref2, _toConsumableArray(concatArr));
+              console.log(concatArr);
+            })();
           }
           if (stepObj[key]['line']) {
             var lineStr = stepObj[key]['line'];
@@ -70006,7 +70011,6 @@ var Parser = function () {
             }
           }
         }
-        console.log(flatLines);
       });
       return loopNum;
     }
@@ -70016,13 +70020,13 @@ var Parser = function () {
       var LEASH = function LEASH(LEASHObj) {
         var flatLines = [];
         if (LEASHObj.file) {
+          var _ref3;
+
+          flatLines = (_ref3 = []).concat.apply(_ref3, _toConsumableArray(LEASHObj['file']));
+        } else {
           var _ref4;
 
-          flatLines = (_ref4 = []).concat.apply(_ref4, _toConsumableArray(LEASHObj['file']));
-        } else {
-          var _ref5;
-
-          flatLines = (_ref5 = []).concat.apply(_ref5, _toConsumableArray(lines));
+          flatLines = (_ref4 = []).concat.apply(_ref4, _toConsumableArray(lines));
         }
         if (stepObj.line) {}
         if (stepObj.mods) {}
@@ -70034,7 +70038,7 @@ var Parser = function () {
       var length = arr.length;
       var r = [];
       if (s.indexOf('/') > -1) {
-        var _ret5 = function () {
+        var _ret6 = function () {
           //parse regex range
           var regex = new RegExp(s.slice(1, -1));
           arr.map(function (string, i) {
@@ -70047,7 +70051,7 @@ var Parser = function () {
           };
         }();
 
-        if ((typeof _ret5 === 'undefined' ? 'undefined' : _typeof(_ret5)) === "object") return _ret5.v;
+        if ((typeof _ret6 === 'undefined' ? 'undefined' : _typeof(_ret6)) === "object") return _ret6.v;
       } else {
         //parse numeric range
         var a = s.split(',');
