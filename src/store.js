@@ -18,15 +18,13 @@ class Store {
     })
 
     this.state = {
-      steps: [{id:'1-2', out:"aaa\nbbb\nccc"}],
+      steps: [{id:'1-2', out:"aaa.bam\nbbb.bam\nccc.bam"}],
       init: 0,
       flist: "/home/usr/b1.bam\n/home/usr/b2.bam\n/home/usr/b3.bam",
       flistArr: [],
-      gvar: "IN_DIR: \nOUT_DIR: \n",
-      //lastId: 0,
-      //files: [],
+      gvar: "#Suggested global variables\n\nIN_DIR: \nOUT_DIR: \n",
       editing: -2,
-      command: "",
+      result: "",
       alertOpen: false,
     }
   }
@@ -38,12 +36,11 @@ class Store {
       name: "",
       code: "", //code
       codeObj: {}, //JSON object parsed from the code
-      parsedOptions: {}, //LEASH converted options of the tool
-      //looping: false, //if the command is to run as a loop, or the values to loop
-      expressions: [], //direct LEASH parsing result
-      options: [], //keys for options
-      parsedCommand: "", //the command to finally run
-      valid: true, //if the JSON is valid
+      //parsedOptions: {}, //LEASH converted options of the tool
+      //expressions: [], //direct LEASH parsing result
+      //options: [], //keys for options
+      command: "", //the command to finally run
+      //valid: true, //if the JSON is valid
       out: "" //the output array
     })
     this.setState({steps})
@@ -93,7 +90,7 @@ class Store {
       
       //call parser
       let parser = new Parser()
-      parser.parseStep(newText, this.state.gvar, this.state.flist, this.state.steps)
+      steps[editing].command = parser.parseStep(newText, this.state.gvar, this.state.flist, this.state.steps)
 
       this.setState({steps})
     }

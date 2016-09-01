@@ -1,3 +1,4 @@
+import path from 'path'
 import yaml from 'js-yaml'
 import { flatten, unflatten } from 'flat'
 
@@ -30,12 +31,16 @@ export default class Parser {
     stepObj['id'] = Object.keys(rvObj)[0]
     //process input lines
     let lines = this.processInArr(stepObj, flist, steps)
+    console.log("inLines:\n"+lines)
     //count loops for this step
     let loopNum = this.countLoop(stepObj, lines)
+    console.log("loopNum:\n"+loopNum)
     //parse the LEASH expressions
-    this.parseLEASH(stepObj, lines, loopNum)
-    console.log(stepObj)
+    let command = this.parseLEASH(stepObj, lines, loopNum)
+    console.log("command:\n"+command)
 
+    console.log(stepObj)
+    return command
   }
 
   combineSteps(stepsObj) {
@@ -187,11 +192,12 @@ export default class Parser {
           if (lineStr.indexOf(':') > -1) {
             lineArr = lineStr.split(':')
           } else {
-            lineArr[0] = lineStr.toString()
+            lineArr[0] = lineStr
             lineArr[1] = 1
           }
           let selectedLineNum = this.parseRange(lineArr[0], flatLines).length
-          let newNum = Math.floor(selectedLineNum < flatLines.length ? selectedLineNum : flatLines.length / lineArr[1])
+          let actualLineNum = selectedLineNum < flatLines.length ? selectedLineNum : flatLines.length
+          let newNum = Math.floor(actualLineNum / lineArr[1])
           loopNum = newNum < loopNum ? newNum : loopNum
         }
       }
@@ -200,8 +206,10 @@ export default class Parser {
   }
 
   parseLEASH(stepObj, lines, loopNum) {
-    const LEASH = (LEASHObj) => {
+    const LEASH = (LEASHObj, loop) => {
       let flatLines = []
+      let eachLoop = 1
+
       if (LEASHObj.file) {
         let fileArr = this.parseRange(LEASHObj['file'], stepObj['in']).map((v) => v-1)
         let concatArr = lines.filter((v, i) => {return fileArr.includes(i)})
@@ -209,29 +217,74 @@ export default class Parser {
       } else {
         flatLines = [].concat(...lines)
       }
+
+      let selectedLines = []
       if (LEASHObj.line) {
         let lineStr = LEASHObj['line']
         let lineArr = []
         if (lineStr.indexOf(':') > -1) {
           lineArr = lineStr.split(':')
+          eachLoop = lineArr[1] === 0 ? flatLines.length : lineArr[1]
         } else {
-          lineArr[0] = lineStr.toString()
-          lineArr[1] = 1
+          lineArr[0] = lineStr
         }
         let selectedLineArr = this.parseRange(lineArr[0], flatLines).map((v) => v-1)
-        let selectedLines = flatLines.filter((v, i) => {return selectedLineArr.includes(i)})
-console.log(selectedLines)
+        selectedLines = flatLines.filter((v, i) => {return selectedLineArr.includes(i)})
       }
-      if (stepObj.mods) {
 
+      //filter lines for each loop
+      let loopingLines = selectedLines.filter((v, i) => {return i >= eachLoop*loop && i < eachLoop*(loop+1)})
+
+      let modLines = []
+      if (LEASHObj.mods) {
+        let modLine = ""
+        modLines = loopingLines.map((line) => {
+          //predefined vars
+          let pvars = {
+            "$ENTRY": line,
+            "$FILENAME": path.basename(line),
+            "$DIRNAME": path.dirname(line),
+            "$FILENAME_NOEXT": line.substr(0, line.lastIndexOf('.')),
+          }
+          Object.keys(pvars).map((key) => {
+            let pos = LEASHObj.mods.indexOf(key)
+            while (pos !== -1) {   
+              modLine = LEASHObj.mods.replace(key, pvars[key])
+              pos = LEASHObj.mods.indexOf(key, pos + 1)
+            }
+          })
+          return modLine
+        })
       }
+
+      let returnStr = ""
+      if (LEASHObj.sep) {
+        returnStr = modLines.join(LEASHObj.sep)
+      } else {
+        returnStr = modLines.join(' ')
+      }
+
+      return returnStr
     }
 
-    Object.keys(stepObj).map((key) => {
-      if (key.indexOf('~') === 0) {
-        stepObj.run.replace(key, LEASH(stepObj[key]))
-      }
-    })
+    let command = ""
+
+    for (let i = 0; i < loopNum; i++) {
+      //parse one command without loop
+      let run = stepObj.run
+      Object.keys(stepObj).map((key) => {
+        if (key.indexOf('~') === 0) {
+          let pos = run.indexOf(key)
+          while (pos !== -1) {
+            run = run.replace(key, LEASH(stepObj[key], i))
+            pos = stepObj.run.indexOf(key, pos + 1)
+          }
+        }
+      })
+      command += run+"&\n"
+    }
+    
+    return command
   }
 
   parseRange(s, arr) {
