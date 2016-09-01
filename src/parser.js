@@ -15,7 +15,7 @@ export default class Parser {
     //read raw step obj
     let rawObj = {}
     try {
-      rawObj = yaml.safeLoad(parseText, null, 'FAILSAFE_SCHEMA')
+      rawObj = yaml.safeLoad(parseText)
     } catch (e) {
       console.log(e)
       return
@@ -24,7 +24,8 @@ export default class Parser {
     let rvObj = this.replaceVars(rawObj)
     //get only the keys inside step
     let stepObj = rvObj[Object.keys(rvObj)[0]]
-    if (!stepObj) return
+    //check stepOjb status
+    if (!stepObj || !stepObj['in'] || !stepObj['run']) return
     //set step ID
     stepObj['id'] = Object.keys(rvObj)[0]
     //process input lines
@@ -32,7 +33,7 @@ export default class Parser {
     //count loops for this step
     let loopNum = this.countLoop(stepObj, lines)
     //parse the LEASH expressions
-    //parseLEASH(stepObj, lines, loopNum)
+    this.parseLEASH(stepObj, lines, loopNum)
     console.log(stepObj)
 
   }
@@ -173,20 +174,25 @@ export default class Parser {
     let flatLines = [].concat(...lines)
     let loopNum = flatLines.length
     Object.keys(stepObj).map((key) => {
+      //find LEASH expressions
       if (key.indexOf('~') === 0) {
         if (stepObj[key]['file'] && stepObj['in']) {
           let fileArr = this.parseRange(stepObj[key]['file'], stepObj['in']).map((v) => v-1)
           let concatArr = lines.filter((v, i) => {return fileArr.includes(i)})
           flatLines = [].concat(...concatArr)
-          console.log(concatArr)
         }
         if (stepObj[key]['line']) {
           let lineStr = stepObj[key]['line']
+          let lineArr = []
           if (lineStr.indexOf(':') > -1) {
-            let lineArr = lineStr.split(':')
-            let newNum = Math.floor(this.parseRange(lineArr[0], flatLines).length / lineArr[1])
-            loopNum = newNum < loopNum ? newNum : loopNum
+            lineArr = lineStr.split(':')
+          } else {
+            lineArr[0] = lineStr.toString()
+            lineArr[1] = 1
           }
+          let selectedLineNum = this.parseRange(lineArr[0], flatLines).length
+          let newNum = Math.floor(selectedLineNum < flatLines.length ? selectedLineNum : flatLines.length / lineArr[1])
+          loopNum = newNum < loopNum ? newNum : loopNum
         }
       }
     })
@@ -197,17 +203,35 @@ export default class Parser {
     const LEASH = (LEASHObj) => {
       let flatLines = []
       if (LEASHObj.file) {
-        flatLines = [].concat(...LEASHObj['file'])
+        let fileArr = this.parseRange(LEASHObj['file'], stepObj['in']).map((v) => v-1)
+        let concatArr = lines.filter((v, i) => {return fileArr.includes(i)})
+        flatLines = [].concat(...concatArr)
       } else {
         flatLines = [].concat(...lines)
       }
-      if (stepObj.line) {
-
+      if (LEASHObj.line) {
+        let lineStr = LEASHObj['line']
+        let lineArr = []
+        if (lineStr.indexOf(':') > -1) {
+          lineArr = lineStr.split(':')
+        } else {
+          lineArr[0] = lineStr.toString()
+          lineArr[1] = 1
+        }
+        let selectedLineArr = this.parseRange(lineArr[0], flatLines).map((v) => v-1)
+        let selectedLines = flatLines.filter((v, i) => {return selectedLineArr.includes(i)})
+console.log(selectedLines)
       }
       if (stepObj.mods) {
 
       }
     }
+
+    Object.keys(stepObj).map((key) => {
+      if (key.indexOf('~') === 0) {
+        stepObj.run.replace(key, LEASH(stepObj[key]))
+      }
+    })
   }
 
   parseRange(s, arr) {
@@ -231,7 +255,7 @@ export default class Parser {
           if (b[0]==="" && b[1]==="") {b[0] = 1; b[1] = length}
           else if (b[1]==="") b[1] = length
           else if (b[0]==="") b[0] = 1
-          else if (b.length>2 || Number(b[0]) > Number(b[1])) {
+          else if (b.length > 2 || Number(b[0]) > Number(b[1])) {
             console.log("illegal range.")
             return
           }

@@ -69813,7 +69813,7 @@ var Parser = function () {
       //read raw step obj
       var rawObj = {};
       try {
-        rawObj = _jsYaml2.default.safeLoad(parseText, null, 'FAILSAFE_SCHEMA');
+        rawObj = _jsYaml2.default.safeLoad(parseText);
       } catch (e) {
         console.log(e);
         return;
@@ -69822,7 +69822,8 @@ var Parser = function () {
       var rvObj = this.replaceVars(rawObj);
       //get only the keys inside step
       var stepObj = rvObj[Object.keys(rvObj)[0]];
-      if (!stepObj) return;
+      //check stepOjb status
+      if (!stepObj || !stepObj['in'] || !stepObj['run']) return;
       //set step ID
       stepObj['id'] = Object.keys(rvObj)[0];
       //process input lines
@@ -69830,7 +69831,7 @@ var Parser = function () {
       //count loops for this step
       var loopNum = this.countLoop(stepObj, lines);
       //parse the LEASH expressions
-      //parseLEASH(stepObj, lines, loopNum)
+      this.parseLEASH(stepObj, lines, loopNum);
       console.log(stepObj);
     }
   }, {
@@ -69987,6 +69988,7 @@ var Parser = function () {
       var flatLines = (_ref = []).concat.apply(_ref, _toConsumableArray(lines));
       var loopNum = flatLines.length;
       Object.keys(stepObj).map(function (key) {
+        //find LEASH expressions
         if (key.indexOf('~') === 0) {
           if (stepObj[key]['file'] && stepObj['in']) {
             (function () {
@@ -69999,16 +70001,20 @@ var Parser = function () {
                 return fileArr.includes(i);
               });
               flatLines = (_ref2 = []).concat.apply(_ref2, _toConsumableArray(concatArr));
-              console.log(concatArr);
             })();
           }
           if (stepObj[key]['line']) {
             var lineStr = stepObj[key]['line'];
+            var lineArr = [];
             if (lineStr.indexOf(':') > -1) {
-              var lineArr = lineStr.split(':');
-              var newNum = Math.floor(_this.parseRange(lineArr[0], flatLines).length / lineArr[1]);
-              loopNum = newNum < loopNum ? newNum : loopNum;
+              lineArr = lineStr.split(':');
+            } else {
+              lineArr[0] = lineStr.toString();
+              lineArr[1] = 1;
             }
+            var selectedLineNum = _this.parseRange(lineArr[0], flatLines).length;
+            var newNum = Math.floor(selectedLineNum < flatLines.length ? selectedLineNum : flatLines.length / lineArr[1]);
+            loopNum = newNum < loopNum ? newNum : loopNum;
           }
         }
       });
@@ -70017,20 +70023,54 @@ var Parser = function () {
   }, {
     key: 'parseLEASH',
     value: function parseLEASH(stepObj, lines, loopNum) {
+      var _this2 = this;
+
       var LEASH = function LEASH(LEASHObj) {
         var flatLines = [];
         if (LEASHObj.file) {
-          var _ref3;
+          (function () {
+            var _ref3;
 
-          flatLines = (_ref3 = []).concat.apply(_ref3, _toConsumableArray(LEASHObj['file']));
+            var fileArr = _this2.parseRange(LEASHObj['file'], stepObj['in']).map(function (v) {
+              return v - 1;
+            });
+            var concatArr = lines.filter(function (v, i) {
+              return fileArr.includes(i);
+            });
+            flatLines = (_ref3 = []).concat.apply(_ref3, _toConsumableArray(concatArr));
+          })();
         } else {
           var _ref4;
 
           flatLines = (_ref4 = []).concat.apply(_ref4, _toConsumableArray(lines));
         }
-        if (stepObj.line) {}
+        if (LEASHObj.line) {
+          (function () {
+            var lineStr = LEASHObj['line'];
+            var lineArr = [];
+            if (lineStr.indexOf(':') > -1) {
+              lineArr = lineStr.split(':');
+            } else {
+              lineArr[0] = lineStr.toString();
+              lineArr[1] = 1;
+            }
+            var selectedLineArr = _this2.parseRange(lineArr[0], flatLines).map(function (v) {
+              return v - 1;
+            });
+            var selectedLines = flatLines.filter(function (v, i) {
+              return selectedLineArr.includes(i);
+            });
+            console.log(selectedLines);
+          })();
+        }
         if (stepObj.mods) {}
       };
+
+      Object.keys(stepObj).map(function (key) {
+        if (key.indexOf('~') === 0) {
+          stepObj.run.replace(key, LEASH(stepObj[key]));
+        }
+      });
     }
   }, {
     key: 'parseRange',
@@ -70038,7 +70078,7 @@ var Parser = function () {
       var length = arr.length;
       var r = [];
       if (s.indexOf('/') > -1) {
-        var _ret6 = function () {
+        var _ret8 = function () {
           //parse regex range
           var regex = new RegExp(s.slice(1, -1));
           arr.map(function (string, i) {
@@ -70051,7 +70091,7 @@ var Parser = function () {
           };
         }();
 
-        if ((typeof _ret6 === 'undefined' ? 'undefined' : _typeof(_ret6)) === "object") return _ret6.v;
+        if ((typeof _ret8 === 'undefined' ? 'undefined' : _typeof(_ret8)) === "object") return _ret8.v;
       } else {
         //parse numeric range
         var a = s.split(',');
