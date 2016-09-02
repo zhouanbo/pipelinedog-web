@@ -106,13 +106,22 @@ class Main extends React.Component {
                 icon={<FontIcon className="material-icons">code</FontIcon>}
                 label="Command" 
               >
-                  
+                <Paper zDepth={0} style={{padding: 8}}>
+                  <pre className="codeblock">
+                    {this.props.editing > -1 ? this.props.steps[this.props.editing].command : "Not Applicable"}
+                  </pre>
+                </Paper>
               </Tab>
 
               <Tab 
                 icon={<FontIcon className="material-icons">insert_drive_file</FontIcon>}
-                label="Output" >
-                  {this.props.text}
+                label="Output" 
+              >
+                <Paper zDepth={0} style={{padding: 8}}>
+                  <pre className="codeblock">
+                    {this.props.editing > -1 ? this.props.steps[this.props.editing].out : "Not Applicable"}
+                  </pre>
+                </Paper>
               </Tab>
 
             </Tabs>

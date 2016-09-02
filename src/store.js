@@ -35,13 +35,14 @@ class Store {
       id: "",
       name: "",
       code: "", //code
-      codeObj: {}, //JSON object parsed from the code
+      //codeObj: {}, //JSON object parsed from the code
       //parsedOptions: {}, //LEASH converted options of the tool
       //expressions: [], //direct LEASH parsing result
       //options: [], //keys for options
       command: "", //the command to finally run
       //valid: true, //if the JSON is valid
-      out: "" //the output array
+      out: "", //the output array
+      comment: ""
     })
     this.setState({steps})
   }
@@ -89,8 +90,16 @@ class Store {
       steps[editing].code = newText
       
       //call parser
-      let parser = new Parser()
-      steps[editing].command = parser.parseStep(newText, this.state.gvar, this.state.flist, this.state.steps)
+      try {
+        let parser = new Parser()
+        let { name, command, out, comment } = parser.parseStep(newText, this.state.gvar, this.state.flist, this.state.steps)
+        steps[editing].command = command
+        steps[editing].name = name
+        steps[editing].out = out
+        steps[editing].comment = comment
+      } catch (e) {
+        console.log(e)
+      }
 
       this.setState({steps})
     }

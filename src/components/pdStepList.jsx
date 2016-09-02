@@ -126,7 +126,7 @@ export default class PdStepList extends React.Component {
                   delete
                 </IconButton>
               }
-              primaryText={step.name === "" ? "Unnamed Step" : step.name}
+              primaryText={!step.name ? "Unnamed Step" : step.name}
               secondaryText={"Index: "+index}
             />
           )

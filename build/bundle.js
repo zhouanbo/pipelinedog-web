@@ -68945,14 +68945,26 @@ var Main = function (_React$Component) {
                   })
                 )
               ),
-              _react2.default.createElement(_Tabs.Tab, {
-                icon: _react2.default.createElement(
-                  _FontIcon2.default,
-                  { className: 'material-icons' },
-                  'code'
-                ),
-                label: 'Command'
-              }),
+              _react2.default.createElement(
+                _Tabs.Tab,
+                {
+                  icon: _react2.default.createElement(
+                    _FontIcon2.default,
+                    { className: 'material-icons' },
+                    'code'
+                  ),
+                  label: 'Command'
+                },
+                _react2.default.createElement(
+                  _Paper2.default,
+                  { zDepth: 0, style: { padding: 8 } },
+                  _react2.default.createElement(
+                    'pre',
+                    { className: 'codeblock' },
+                    this.props.editing > -1 ? this.props.steps[this.props.editing].command : "Not Applicable"
+                  )
+                )
+              ),
               _react2.default.createElement(
                 _Tabs.Tab,
                 {
@@ -68961,8 +68973,17 @@ var Main = function (_React$Component) {
                     { className: 'material-icons' },
                     'insert_drive_file'
                   ),
-                  label: 'Output' },
-                this.props.text
+                  label: 'Output'
+                },
+                _react2.default.createElement(
+                  _Paper2.default,
+                  { zDepth: 0, style: { padding: 8 } },
+                  _react2.default.createElement(
+                    'pre',
+                    { className: 'codeblock' },
+                    this.props.editing > -1 ? this.props.steps[this.props.editing].out : "Not Applicable"
+                  )
+                )
               )
             )
           )
@@ -69274,7 +69295,7 @@ var PdEditorToolBar = function (_React$Component) {
           _react2.default.createElement(
             'h4',
             { style: { marginLeft: 16, color: "#757575" } },
-            this.props.name === "" ? "Unnamed Step" : this.props.name
+            !this.props.name ? "Unnamed Step" : this.props.name
           )
         ),
         _react2.default.createElement(
@@ -69499,7 +69520,7 @@ var PdStepList = function (_React$Component) {
               },
               'delete'
             ),
-            primaryText: step.name === "" ? "Unnamed Step" : step.name,
+            primaryText: !step.name ? "Unnamed Step" : step.name,
             secondaryText: "Index: " + index
           });
         })
@@ -69837,11 +69858,16 @@ var Parser = function () {
       var loopNum = this.countLoop(stepObj, lines);
       console.log("loopNum:\n" + loopNum);
       //parse the LEASH expressions
-      var command = this.parseLEASH(stepObj, lines, loopNum);
+
+      var _parseLEASH = this.parseLEASH(stepObj, lines, loopNum);
+
+      var command = _parseLEASH.command;
+      var out = _parseLEASH.out;
+
       console.log("command:\n" + command);
 
       console.log(stepObj);
-      return command;
+      return { name: stepObj.name, command: command, out: out, comment: stepObj.comment };
     }
   }, {
     key: 'combineSteps',
@@ -69866,7 +69892,10 @@ var Parser = function () {
         if (typeof value === 'string') {
           var _ret = function () {
             var flatVarObj = (0, _flat.flatten)(varObj, { safe: true });
-            Object.keys(flatVarObj).map(function (processKey) {
+            //sort to make sure the longer vars get recognized first
+            Object.keys(flatVarObj).sort(function (a, b) {
+              return b.length - a.length;
+            }).map(function (processKey) {
               var pos = value.indexOf('$' + processKey);
               while (pos !== -1) {
                 if (typeof flatVarObj[processKey] === 'string') {
@@ -70137,7 +70166,9 @@ var Parser = function () {
         _loop(i);
       }
 
-      return command;
+      var out = "";
+
+      return { command: command, out: out };
     }
   }, {
     key: 'parseRange',
@@ -70255,13 +70286,14 @@ var Store = function () {
         id: "",
         name: "",
         code: "", //code
-        codeObj: {}, //JSON object parsed from the code
+        //codeObj: {}, //JSON object parsed from the code
         //parsedOptions: {}, //LEASH converted options of the tool
         //expressions: [], //direct LEASH parsing result
         //options: [], //keys for options
         command: "", //the command to finally run
         //valid: true, //if the JSON is valid
-        out: "" //the output array
+        out: "", //the output array
+        comment: ""
       });
       this.setState({ steps: steps });
     }
@@ -70318,8 +70350,23 @@ var Store = function () {
         steps[editing].code = newText;
 
         //call parser
-        var parser = new _parser2.default();
-        steps[editing].command = parser.parseStep(newText, this.state.gvar, this.state.flist, this.state.steps);
+        try {
+          var parser = new _parser2.default();
+
+          var _parser$parseStep = parser.parseStep(newText, this.state.gvar, this.state.flist, this.state.steps);
+
+          var name = _parser$parseStep.name;
+          var command = _parser$parseStep.command;
+          var out = _parser$parseStep.out;
+          var comment = _parser$parseStep.comment;
+
+          steps[editing].command = command;
+          steps[editing].name = name;
+          steps[editing].out = out;
+          steps[editing].comment = comment;
+        } catch (e) {
+          console.log(e);
+        }
 
         this.setState({ steps: steps });
       }

@@ -36,11 +36,11 @@ export default class Parser {
     let loopNum = this.countLoop(stepObj, lines)
     console.log("loopNum:\n"+loopNum)
     //parse the LEASH expressions
-    let command = this.parseLEASH(stepObj, lines, loopNum)
+    let { command, out } = this.parseLEASH(stepObj, lines, loopNum)
     console.log("command:\n"+command)
 
     console.log(stepObj)
-    return command
+    return { name: stepObj.name, command: command, out: out, comment: stepObj.comment }
   }
 
   combineSteps(stepsObj) {
@@ -64,7 +64,8 @@ export default class Parser {
     const processValue = (value) => {
       if (typeof(value) === 'string') {
         let flatVarObj = flatten(varObj, {safe: true})
-        Object.keys(flatVarObj).map((processKey) => { 
+        //sort to make sure the longer vars get recognized first
+        Object.keys(flatVarObj).sort((a, b)=>{return b.length-a.length}).map((processKey) => { 
           let pos = value.indexOf('$'+processKey)
           while (pos !== -1) {
             if (typeof(flatVarObj[processKey]) === 'string') {
@@ -283,8 +284,10 @@ export default class Parser {
       })
       command += run+"&\n"
     }
+
+    let out = ""
     
-    return command
+    return { command, out }
   }
 
   parseRange(s, arr) {
