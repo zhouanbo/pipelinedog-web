@@ -68775,6 +68775,10 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
+var _jsYaml = require('js-yaml');
+
+var _jsYaml2 = _interopRequireDefault(_jsYaml);
+
 var _actions = require('../actions');
 
 var _actions2 = _interopRequireDefault(_actions);
@@ -68981,7 +68985,7 @@ var Main = function (_React$Component) {
                   _react2.default.createElement(
                     'pre',
                     { className: 'codeblock' },
-                    this.props.editing > -1 ? this.props.steps[this.props.editing].out : "Not Applicable"
+                    this.props.editing > -1 && this.props.steps[this.props.editing].out ? _jsYaml2.default.safeDump(this.props.steps[this.props.editing].out) : "Not Applicable"
                   )
                 )
               )
@@ -69014,7 +69018,7 @@ var Main = function (_React$Component) {
 
 exports.default = Main;
 
-},{"../actions":510,"./pdAppBar.jsx":514,"./pdEditor.jsx":515,"./pdEditorToolBar.jsx":516,"./pdStepList.jsx":517,"./pdWelcome.jsx":518,"material-ui/FontIcon":246,"material-ui/Paper":261,"material-ui/Subheader":275,"material-ui/Tabs":282,"react":494}],514:[function(require,module,exports){
+},{"../actions":510,"./pdAppBar.jsx":514,"./pdEditor.jsx":515,"./pdEditorToolBar.jsx":516,"./pdStepList.jsx":517,"./pdWelcome.jsx":518,"js-yaml":79,"material-ui/FontIcon":246,"material-ui/Paper":261,"material-ui/Subheader":275,"material-ui/Tabs":282,"react":494}],514:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -69521,7 +69525,7 @@ var PdStepList = function (_React$Component) {
               'delete'
             ),
             primaryText: !step.name ? "Unnamed Step" : step.name,
-            secondaryText: "Index: " + index
+            secondaryText: "ID: " + (step.id ? step.id : "NA")
           });
         })
       );
@@ -69862,12 +69866,18 @@ var Parser = function () {
       var _parseLEASH = this.parseLEASH(stepObj, lines, loopNum);
 
       var command = _parseLEASH.command;
-      var out = _parseLEASH.out;
+      var outObj = _parseLEASH.outObj;
 
       console.log("command:\n" + command);
 
       console.log(stepObj);
-      return { name: stepObj.name, command: command, out: out, comment: stepObj.comment };
+      return {
+        id: stepObj['id'],
+        name: stepObj.name,
+        command: command,
+        out: outObj,
+        comment: stepObj.comment
+      };
     }
   }, {
     key: 'combineSteps',
@@ -69876,34 +69886,27 @@ var Parser = function () {
     key: 'replaceVars',
     value: function replaceVars(rawObj) {
       var varObj = {};
+      var gvarObj = {};
       var rObj = rawObj;
 
-      var isStep = function isStep(testObj) {
-        var stepTest = false;
-        Object.keys(testObj).map(function (testKey) {
-          if (testKey.indexOf('~') === 0) {
-            stepTest = true;
-          }
-        });
-        return stepTest;
-      };
       //switch vars in a string
       var processValue = function processValue(value) {
         if (typeof value === 'string') {
           var _ret = function () {
-            var flatVarObj = (0, _flat.flatten)(varObj, { safe: true });
+            var flatgVarObj = (0, _flat.flatten)(gvarObj, { safe: true });
+            var flatVarObj = Object.assign(varObj, flatgVarObj);
             //sort to make sure the longer vars get recognized first
             Object.keys(flatVarObj).sort(function (a, b) {
               return b.length - a.length;
             }).map(function (processKey) {
-              var pos = value.indexOf('$' + processKey);
+              var pos = typeof value === 'string' ? value.indexOf('$' + processKey, pos + 1) : -1;
               while (pos !== -1) {
                 if (typeof flatVarObj[processKey] === 'string') {
                   value = value.replace('$' + processKey, flatVarObj[processKey]);
                 } else {
                   value = flatVarObj[processKey];
                 }
-                pos = value.indexOf('$' + processKey, pos + 1);
+                pos = typeof value === 'string' ? value.indexOf('$' + processKey, pos + 1) : -1;
               }
             });
             return {
@@ -69923,21 +69926,25 @@ var Parser = function () {
       });
 
       //get vars
-      Object.keys(rObj).map(function (key) {
-        if (rObj[key] && typeof rObj[key] !== 'string' && isStep(rObj[key])) {
+      Object.keys(rObj).map(function (key, index) {
+        if (index === Object.keys(rObj).length - 1) {
           (function () {
+            Object.keys(rObj[key]).map(function (stepKey) {
+              varObj[stepKey] = rObj[key][stepKey];
+            });
             var flatStepObj = (0, _flat.flatten)(rObj[key], { safe: true });
             Object.keys(flatStepObj).map(function (stepKey) {
               varObj[stepKey] = flatStepObj[stepKey];
             });
           })();
         } else {
-          varObj[key] = rObj[key];
+          gvarObj[key] = rObj[key];
         }
       });
 
-      var flatVarObj = (0, _flat.flatten)(varObj, { safe: true });
-
+      var flatgVarObj = (0, _flat.flatten)(gvarObj, { safe: true });
+      var flatVarObj = Object.assign(varObj, flatgVarObj);
+      console.log(flatVarObj);
       //replace keys
       Object.keys(flatObj).map(function (key) {
         var processedKey = processValue(key);
@@ -69951,7 +69958,7 @@ var Parser = function () {
         var varTest = false;
         Object.keys(flatObj).map(function (key) {
           Object.keys(flatVarObj).map(function (varKey) {
-            if (flatObj[key] && flatObj[key].indexOf('$' + varKey) > -1) {
+            if (flatObj[key] && typeof flatObj[key] === 'string' && flatObj[key].indexOf('$' + varKey) > -1) {
               varTest = true;
             }
           });
@@ -69966,8 +69973,9 @@ var Parser = function () {
 
       rObj = (0, _flat.unflatten)(flatObj);
       //remove var definitions
-      Object.keys(rObj).map(function (key) {
-        if (!(rObj[key] && typeof rObj[key] !== 'string' && isStep(rObj[key]))) {
+      var rObjKeys = Object.keys(rObj);
+      rObjKeys.map(function (key, index) {
+        if (index !== rObjKeys.length - 1) {
           delete rObj[key];
         }
       });
@@ -70003,15 +70011,18 @@ var Parser = function () {
           })();
         } else {
           steps.map(function (step) {
-            if (inFile === "$" + step.id + ".out") {
-              (function () {
-                var subLine = [];
-                step.out.split('\n').map(function (line) {
-                  subLine.push(line);
-                });
-                lines.push(subLine);
-              })();
-            }
+            Object.keys(step.out).map(function (outKey) {
+              var outStr = outKey === 'default' ? "" : "." + outKey;
+              if (inFile === "$" + step.id + ".out" + outStr) {
+                (function () {
+                  var subLine = [];
+                  step.out[outKey].split('\n').map(function (line) {
+                    subLine.push(line);
+                  });
+                  lines.push(subLine);
+                })();
+              }
+            });
           });
         }
       });
@@ -70166,9 +70177,44 @@ var Parser = function () {
         _loop(i);
       }
 
-      var out = "";
+      var outObj = {};
+      Object.keys(stepObj).map(function (outKey) {
+        if (outKey.indexOf('out') === 0) {
+          (function () {
+            var outStr = stepObj[outKey];
+            var result = "";
 
-      return { command: command, out: out };
+            var _loop2 = function _loop2(_i) {
+              //decide to parse LEASH or string
+              if (typeof outStr === 'string') {
+                Object.keys(stepObj).map(function (key) {
+                  if (key.indexOf('~') === 0) {
+                    var pos = outStr.indexOf(key);
+                    while (pos !== -1) {
+                      outStr = outStr.replace(key, LEASH(stepObj[key], _i));
+                      pos = outStr.indexOf(key, pos + 1);
+                    }
+                  }
+                });
+              } else {
+                outStr = LEASH(outStr, _i);
+              }
+              result += outStr + '\n';
+            };
+
+            for (var _i = 0; _i < loopNum; _i++) {
+              _loop2(_i);
+            }
+            if (outKey === 'out') {
+              outObj['default'] = result;
+            } else {
+              outObj[outKey.substr(outKey.indexOf('.') + 1, outKey.length)] = result;
+            }
+          })();
+        }
+      });
+
+      return { command: command, outObj: outObj };
     }
   }, {
     key: 'parseRange',
@@ -70176,7 +70222,7 @@ var Parser = function () {
       var length = arr.length;
       var r = [];
       if (s.indexOf('/') > -1) {
-        var _ret10 = function () {
+        var _ret12 = function () {
           //parse regex range
           var regex = new RegExp(s.slice(1, -1));
           arr.map(function (string, i) {
@@ -70189,7 +70235,7 @@ var Parser = function () {
           };
         }();
 
-        if ((typeof _ret10 === 'undefined' ? 'undefined' : _typeof(_ret10)) === "object") return _ret10.v;
+        if ((typeof _ret12 === 'undefined' ? 'undefined' : _typeof(_ret12)) === "object") return _ret12.v;
       } else {
         //parse numeric range
         var a = s.split(',');
@@ -70202,8 +70248,8 @@ var Parser = function () {
               console.log("illegal range.");
               return;
             }
-            for (var _i = Number(b[0]); _i <= Number(b[1]); _i++) {
-              r.push(_i);
+            for (var _i2 = Number(b[0]); _i2 <= Number(b[1]); _i2++) {
+              r.push(_i2);
             }
           } else {
             r.push(Number(ss));
@@ -70267,7 +70313,7 @@ var Store = function () {
     });
 
     this.state = {
-      steps: [{ id: '1-2', out: "aaa.bam\nbbb.bam\nccc.bam" }],
+      steps: [{ id: '1-2', out: { default: "aaa.bam\nbbb.bam\nccc.bam" } }],
       init: 0,
       flist: "/home/usr/b1.bam\n/home/usr/b2.bam\n/home/usr/b3.bam",
       flistArr: [],
@@ -70292,7 +70338,7 @@ var Store = function () {
         //options: [], //keys for options
         command: "", //the command to finally run
         //valid: true, //if the JSON is valid
-        out: "", //the output array
+        out: {}, //the output array
         comment: ""
       });
       this.setState({ steps: steps });
@@ -70355,19 +70401,21 @@ var Store = function () {
 
           var _parser$parseStep = parser.parseStep(newText, this.state.gvar, this.state.flist, this.state.steps);
 
+          var id = _parser$parseStep.id;
           var name = _parser$parseStep.name;
           var command = _parser$parseStep.command;
           var out = _parser$parseStep.out;
           var comment = _parser$parseStep.comment;
 
           steps[editing].command = command;
+          steps[editing].id = id;
           steps[editing].name = name;
           steps[editing].out = out;
           steps[editing].comment = comment;
         } catch (e) {
           console.log(e);
         }
-
+        console.log(steps);
         this.setState({ steps: steps });
       }
     }

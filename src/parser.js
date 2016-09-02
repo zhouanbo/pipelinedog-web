@@ -36,11 +36,17 @@ export default class Parser {
     let loopNum = this.countLoop(stepObj, lines)
     console.log("loopNum:\n"+loopNum)
     //parse the LEASH expressions
-    let { command, out } = this.parseLEASH(stepObj, lines, loopNum)
+    let { command, outObj } = this.parseLEASH(stepObj, lines, loopNum)
     console.log("command:\n"+command)
 
     console.log(stepObj)
-    return { name: stepObj.name, command: command, out: out, comment: stepObj.comment }
+    return { 
+      id: stepObj['id'],
+      name: stepObj.name, 
+      command: command, 
+      out: outObj, 
+      comment: stepObj.comment 
+    }
   }
 
   combineSteps(stepsObj) {
@@ -49,31 +55,24 @@ export default class Parser {
 
   replaceVars(rawObj) {
     let varObj = {}
+    let gvarObj = {}
     let rObj = rawObj
-        
-    const isStep = (testObj) => {
-      let stepTest = false
-      Object.keys(testObj).map((testKey) => {
-        if (testKey.indexOf('~') === 0) {
-          stepTest = true
-        }
-      })
-      return stepTest
-    }
+    
     //switch vars in a string
     const processValue = (value) => {
       if (typeof(value) === 'string') {
-        let flatVarObj = flatten(varObj, {safe: true})
+        let flatgVarObj = flatten(gvarObj, {safe: true})
+        let flatVarObj = Object.assign(varObj, flatgVarObj)
         //sort to make sure the longer vars get recognized first
         Object.keys(flatVarObj).sort((a, b)=>{return b.length-a.length}).map((processKey) => { 
-          let pos = value.indexOf('$'+processKey)
+          let pos = typeof(value) === 'string' ? value.indexOf('$'+processKey, pos + 1) : -1
           while (pos !== -1) {
             if (typeof(flatVarObj[processKey]) === 'string') {
               value = value.replace('$'+processKey, flatVarObj[processKey])
             } else {
               value = flatVarObj[processKey]
             }
-            pos = value.indexOf('$'+processKey, pos + 1)
+            pos = typeof(value) === 'string' ? value.indexOf('$'+processKey, pos + 1) : -1
           }      
         })
         return value
@@ -88,19 +87,23 @@ export default class Parser {
     })
 
     //get vars
-    Object.keys(rObj).map((key) => {
-      if (rObj[key] && typeof(rObj[key]) !== 'string' && isStep(rObj[key])) {
+    Object.keys(rObj).map((key, index) => {
+      if (index === Object.keys(rObj).length-1) {
+        Object.keys(rObj[key]).map((stepKey) => {
+          varObj[stepKey] = rObj[key][stepKey]
+        })      
         let flatStepObj = flatten(rObj[key], {safe: true})
         Object.keys(flatStepObj).map((stepKey) => {
             varObj[stepKey] = flatStepObj[stepKey]
         })
       } else {
-        varObj[key] = rObj[key]
+        gvarObj[key] = rObj[key]
       }
     })
 
-    let flatVarObj = flatten(varObj, {safe: true})
-    
+    let flatgVarObj = flatten(gvarObj, {safe: true})
+    let flatVarObj = Object.assign(varObj, flatgVarObj)
+    console.log(flatVarObj)
     //replace keys
     Object.keys(flatObj).map((key) => {
       let processedKey = processValue(key)
@@ -114,7 +117,7 @@ export default class Parser {
       let varTest = false
       Object.keys(flatObj).map((key) => {
         Object.keys(flatVarObj).map((varKey) => { 
-          if (flatObj[key] && flatObj[key].indexOf('$'+varKey) > -1) {
+          if (flatObj[key] && typeof(flatObj[key]) === 'string' && flatObj[key].indexOf('$'+varKey) > -1) {
             varTest = true
           }
         })
@@ -129,8 +132,9 @@ export default class Parser {
 
     rObj = unflatten(flatObj)
     //remove var definitions
-    Object.keys(rObj).map((key) => {
-      if (!(rObj[key] && typeof(rObj[key]) !== 'string' && isStep(rObj[key]))) {
+    let rObjKeys = Object.keys(rObj)
+    rObjKeys.map((key, index) => {
+      if (index !== rObjKeys.length-1) {
         delete rObj[key]
       }
     })
@@ -163,13 +167,17 @@ export default class Parser {
         lines.push(subLine)
       } else {
         steps.map((step) => { 
-          if (inFile === "$"+step.id+".out") {
-            let subLine = []
-            step.out.split('\n').map((line) => {
-              subLine.push(line)
-            })
-            lines.push(subLine)
-          }
+          Object.keys(step.out).map((outKey) => {
+            let outStr = outKey === 'default' ? "" : "."+outKey
+            if (inFile === "$"+step.id+".out"+outStr) {
+              let subLine = []
+              step.out[outKey].split('\n').map((line) => {
+                subLine.push(line)
+              })
+              lines.push(subLine)
+            }
+          })
+          
         })
       }
     })
@@ -269,7 +277,6 @@ export default class Parser {
     }
 
     let command = ""
-
     for (let i = 0; i < loopNum; i++) {
       //parse one command without loop
       let run = stepObj.run
@@ -282,12 +289,40 @@ export default class Parser {
           }
         }
       })
-      command += run+"&\n"
+      command += run+"&\n"     
     }
-
-    let out = ""
     
-    return { command, out }
+    let outObj = {}
+    Object.keys(stepObj).map((outKey) => {
+      if (outKey.indexOf('out') === 0) {
+        let outStr = stepObj[outKey]
+        let result = ""
+        for (let i = 0; i < loopNum; i++) {
+          //decide to parse LEASH or string
+          if (typeof(outStr) === 'string') {
+            Object.keys(stepObj).map((key) => {
+              if (key.indexOf('~') === 0) {
+                let pos = outStr.indexOf(key)
+                while (pos !== -1) {
+                  outStr = outStr.replace(key, LEASH(stepObj[key], i))
+                  pos = outStr.indexOf(key, pos + 1)
+                }
+              }
+            })
+          } else {
+            outStr = LEASH(outStr, i)
+          }
+          result += outStr+'\n'
+        }
+        if (outKey === 'out') {
+          outObj['default'] = result
+        } else {
+          outObj[outKey.substr(outKey.indexOf('.')+1, outKey.length)] = result
+        }
+      }
+    })
+
+    return { command, outObj }
   }
 
   parseRange(s, arr) {

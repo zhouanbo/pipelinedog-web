@@ -1,4 +1,5 @@
 import React from 'react'
+import yaml from 'js-yaml'
 import Actions from '../actions'
 
 import FontIcon from 'material-ui/FontIcon'
@@ -119,7 +120,7 @@ class Main extends React.Component {
               >
                 <Paper zDepth={0} style={{padding: 8}}>
                   <pre className="codeblock">
-                    {this.props.editing > -1 ? this.props.steps[this.props.editing].out : "Not Applicable"}
+                    {this.props.editing > -1 && this.props.steps[this.props.editing].out ? yaml.safeDump(this.props.steps[this.props.editing].out) : "Not Applicable"}
                   </pre>
                 </Paper>
               </Tab>

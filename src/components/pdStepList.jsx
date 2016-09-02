@@ -127,7 +127,7 @@ export default class PdStepList extends React.Component {
                 </IconButton>
               }
               primaryText={!step.name ? "Unnamed Step" : step.name}
-              secondaryText={"Index: "+index}
+              secondaryText={"ID: " + (step.id ? step.id : "NA")}
             />
           )
         })}    

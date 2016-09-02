@@ -18,7 +18,7 @@ class Store {
     })
 
     this.state = {
-      steps: [{id:'1-2', out:"aaa.bam\nbbb.bam\nccc.bam"}],
+      steps: [{id:'1-2', out:{default: "aaa.bam\nbbb.bam\nccc.bam"}}],
       init: 0,
       flist: "/home/usr/b1.bam\n/home/usr/b2.bam\n/home/usr/b3.bam",
       flistArr: [],
@@ -41,7 +41,7 @@ class Store {
       //options: [], //keys for options
       command: "", //the command to finally run
       //valid: true, //if the JSON is valid
-      out: "", //the output array
+      out: {}, //the output array
       comment: ""
     })
     this.setState({steps})
@@ -92,15 +92,16 @@ class Store {
       //call parser
       try {
         let parser = new Parser()
-        let { name, command, out, comment } = parser.parseStep(newText, this.state.gvar, this.state.flist, this.state.steps)
+        let { id, name, command, out, comment } = parser.parseStep(newText, this.state.gvar, this.state.flist, this.state.steps)
         steps[editing].command = command
+        steps[editing].id = id
         steps[editing].name = name
         steps[editing].out = out
         steps[editing].comment = comment
       } catch (e) {
         console.log(e)
       }
-
+console.log(steps)
       this.setState({steps})
     }
     
