@@ -27,19 +27,20 @@ export default class Parser {
     let stepObj = rvObj[Object.keys(rvObj)[0]]
     //check stepOjb status
     if (!stepObj || !stepObj['in'] || !stepObj['run']) return
+    console.log("stepObj:")
+    console.log(stepObj)
     //set step ID
     stepObj['id'] = Object.keys(rvObj)[0]
     //process input lines
     let lines = this.processInArr(stepObj, flist, steps)
-    console.log("inLines:\n"+lines)
+    //console.log("inLines:\n"+lines)
     //count loops for this step
     let loopNum = this.countLoop(stepObj, lines)
-    console.log("loopNum:\n"+loopNum)
+    //console.log("loopNum:\n"+loopNum)
     //parse the LEASH expressions
     let { command, outObj } = this.parseLEASH(stepObj, lines, loopNum)
-    console.log("command:\n"+command)
+    //console.log("command:\n"+command)
 
-    console.log(stepObj)
     return { 
       id: stepObj['id'],
       name: stepObj.name, 
@@ -57,27 +58,6 @@ export default class Parser {
     let varObj = {}
     let gvarObj = {}
     let rObj = rawObj
-    
-    //switch vars in a string
-    const processValue = (value) => {
-      if (typeof(value) === 'string') {
-        let flatgVarObj = flatten(gvarObj, {safe: true})
-        let flatVarObj = Object.assign(varObj, flatgVarObj)
-        //sort to make sure the longer vars get recognized first
-        Object.keys(flatVarObj).sort((a, b)=>{return b.length-a.length}).map((processKey) => { 
-          let pos = typeof(value) === 'string' ? value.indexOf('$'+processKey, pos + 1) : -1
-          while (pos !== -1) {
-            if (typeof(flatVarObj[processKey]) === 'string') {
-              value = value.replace('$'+processKey, flatVarObj[processKey])
-            } else {
-              value = flatVarObj[processKey]
-            }
-            pos = typeof(value) === 'string' ? value.indexOf('$'+processKey, pos + 1) : -1
-          }      
-        })
-        return value
-      }
-    }
 
     let flatObj = flatten(rObj, {safe: true})
      
@@ -101,9 +81,27 @@ export default class Parser {
       }
     })
 
-    let flatgVarObj = flatten(gvarObj, {safe: true})
-    let flatVarObj = Object.assign(varObj, flatgVarObj)
-    console.log(flatVarObj)
+    let flatVarObj = Object.assign(varObj, flatten(gvarObj, {safe: true}))
+
+    //switch vars in a string
+    const processValue = (value) => {
+      if (typeof(value) === 'string') {
+        //sort to make sure the longer vars get recognized first
+        Object.keys(flatVarObj).sort((a, b)=>{return b.length-a.length}).map((processKey) => { 
+          let pos = typeof(value) === 'string' ? value.indexOf('$'+processKey, pos + 1) : -1
+          while (pos !== -1) {
+            if (typeof(flatVarObj[processKey]) === 'string') {
+              value = value.replace('$'+processKey, flatVarObj[processKey])
+            } else {
+              value = flatVarObj[processKey]
+            }
+            pos = typeof(value) === 'string' ? value.indexOf('$'+processKey, pos + 1) : -1
+          }      
+        })
+        return value
+      }
+    }
+console.log(flatVarObj)
     //replace keys
     Object.keys(flatObj).map((key) => {
       let processedKey = processValue(key)
@@ -114,20 +112,20 @@ export default class Parser {
     })
     //replace values
     const haveVar = () => {
-      let varTest = false
+      let rKey = false
       Object.keys(flatObj).map((key) => {
         Object.keys(flatVarObj).map((varKey) => { 
-          if (flatObj[key] && typeof(flatObj[key]) === 'string' && flatObj[key].indexOf('$'+varKey) > -1) {
-            varTest = true
+          if (flatObj[key] && typeof(flatObj[key]) === 'string' && flatObj[key].indexOf('$'+varKey) > -1 && key.indexOf("comment") === -1) {
+            rKey = key
           }
         })
       })
-      return varTest
+      return rKey
     }
-    while (haveVar()) {
-      Object.keys(flatObj).map((key) => {
-        flatObj[key] = processValue(flatObj[key])
-      })
+    let varKey
+    while (varKey = haveVar()) {
+      console.log(varKey)
+      flatObj[varKey] = processValue(flatObj[varKey])
     }
 
     rObj = unflatten(flatObj)
@@ -246,19 +244,19 @@ export default class Parser {
 
       let modLines = []
       if (LEASHObj.mods) {
-        let modLine = ""
         modLines = loopingLines.map((line) => {
+          let modLine = LEASHObj.mods
           //predefined vars
           let pvars = {
             "$ENTRY": line,
             "$FILENAME": path.basename(line),
             "$DIRNAME": path.dirname(line),
-            "$FILENAME_NOEXT": line.substr(0, line.lastIndexOf('.')),
+            "$FILENAME_NOEXT": path.basename(line).substr(0, line.lastIndexOf('.')),
           }
           Object.keys(pvars).map((key) => {
             let pos = LEASHObj.mods.indexOf(key)
             while (pos !== -1) {   
-              modLine = LEASHObj.mods.replace(key, pvars[key])
+              modLine = modLine.replace(key, pvars[key])
               pos = LEASHObj.mods.indexOf(key, pos + 1)
             }
           })
@@ -293,18 +291,19 @@ export default class Parser {
     }
     
     let outObj = {}
-    Object.keys(stepObj).map((outKey) => {
+    let flatObj = flatten(stepObj, {safe: true, maxDepth: 2})
+    Object.keys(flatObj).map((outKey) => {
       if (outKey.indexOf('out') === 0) {
-        let outStr = stepObj[outKey]
+        let outStr = flatObj[outKey]
         let result = ""
         for (let i = 0; i < loopNum; i++) {
           //decide to parse LEASH or string
           if (typeof(outStr) === 'string') {
-            Object.keys(stepObj).map((key) => {
+            Object.keys(flatObj).map((key) => {
               if (key.indexOf('~') === 0) {
                 let pos = outStr.indexOf(key)
                 while (pos !== -1) {
-                  outStr = outStr.replace(key, LEASH(stepObj[key], i))
+                  outStr = outStr.replace(key, LEASH(flatObj[key], i))
                   pos = outStr.indexOf(key, pos + 1)
                 }
               }

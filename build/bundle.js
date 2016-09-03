@@ -69853,24 +69853,24 @@ var Parser = function () {
       var stepObj = rvObj[Object.keys(rvObj)[0]];
       //check stepOjb status
       if (!stepObj || !stepObj['in'] || !stepObj['run']) return;
+      console.log("stepObj:");
+      console.log(stepObj);
       //set step ID
       stepObj['id'] = Object.keys(rvObj)[0];
       //process input lines
       var lines = this.processInArr(stepObj, flist, steps);
-      console.log("inLines:\n" + lines);
+      //console.log("inLines:\n"+lines)
       //count loops for this step
       var loopNum = this.countLoop(stepObj, lines);
-      console.log("loopNum:\n" + loopNum);
+      //console.log("loopNum:\n"+loopNum)
       //parse the LEASH expressions
 
       var _parseLEASH = this.parseLEASH(stepObj, lines, loopNum);
 
       var command = _parseLEASH.command;
       var outObj = _parseLEASH.outObj;
+      //console.log("command:\n"+command)
 
-      console.log("command:\n" + command);
-
-      console.log(stepObj);
       return {
         id: stepObj['id'],
         name: stepObj.name,
@@ -69888,35 +69888,6 @@ var Parser = function () {
       var varObj = {};
       var gvarObj = {};
       var rObj = rawObj;
-
-      //switch vars in a string
-      var processValue = function processValue(value) {
-        if (typeof value === 'string') {
-          var _ret = function () {
-            var flatgVarObj = (0, _flat.flatten)(gvarObj, { safe: true });
-            var flatVarObj = Object.assign(varObj, flatgVarObj);
-            //sort to make sure the longer vars get recognized first
-            Object.keys(flatVarObj).sort(function (a, b) {
-              return b.length - a.length;
-            }).map(function (processKey) {
-              var pos = typeof value === 'string' ? value.indexOf('$' + processKey, pos + 1) : -1;
-              while (pos !== -1) {
-                if (typeof flatVarObj[processKey] === 'string') {
-                  value = value.replace('$' + processKey, flatVarObj[processKey]);
-                } else {
-                  value = flatVarObj[processKey];
-                }
-                pos = typeof value === 'string' ? value.indexOf('$' + processKey, pos + 1) : -1;
-              }
-            });
-            return {
-              v: value
-            };
-          }();
-
-          if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
-        }
-      };
 
       var flatObj = (0, _flat.flatten)(rObj, { safe: true });
 
@@ -69942,8 +69913,28 @@ var Parser = function () {
         }
       });
 
-      var flatgVarObj = (0, _flat.flatten)(gvarObj, { safe: true });
-      var flatVarObj = Object.assign(varObj, flatgVarObj);
+      var flatVarObj = Object.assign(varObj, (0, _flat.flatten)(gvarObj, { safe: true }));
+
+      //switch vars in a string
+      var processValue = function processValue(value) {
+        if (typeof value === 'string') {
+          //sort to make sure the longer vars get recognized first
+          Object.keys(flatVarObj).sort(function (a, b) {
+            return b.length - a.length;
+          }).map(function (processKey) {
+            var pos = typeof value === 'string' ? value.indexOf('$' + processKey, pos + 1) : -1;
+            while (pos !== -1) {
+              if (typeof flatVarObj[processKey] === 'string') {
+                value = value.replace('$' + processKey, flatVarObj[processKey]);
+              } else {
+                value = flatVarObj[processKey];
+              }
+              pos = typeof value === 'string' ? value.indexOf('$' + processKey, pos + 1) : -1;
+            }
+          });
+          return value;
+        }
+      };
       console.log(flatVarObj);
       //replace keys
       Object.keys(flatObj).map(function (key) {
@@ -69955,20 +69946,20 @@ var Parser = function () {
       });
       //replace values
       var haveVar = function haveVar() {
-        var varTest = false;
+        var rKey = false;
         Object.keys(flatObj).map(function (key) {
           Object.keys(flatVarObj).map(function (varKey) {
-            if (flatObj[key] && typeof flatObj[key] === 'string' && flatObj[key].indexOf('$' + varKey) > -1) {
-              varTest = true;
+            if (flatObj[key] && typeof flatObj[key] === 'string' && flatObj[key].indexOf('$' + varKey) > -1 && key.indexOf("comment") === -1) {
+              rKey = key;
             }
           });
         });
-        return varTest;
+        return rKey;
       };
-      while (haveVar()) {
-        Object.keys(flatObj).map(function (key) {
-          flatObj[key] = processValue(flatObj[key]);
-        });
+      var varKey = void 0;
+      while (varKey = haveVar()) {
+        console.log(varKey);
+        flatObj[varKey] = processValue(flatObj[varKey]);
       }
 
       rObj = (0, _flat.unflatten)(flatObj);
@@ -70124,26 +70115,24 @@ var Parser = function () {
 
         var modLines = [];
         if (LEASHObj.mods) {
-          (function () {
-            var modLine = "";
-            modLines = loopingLines.map(function (line) {
-              //predefined vars
-              var pvars = {
-                "$ENTRY": line,
-                "$FILENAME": _path2.default.basename(line),
-                "$DIRNAME": _path2.default.dirname(line),
-                "$FILENAME_NOEXT": line.substr(0, line.lastIndexOf('.'))
-              };
-              Object.keys(pvars).map(function (key) {
-                var pos = LEASHObj.mods.indexOf(key);
-                while (pos !== -1) {
-                  modLine = LEASHObj.mods.replace(key, pvars[key]);
-                  pos = LEASHObj.mods.indexOf(key, pos + 1);
-                }
-              });
-              return modLine;
+          modLines = loopingLines.map(function (line) {
+            var modLine = LEASHObj.mods;
+            //predefined vars
+            var pvars = {
+              "$ENTRY": line,
+              "$FILENAME": _path2.default.basename(line),
+              "$DIRNAME": _path2.default.dirname(line),
+              "$FILENAME_NOEXT": _path2.default.basename(line).substr(0, line.lastIndexOf('.'))
+            };
+            Object.keys(pvars).map(function (key) {
+              var pos = LEASHObj.mods.indexOf(key);
+              while (pos !== -1) {
+                modLine = modLine.replace(key, pvars[key]);
+                pos = LEASHObj.mods.indexOf(key, pos + 1);
+              }
             });
-          })();
+            return modLine;
+          });
         }
 
         var returnStr = "";
@@ -70178,20 +70167,21 @@ var Parser = function () {
       }
 
       var outObj = {};
-      Object.keys(stepObj).map(function (outKey) {
+      var flatObj = (0, _flat.flatten)(stepObj, { safe: true, maxDepth: 2 });
+      Object.keys(flatObj).map(function (outKey) {
         if (outKey.indexOf('out') === 0) {
           (function () {
-            var outStr = stepObj[outKey];
+            var outStr = flatObj[outKey];
             var result = "";
 
             var _loop2 = function _loop2(_i) {
               //decide to parse LEASH or string
               if (typeof outStr === 'string') {
-                Object.keys(stepObj).map(function (key) {
+                Object.keys(flatObj).map(function (key) {
                   if (key.indexOf('~') === 0) {
                     var pos = outStr.indexOf(key);
                     while (pos !== -1) {
-                      outStr = outStr.replace(key, LEASH(stepObj[key], _i));
+                      outStr = outStr.replace(key, LEASH(flatObj[key], _i));
                       pos = outStr.indexOf(key, pos + 1);
                     }
                   }
@@ -70222,7 +70212,7 @@ var Parser = function () {
       var length = arr.length;
       var r = [];
       if (s.indexOf('/') > -1) {
-        var _ret12 = function () {
+        var _ret10 = function () {
           //parse regex range
           var regex = new RegExp(s.slice(1, -1));
           arr.map(function (string, i) {
@@ -70235,7 +70225,7 @@ var Parser = function () {
           };
         }();
 
-        if ((typeof _ret12 === 'undefined' ? 'undefined' : _typeof(_ret12)) === "object") return _ret12.v;
+        if ((typeof _ret10 === 'undefined' ? 'undefined' : _typeof(_ret10)) === "object") return _ret10.v;
       } else {
         //parse numeric range
         var a = s.split(',');
