@@ -69856,7 +69856,11 @@ var Parser = function () {
       console.log("stepObj:");
       console.log(stepObj);
       //set step ID
-      stepObj['id'] = Object.keys(rvObj)[0];
+      var haveID = false;
+      steps.map(function (step) {
+        if (step.id === stepObj.id) haveID = true;
+      });
+      if (!haveID) stepObj.id = Object.keys(rvObj)[0];
       //process input lines
       var lines = this.processInArr(stepObj, flist, steps);
       //console.log("inLines:\n"+lines)
@@ -69872,7 +69876,7 @@ var Parser = function () {
       //console.log("command:\n"+command)
 
       return {
-        id: stepObj['id'],
+        id: stepObj.id,
         name: stepObj.name,
         command: command,
         out: outObj,
@@ -69935,7 +69939,7 @@ var Parser = function () {
           return value;
         }
       };
-      console.log(flatVarObj);
+
       //replace keys
       Object.keys(flatObj).map(function (key) {
         var processedKey = processValue(key);
@@ -70043,20 +70047,19 @@ var Parser = function () {
               flatLines = (_ref2 = []).concat.apply(_ref2, _toConsumableArray(concatArr));
             })();
           }
-          if (stepObj[key]['line']) {
-            var lineStr = stepObj[key]['line'];
-            var lineArr = [];
-            if (lineStr.indexOf(':') > -1) {
-              lineArr = lineStr.split(':');
-            } else {
-              lineArr[0] = lineStr;
-              lineArr[1] = 1;
-            }
-            var selectedLineNum = _this.parseRange(lineArr[0], flatLines).length;
-            var actualLineNum = selectedLineNum < flatLines.length ? selectedLineNum : flatLines.length;
-            var newNum = Math.floor(actualLineNum / lineArr[1]);
-            loopNum = newNum < loopNum ? newNum : loopNum;
+
+          var lineStr = stepObj[key]['line'] ? stepObj[key]['line'] : "-";
+          var lineArr = [];
+          if (lineStr.indexOf(':') > -1) {
+            lineArr = lineStr.split(':');
+          } else {
+            lineArr[0] = lineStr;
+            lineArr[1] = 1;
           }
+          var selectedLineNum = _this.parseRange(lineArr[0], flatLines).length;
+          var actualLineNum = selectedLineNum < flatLines.length ? selectedLineNum : flatLines.length;
+          var newNum = Math.floor(actualLineNum / lineArr[1]);
+          loopNum = newNum < loopNum ? newNum : loopNum;
         }
       });
       return loopNum;
@@ -70070,6 +70073,7 @@ var Parser = function () {
         var flatLines = [];
         var eachLoop = 1;
 
+        //file key
         if (LEASHObj.file) {
           (function () {
             var _ref3;
@@ -70088,60 +70092,62 @@ var Parser = function () {
           flatLines = (_ref4 = []).concat.apply(_ref4, _toConsumableArray(lines));
         }
 
+        //line key
         var selectedLines = [];
-        if (LEASHObj.line) {
-          (function () {
-            var lineStr = LEASHObj['line'];
-            var lineArr = [];
-            if (lineStr.indexOf(':') > -1) {
-              lineArr = lineStr.split(':');
-              eachLoop = lineArr[1] === 0 ? flatLines.length : lineArr[1];
-            } else {
-              lineArr[0] = lineStr;
-            }
-            var selectedLineArr = _this2.parseRange(lineArr[0], flatLines).map(function (v) {
-              return v - 1;
-            });
-            selectedLines = flatLines.filter(function (v, i) {
-              return selectedLineArr.includes(i);
-            });
-          })();
+        var lineStr = LEASHObj.line ? LEASHObj['line'] : "-";
+        var lineArr = [];
+        if (lineStr.indexOf(':') > -1) {
+          lineArr = lineStr.split(':');
+          eachLoop = lineArr[1] === 0 ? flatLines.length : lineArr[1];
+        } else {
+          lineArr[0] = lineStr;
         }
+        var selectedLineArr = _this2.parseRange(lineArr[0], flatLines).map(function (v) {
+          return v - 1;
+        });
+        selectedLines = flatLines.filter(function (v, i) {
+          return selectedLineArr.includes(i);
+        });
 
         //filter lines for each loop
         var loopingLines = selectedLines.filter(function (v, i) {
           return i >= eachLoop * loop && i < eachLoop * (loop + 1);
         });
 
-        var modLines = [];
+        //mods key
+        var modsLines = loopingLines;
         if (LEASHObj.mods) {
-          modLines = loopingLines.map(function (line) {
-            var modLine = LEASHObj.mods;
+          modsLines = loopingLines.map(function (line) {
+            var modsLine = LEASHObj.mods;
             //predefined vars
             var pvars = {
               "$ENTRY": line,
               "$FILENAME": _path2.default.basename(line),
               "$DIRNAME": _path2.default.dirname(line),
-              "$FILENAME_NOEXT": _path2.default.basename(line).substr(0, line.lastIndexOf('.'))
+              "$PARENT_DIR": _path2.default.resolve(_path2.default.dirname(line), "../"),
+              "$FILENAME_NOEXT": _path2.default.basename(line).substr(0, line.lastIndexOf('.')),
+              "$SEP": _path2.default.sep
             };
             Object.keys(pvars).map(function (key) {
               var pos = LEASHObj.mods.indexOf(key);
               while (pos !== -1) {
-                modLine = modLine.replace(key, pvars[key]);
+                modsLine = modsLine.replace(key, pvars[key]);
                 pos = LEASHObj.mods.indexOf(key, pos + 1);
               }
             });
-            return modLine;
+            return modsLine;
           });
         }
 
+        //mod key
+
+
         var returnStr = "";
         if (LEASHObj.sep) {
-          returnStr = modLines.join(LEASHObj.sep);
+          returnStr = modsLines.join(LEASHObj.sep);
         } else {
-          returnStr = modLines.join(' ');
+          returnStr = modsLines.join(' ');
         }
-
         return returnStr;
       };
 
@@ -70212,7 +70218,7 @@ var Parser = function () {
       var length = arr.length;
       var r = [];
       if (s.indexOf('/') > -1) {
-        var _ret10 = function () {
+        var _ret9 = function () {
           //parse regex range
           var regex = new RegExp(s.slice(1, -1));
           arr.map(function (string, i) {
@@ -70225,7 +70231,7 @@ var Parser = function () {
           };
         }();
 
-        if ((typeof _ret10 === 'undefined' ? 'undefined' : _typeof(_ret10)) === "object") return _ret10.v;
+        if ((typeof _ret9 === 'undefined' ? 'undefined' : _typeof(_ret9)) === "object") return _ret9.v;
       } else {
         //parse numeric range
         var a = s.split(',');

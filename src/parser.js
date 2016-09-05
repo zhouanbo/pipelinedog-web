@@ -30,7 +30,11 @@ export default class Parser {
     console.log("stepObj:")
     console.log(stepObj)
     //set step ID
-    stepObj['id'] = Object.keys(rvObj)[0]
+    let haveID = false
+    steps.map(step => {
+      if (step.id === stepObj.id) haveID = true
+    })
+    if (!haveID) stepObj.id = Object.keys(rvObj)[0]
     //process input lines
     let lines = this.processInArr(stepObj, flist, steps)
     //console.log("inLines:\n"+lines)
@@ -42,7 +46,7 @@ export default class Parser {
     //console.log("command:\n"+command)
 
     return { 
-      id: stepObj['id'],
+      id: stepObj.id,
       name: stepObj.name, 
       command: command, 
       out: outObj, 
@@ -62,7 +66,7 @@ export default class Parser {
     let flatObj = flatten(rObj, {safe: true})
      
     //change numbers to strings
-    Object.keys(flatObj).map((key) => {
+    Object.keys(flatObj).map(key => {
       if (typeof(flatObj[key]) === 'number') flatObj[key] = flatObj[key].toString()
     })
 
@@ -73,7 +77,7 @@ export default class Parser {
           varObj[stepKey] = rObj[key][stepKey]
         })      
         let flatStepObj = flatten(rObj[key], {safe: true})
-        Object.keys(flatStepObj).map((stepKey) => {
+        Object.keys(flatStepObj).map(stepKey => {
             varObj[stepKey] = flatStepObj[stepKey]
         })
       } else {
@@ -101,9 +105,9 @@ export default class Parser {
         return value
       }
     }
-console.log(flatVarObj)
+
     //replace keys
-    Object.keys(flatObj).map((key) => {
+    Object.keys(flatObj).map(key => {
       let processedKey = processValue(key)
       if (processedKey !== key) {
         flatObj[processedKey] = flatObj[key]
@@ -113,8 +117,8 @@ console.log(flatVarObj)
     //replace values
     const haveVar = () => {
       let rKey = false
-      Object.keys(flatObj).map((key) => {
-        Object.keys(flatVarObj).map((varKey) => { 
+      Object.keys(flatObj).map(key => {
+        Object.keys(flatVarObj).map(varKey => { 
           if (flatObj[key] && typeof(flatObj[key]) === 'string' && flatObj[key].indexOf('$'+varKey) > -1 && key.indexOf("comment") === -1) {
             rKey = key
           }
@@ -159,17 +163,17 @@ console.log(flatVarObj)
     inArr.map((inFile) => {
       if (inFile === "$LIST_FILE") {
         let subLine = []
-        flist.split('\n').map((line) => {
+        flist.split('\n').map(line => {
           subLine.push(line)
         })
         lines.push(subLine)
       } else {
         steps.map((step) => { 
-          Object.keys(step.out).map((outKey) => {
+          Object.keys(step.out).map(outKey => {
             let outStr = outKey === 'default' ? "" : "."+outKey
             if (inFile === "$"+step.id+".out"+outStr) {
               let subLine = []
-              step.out[outKey].split('\n').map((line) => {
+              step.out[outKey].split('\n').map(line => {
                 subLine.push(line)
               })
               lines.push(subLine)
@@ -185,7 +189,7 @@ console.log(flatVarObj)
   countLoop(stepObj, lines) {
     let flatLines = [].concat(...lines)
     let loopNum = flatLines.length
-    Object.keys(stepObj).map((key) => {
+    Object.keys(stepObj).map(key => {
       //find LEASH expressions
       if (key.indexOf('~') === 0) {
         if (stepObj[key]['file'] && stepObj['in']) {
@@ -193,20 +197,20 @@ console.log(flatVarObj)
           let concatArr = lines.filter((v, i) => {return fileArr.includes(i)})
           flatLines = [].concat(...concatArr)
         }
-        if (stepObj[key]['line']) {
-          let lineStr = stepObj[key]['line']
-          let lineArr = []
-          if (lineStr.indexOf(':') > -1) {
-            lineArr = lineStr.split(':')
-          } else {
-            lineArr[0] = lineStr
-            lineArr[1] = 1
-          }
-          let selectedLineNum = this.parseRange(lineArr[0], flatLines).length
-          let actualLineNum = selectedLineNum < flatLines.length ? selectedLineNum : flatLines.length
-          let newNum = Math.floor(actualLineNum / lineArr[1])
-          loopNum = newNum < loopNum ? newNum : loopNum
+
+        let lineStr = stepObj[key]['line'] ? stepObj[key]['line'] : "-"
+        let lineArr = []
+        if (lineStr.indexOf(':') > -1) {
+          lineArr = lineStr.split(':')
+        } else {
+          lineArr[0] = lineStr
+          lineArr[1] = 1
         }
+        let selectedLineNum = this.parseRange(lineArr[0], flatLines).length
+        let actualLineNum = selectedLineNum < flatLines.length ? selectedLineNum : flatLines.length
+        let newNum = Math.floor(actualLineNum / lineArr[1])
+        loopNum = newNum < loopNum ? newNum : loopNum
+
       }
     })
     return loopNum
@@ -217,6 +221,7 @@ console.log(flatVarObj)
       let flatLines = []
       let eachLoop = 1
 
+      //file key
       if (LEASHObj.file) {
         let fileArr = this.parseRange(LEASHObj['file'], stepObj['in']).map((v) => v-1)
         let concatArr = lines.filter((v, i) => {return fileArr.includes(i)})
@@ -225,60 +230,69 @@ console.log(flatVarObj)
         flatLines = [].concat(...lines)
       }
 
+      //line key
       let selectedLines = []
-      if (LEASHObj.line) {
-        let lineStr = LEASHObj['line']
-        let lineArr = []
-        if (lineStr.indexOf(':') > -1) {
-          lineArr = lineStr.split(':')
-          eachLoop = lineArr[1] === 0 ? flatLines.length : lineArr[1]
-        } else {
-          lineArr[0] = lineStr
-        }
-        let selectedLineArr = this.parseRange(lineArr[0], flatLines).map((v) => v-1)
-        selectedLines = flatLines.filter((v, i) => {return selectedLineArr.includes(i)})
+      let lineStr = LEASHObj.line ? LEASHObj['line'] : "-"
+      let lineArr = []
+      if (lineStr.indexOf(':') > -1) {
+        lineArr = lineStr.split(':')
+        eachLoop = lineArr[1] === 0 ? flatLines.length : lineArr[1]
+      } else {
+        lineArr[0] = lineStr
       }
+      let selectedLineArr = this.parseRange(lineArr[0], flatLines).map((v) => v-1)
+      selectedLines = flatLines.filter((v, i) => {return selectedLineArr.includes(i)})
 
       //filter lines for each loop
       let loopingLines = selectedLines.filter((v, i) => {return i >= eachLoop*loop && i < eachLoop*(loop+1)})
 
-      let modLines = []
+      //mods key
+      let modsLines = loopingLines
       if (LEASHObj.mods) {
-        modLines = loopingLines.map((line) => {
-          let modLine = LEASHObj.mods
+        modsLines = loopingLines.map(line => {
+          let modsLine = LEASHObj.mods
           //predefined vars
           let pvars = {
             "$ENTRY": line,
             "$FILENAME": path.basename(line),
             "$DIRNAME": path.dirname(line),
+            "$PARENT_DIR": path.resolve(path.dirname(line), "../"),
             "$FILENAME_NOEXT": path.basename(line).substr(0, line.lastIndexOf('.')),
+            "$SEP": path.sep
           }
-          Object.keys(pvars).map((key) => {
+          Object.keys(pvars).map(key => {
             let pos = LEASHObj.mods.indexOf(key)
-            while (pos !== -1) {   
-              modLine = modLine.replace(key, pvars[key])
+            while (pos !== -1) {
+              modsLine = modsLine.replace(key, pvars[key])
               pos = LEASHObj.mods.indexOf(key, pos + 1)
             }
           })
-          return modLine
+          return modsLine
         })
       }
 
+      //mod key
+      
+      
       let returnStr = ""
       if (LEASHObj.sep) {
-        returnStr = modLines.join(LEASHObj.sep)
+        returnStr = modsLines.join(LEASHObj.sep)
       } else {
-        returnStr = modLines.join(' ')
+        returnStr = modsLines.join(' ')
       }
-
       return returnStr
+
+
+
+
+      
     }
 
     let command = ""
     for (let i = 0; i < loopNum; i++) {
       //parse one command without loop
       let run = stepObj.run
-      Object.keys(stepObj).map((key) => {
+      Object.keys(stepObj).map(key => {
         if (key.indexOf('~') === 0) {
           let pos = run.indexOf(key)
           while (pos !== -1) {
@@ -287,12 +301,12 @@ console.log(flatVarObj)
           }
         }
       })
-      command += run+"&\n"     
+      command += run+"&\n"
     }
     
     let outObj = {}
     let flatObj = flatten(stepObj, {safe: true, maxDepth: 2})
-    Object.keys(flatObj).map((outKey) => {
+    Object.keys(flatObj).map(outKey => {
       if (outKey.indexOf('out') === 0) {
         let outStr = flatObj[outKey]
         let result = ""
