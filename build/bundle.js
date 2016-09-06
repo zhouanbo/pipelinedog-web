@@ -69198,7 +69198,7 @@ var PdEditor = function (_React$Component) {
     value: function componentDidMount() {
       //Set editor height
       var setEditorSize = function setEditorSize() {
-        document.getElementById('editor').style.height = Number(document.getElementById('container').offsetHeight - 64 - 56 - 72 - 50) + "px";
+        document.getElementById('editor').style.height = Number(document.getElementById('container').offsetHeight - 64 - 56 - 72 - 50 - 1) + "px";
       };
       setEditorSize();
       window.addEventListener("resize", setEditorSize);
@@ -70151,6 +70151,7 @@ var Parser = function () {
         return returnStr;
       };
 
+      //generate commands
       var command = "";
 
       var _loop = function _loop(i) {
@@ -70172,22 +70173,22 @@ var Parser = function () {
         _loop(i);
       }
 
+      //generate out
       var outObj = {};
-      var flatObj = (0, _flat.flatten)(stepObj, { safe: true, maxDepth: 2 });
-      Object.keys(flatObj).map(function (outKey) {
+      Object.keys(stepObj).map(function (outKey) {
         if (outKey.indexOf('out') === 0) {
           (function () {
-            var outStr = flatObj[outKey];
+            var outStr = stepObj[outKey];
             var result = "";
 
             var _loop2 = function _loop2(_i) {
               //decide to parse LEASH or string
               if (typeof outStr === 'string') {
-                Object.keys(flatObj).map(function (key) {
+                Object.keys(stepObj).map(function (key) {
                   if (key.indexOf('~') === 0) {
                     var pos = outStr.indexOf(key);
                     while (pos !== -1) {
-                      outStr = outStr.replace(key, LEASH(flatObj[key], _i));
+                      outStr = outStr.replace(key, LEASH(stepObj[key], _i));
                       pos = outStr.indexOf(key, pos + 1);
                     }
                   }
@@ -70204,7 +70205,7 @@ var Parser = function () {
             if (outKey === 'out') {
               outObj['default'] = result;
             } else {
-              outObj[outKey.substr(outKey.indexOf('.') + 1, outKey.length)] = result;
+              outObj[outKey.substr(outKey.indexOf('#') + 1, outKey.length)] = result;
             }
           })();
         }

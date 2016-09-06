@@ -273,7 +273,7 @@ export default class Parser {
 
       //mod key
       
-      
+
       let returnStr = ""
       if (LEASHObj.sep) {
         returnStr = modsLines.join(LEASHObj.sep)
@@ -281,13 +281,10 @@ export default class Parser {
         returnStr = modsLines.join(' ')
       }
       return returnStr
-
-
-
-
       
     }
 
+    //generate commands
     let command = ""
     for (let i = 0; i < loopNum; i++) {
       //parse one command without loop
@@ -304,20 +301,20 @@ export default class Parser {
       command += run+"&\n"
     }
     
+    //generate out
     let outObj = {}
-    let flatObj = flatten(stepObj, {safe: true, maxDepth: 2})
-    Object.keys(flatObj).map(outKey => {
+    Object.keys(stepObj).map(outKey => {
       if (outKey.indexOf('out') === 0) {
-        let outStr = flatObj[outKey]
+        let outStr = stepObj[outKey]
         let result = ""
         for (let i = 0; i < loopNum; i++) {
           //decide to parse LEASH or string
           if (typeof(outStr) === 'string') {
-            Object.keys(flatObj).map((key) => {
+            Object.keys(stepObj).map((key) => {
               if (key.indexOf('~') === 0) {
                 let pos = outStr.indexOf(key)
                 while (pos !== -1) {
-                  outStr = outStr.replace(key, LEASH(flatObj[key], i))
+                  outStr = outStr.replace(key, LEASH(stepObj[key], i))
                   pos = outStr.indexOf(key, pos + 1)
                 }
               }
@@ -330,7 +327,7 @@ export default class Parser {
         if (outKey === 'out') {
           outObj['default'] = result
         } else {
-          outObj[outKey.substr(outKey.indexOf('.')+1, outKey.length)] = result
+          outObj[outKey.substr(outKey.indexOf('#')+1, outKey.length)] = result
         }
       }
     })
