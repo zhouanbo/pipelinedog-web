@@ -15,7 +15,7 @@ export default class PdEditor extends React.Component {
   componentDidMount() {
     //Set editor height
     const setEditorSize = () => {
-      document.getElementById('editor').style.height=Number(document.getElementById('container').offsetHeight-64-56-72-50-1)+"px"
+      document.getElementById('editor').style.height=Number(document.getElementById('container').offsetHeight-64-56-72-50)+"px"
     }
     setEditorSize();
     window.addEventListener("resize", setEditorSize);

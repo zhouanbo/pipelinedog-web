@@ -69198,7 +69198,7 @@ var PdEditor = function (_React$Component) {
     value: function componentDidMount() {
       //Set editor height
       var setEditorSize = function setEditorSize() {
-        document.getElementById('editor').style.height = Number(document.getElementById('container').offsetHeight - 64 - 56 - 72 - 50 - 1) + "px";
+        document.getElementById('editor').style.height = Number(document.getElementById('container').offsetHeight - 64 - 56 - 72 - 50) + "px";
       };
       setEditorSize();
       window.addEventListener("resize", setEditorSize);
@@ -70070,6 +70070,8 @@ var Parser = function () {
       var _this2 = this;
 
       var LEASH = function LEASH(LEASHObj, loop) {
+        var out = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
+
         var flatLines = [];
         var eachLoop = 1;
 
@@ -70140,14 +70142,61 @@ var Parser = function () {
         }
 
         //mod key
+        var modLines = modsLines;
+        if (LEASHObj.mod) {
+          (function () {
+            var matchArr = LEASHObj.mod.match(/\w'\w+'/g);
+            modLines = modLines.map(function (line) {
+              var modLine = line;
+              matchArr.map(function (seg) {
+                var segArr = seg.split("'");
 
-
-        var returnStr = "";
-        if (LEASHObj.sep) {
-          returnStr = modsLines.join(LEASHObj.sep);
-        } else {
-          returnStr = modsLines.join(' ');
+                (function () {
+                  switch (segArr[0]) {
+                    case 'P':
+                      modLine = segArr[1] + modLine;
+                      break;
+                    case 'S':
+                      modLine = modLine + segArr[1];
+                      break;
+                    case 'L':
+                      var levelArr = _path2.default.dirname(modLine).split(_path2.default.sep);
+                      var selectedLevelArr = [];
+                      _this2.parseRange(segArr[1], levelArr).map(function (index) {
+                        if (_path2.default.dirname(modLine).indexOf(_path2.default.sep) === 0) {
+                          selectedLevelArr.push(levelArr[index]);
+                        } else {
+                          selectedLevelArr.push(levelArr[index - 1]);
+                        }
+                      });
+                      modLine = _path2.default.resolve(selectedLevelArr.join(_path2.default.sep), _path2.default.basename(modLine));
+                      break;
+                    case 'F':
+                      var fileArr = _path2.default.basename(modLine).split('.');
+                      var selectedFileArr = [];
+                      _this2.parseRange(segArr[1], fileArr).map(function (index) {
+                        selectedFileArr.push(fileArr[index - 1]);
+                      });
+                      modLine = _path2.default.resolve(_path2.default.dirname(modLine), selectedFileArr.join('.'));
+                      break;
+                  }
+                })();
+              });
+              return modLine;
+            });
+          })();
         }
+
+        //sep key
+        var returnStr = "";
+        if (out) {
+          returnStr = modLines.join('\n');
+        } else if (LEASHObj.sep) {
+          returnStr = modLines.join(LEASHObj.sep);
+        } else {
+          returnStr = modLines.join(' ');
+        }
+
         return returnStr;
       };
 
@@ -70194,7 +70243,7 @@ var Parser = function () {
                   }
                 });
               } else {
-                outStr = LEASH(outStr, _i);
+                outStr = LEASH(outStr, _i, true);
               }
               result += outStr + '\n';
             };
@@ -70219,7 +70268,7 @@ var Parser = function () {
       var length = arr.length;
       var r = [];
       if (s.indexOf('/') > -1) {
-        var _ret9 = function () {
+        var _ret11 = function () {
           //parse regex range
           var regex = new RegExp(s.slice(1, -1));
           arr.map(function (string, i) {
@@ -70232,7 +70281,7 @@ var Parser = function () {
           };
         }();
 
-        if ((typeof _ret9 === 'undefined' ? 'undefined' : _typeof(_ret9)) === "object") return _ret9.v;
+        if ((typeof _ret11 === 'undefined' ? 'undefined' : _typeof(_ret11)) === "object") return _ret11.v;
       } else {
         //parse numeric range
         var a = s.split(',');

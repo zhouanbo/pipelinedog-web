@@ -217,7 +217,7 @@ export default class Parser {
   }
 
   parseLEASH(stepObj, lines, loopNum) {
-    const LEASH = (LEASHObj, loop) => {
+    const LEASH = (LEASHObj, loop, out=false) => {
       let flatLines = []
       let eachLoop = 1
 
@@ -272,14 +272,62 @@ export default class Parser {
       }
 
       //mod key
-      
-
-      let returnStr = ""
-      if (LEASHObj.sep) {
-        returnStr = modsLines.join(LEASHObj.sep)
-      } else {
-        returnStr = modsLines.join(' ')
+      let modLines = modsLines
+      if (LEASHObj.mod) {
+        let matchArr = LEASHObj.mod.match(/\w'\w+'/g)
+        modLines = modLines.map(line => {
+          let modLine = line
+          matchArr.map(seg => {
+            let segArr = seg.split("'")
+            switch (segArr[0]) {
+              case 'P':
+                modLine = segArr[1] + modLine
+                break
+              case 'S':
+                modLine = modLine + segArr[1]
+                break
+              case 'L':
+                let levelArr = path.dirname(modLine).split(path.sep)
+                let selectedLevelArr = []
+                this.parseRange(segArr[1], levelArr).map(index => {
+                  if (path.dirname(modLine).indexOf(path.sep) === 0) {
+                    selectedLevelArr.push(levelArr[index])
+                  } else {
+                    selectedLevelArr.push(levelArr[index-1])
+                  }
+                })
+                modLine = path.resolve(
+                  selectedLevelArr.join(path.sep), 
+                  path.basename(modLine)
+                )
+                break
+              case 'F':
+                let fileArr = path.basename(modLine).split('.')
+                let selectedFileArr = []
+                this.parseRange(segArr[1], fileArr).map(index => {
+                  selectedFileArr.push(fileArr[index-1])
+                })
+                modLine = path.resolve( 
+                  path.dirname(modLine),
+                  selectedFileArr.join('.')
+                )
+                break
+            }
+          })
+          return modLine
+        })      
       }
+
+      //sep key
+      let returnStr = ""
+      if (out) {
+        returnStr = modLines.join('\n')
+      } else if (LEASHObj.sep) {
+        returnStr = modLines.join(LEASHObj.sep)
+      } else {
+        returnStr = modLines.join(' ')
+      }
+      
       return returnStr
       
     }
@@ -320,7 +368,7 @@ export default class Parser {
               }
             })
           } else {
-            outStr = LEASH(outStr, i)
+            outStr = LEASH(outStr, i, true)
           }
           result += outStr+'\n'
         }
