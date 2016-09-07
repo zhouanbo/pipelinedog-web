@@ -5,40 +5,66 @@ import Actions from './actions'
 import Parser from './parser'
 
 class Store {
+  
   constructor() {
+
+    this.on('afterEach', () => {
+      try {
+        localStorage.setItem('state', JSON.stringify(this.state))
+      } catch(e) {
+        console.log(e)
+      }
+    })
+
     this.bindListeners({
       onEditorChange: Actions.editorChange,
-      onInit: Actions.init,
-      onSessionUpload: Actions.sessionUpload,
+      onEnterMain: Actions.enterMain,
+      onProjectUpload: Actions.projectUpload,
+      onProjectCreate: Actions.projectCreate,
       onListUpload: Actions.listUpload,
       onStepChange: Actions.stepChange,
       onCreateStep: Actions.createStep,
       onDeleteStep: Actions.deleteStep,
-      onSaveSession: Actions.saveSession
+      onProjectSave: Actions.projectSave,
+      onExportCommand: Actions.exportCommand,
+      onTabChange: Actions.tabChange,
+      onAppStart: Actions.appStart
     })
 
-    this.state = {
-      steps: [{id:'1-2', out:{default: "aaa.bam\nbbb.bam\nccc.bam"}}],
-      init: 0,
-      flist: "/home/usr/b1.bam\n/home/usr/b2.bam\n/home/usr/b3.bam",
-      flistArr: [],
-      gvar: "#Suggested global variables\n\nIN_DIR: \nOUT_DIR: \n",
-      editing: -2,
-      result: "",
-      alertOpen: false,
-    }
+    this.state = {}
   }
 
+  onAppStart() {
+    let localState = {}
+    if (localState = localStorage.getItem('state')) {
+      this.setState(JSON.parse(localState))
+    } else {
+      this.setState({
+        steps: [{
+          id:'1-1', 
+          name: 'Default Step',
+          code: '#Enter code here\n',
+          command: "", 
+          out: {default: "/home/usr/out1.out\n/home/usr/out2.out\n/home/usr/out3.out"},
+          comment: ""
+        }],
+        enterMain: 0,
+        tab: 0,
+        flist: "/home/usr/b1.bam\n/home/usr/b2.bam\n/home/usr/b3.bam",
+        flistArr: [],
+        gvar: "#Suggested global variables\nIN_DIR: \nOUT_DIR:",
+        editing: -2,
+        result: "",
+        alertOpen: false,
+      })
+    }
+  }
   onCreateStep() {
     let steps = this.state.steps
     steps.push({
       id: "",
       name: "",
       code: "", //code
-      //codeObj: {}, //JSON object parsed from the code
-      //parsedOptions: {}, //LEASH converted options of the tool
-      //expressions: [], //direct LEASH parsing result
-      //options: [], //keys for options
       command: "", //the command to finally run
       //valid: true, //if the JSON is valid
       out: {}, //the output array
@@ -46,7 +72,6 @@ class Store {
     })
     this.setState({steps})
   }
-
   onDeleteStep(index) {
     let steps = this.state.steps
     let editing = this.state.editing
@@ -56,15 +81,19 @@ class Store {
     }
     this.setState({steps, editing})
   }
-
-  onInit() {
-    this.setState({init: 1})
+  onEnterMain() {
+    this.setState({enterMain: 1})
   }
+  onTabChange(value) {
+    this.setState({tab: value})
+  }
+  onProjectCreate() {
 
-  onSaveSession() {
+  }
+  onProjectSave() {
     
   }
-  onSessionUpload(files) {
+  onProjectUpload(files) {
     const reader = new FileReader()
     reader.onloadend = (e) => {
       console.log(yaml.safeLoad(reader.result))
@@ -101,16 +130,22 @@ class Store {
       } catch (e) {
         console.log(e)
       }
-console.log(steps)
+
       this.setState({steps})
     }
-    
   }
   onStepChange(index) {
-    //add onEditorChange later to refresh output
-    this.setState({editing: index})
+    this.setState({editing: index, tab: 0})
   }
-
+  onExportCommand() {
+    try {
+      let parser = new Parser()
+      let result = parser.combineSteps(this.state.steps)
+      console.log(result)
+    } catch (e) {
+      console.log(e)
+    }
+  }
 
 }
 

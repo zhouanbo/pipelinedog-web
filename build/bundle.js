@@ -68693,7 +68693,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var Actions = function Actions() {
   _classCallCheck(this, Actions);
 
-  this.generateActions('uploadFile', 'createStep', 'deleteStep', 'editorChange', 'init', 'sessionUpload', 'listUpload', 'stepChange', 'saveSession', 'editorChange');
+  this.generateActions('uploadFile', 'createStep', 'deleteStep', 'editorChange', 'enterMain', 'projectUpload', 'listUpload', 'stepChange', 'projectSave', 'projectCreate', 'editorChange', 'exportCommand', 'tabChange', 'appStart');
 };
 
 exports.default = _alt2.default.createActions(Actions);
@@ -68831,7 +68831,10 @@ var Main = function (_React$Component) {
   function Main(props) {
     _classCallCheck(this, Main);
 
-    return _possibleConstructorReturn(this, Object.getPrototypeOf(Main).call(this, props));
+    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Main).call(this, props));
+
+    _actions2.default.appStart();
+    return _this;
   }
 
   _createClass(Main, [{
@@ -68857,19 +68860,24 @@ var Main = function (_React$Component) {
       }
     }
   }, {
-    key: 'dispatchInit',
-    value: function dispatchInit() {
-      _actions2.default.init();
+    key: 'dispatchEnterMain',
+    value: function dispatchEnterMain() {
+      _actions2.default.enterMain();
     }
   }, {
-    key: 'dispatchSessionUpload',
-    value: function dispatchSessionUpload(file) {
-      _actions2.default.sessionUpload(file);
+    key: 'dispatchProjectUpload',
+    value: function dispatchProjectUpload(file) {
+      _actions2.default.ProjectUpload(file);
     }
   }, {
-    key: 'dispatchSaveSession',
-    value: function dispatchSaveSession() {
-      _actions2.default.saveSession();
+    key: 'dispatchProjectCreate',
+    value: function dispatchProjectCreate() {
+      _actions2.default.projectCreate();
+    }
+  }, {
+    key: 'dispatchProjectSave',
+    value: function dispatchProjectSave() {
+      _actions2.default.projectSave();
     }
   }, {
     key: 'dispatchListUpload',
@@ -68897,6 +68905,16 @@ var Main = function (_React$Component) {
       _actions2.default.editorChange(newText);
     }
   }, {
+    key: 'dispatchExportCommand',
+    value: function dispatchExportCommand() {
+      _actions2.default.exportCommand();
+    }
+  }, {
+    key: 'dispatchTabChange',
+    value: function dispatchTabChange(value) {
+      _actions2.default.tabChange(value);
+    }
+  }, {
     key: 'render',
     value: function render() {
       return _react2.default.createElement(
@@ -68905,14 +68923,19 @@ var Main = function (_React$Component) {
         _react2.default.createElement(
           'div',
           { id: 'header', style: { flex: "0 0 auto", zIndex: 99 } },
-          _react2.default.createElement(_pdAppBar2.default, { init: this.props.init, dispatchSaveSession: this.dispatchSaveSession })
+          _react2.default.createElement(_pdAppBar2.default, {
+            enterMain: this.props.enterMain,
+            dispatchProjectCreate: this.dispatchProjectCreate,
+            dispatchProjectSave: this.dispatchProjectSave,
+            dispatchExportCommand: this.dispatchExportCommand
+          })
         ),
-        this.props.init ? _react2.default.createElement(
+        this.props.enterMain ? _react2.default.createElement(
           'div',
           { id: 'content', style: { flex: "1 1 auto", display: "flex", alignItems: "stretch" } },
           _react2.default.createElement(
             _Paper2.default,
-            { style: { flex: "0 0 25%" }, zDepth: 0 },
+            { style: { flex: "0 0 25%", overflow: "scroll" }, zDepth: 0 },
             _react2.default.createElement(_pdStepList2.default, {
               steps: this.props.steps,
               dispatchStepChange: this.dispatchStepChange,
@@ -68923,10 +68946,10 @@ var Main = function (_React$Component) {
           ),
           _react2.default.createElement(
             _Paper2.default,
-            { style: { flex: "1 1 auto" }, zDepth: 1 },
+            { style: { flex: "1 1 auto", zIndex: 9 }, zDepth: 1 },
             _react2.default.createElement(
               _Tabs.Tabs,
-              null,
+              { value: this.props.tab, onChange: this.dispatchTabChange },
               _react2.default.createElement(
                 _Tabs.Tab,
                 {
@@ -68935,7 +68958,8 @@ var Main = function (_React$Component) {
                     { className: 'material-icons' },
                     'edit'
                   ),
-                  label: 'Editor'
+                  label: 'Editor',
+                  value: 0
                 },
                 _react2.default.createElement(_pdEditorToolBar2.default, {
                   name: this.getEditorName(this.props.editing)
@@ -68957,14 +68981,19 @@ var Main = function (_React$Component) {
                     { className: 'material-icons' },
                     'code'
                   ),
-                  label: 'Command'
+                  label: 'Command',
+                  value: 1,
+                  style: this.props.editing < 0 ? { display: "none" } : {}
                 },
+                _react2.default.createElement(_pdEditorToolBar2.default, {
+                  name: this.getEditorName(this.props.editing)
+                }),
                 _react2.default.createElement(
                   _Paper2.default,
                   { zDepth: 0, style: { padding: 8 } },
                   _react2.default.createElement(
                     'pre',
-                    { className: 'codeblock' },
+                    { className: 'codeblock', style: { margin: 0 } },
                     this.props.editing > -1 ? this.props.steps[this.props.editing].command : "Not Applicable"
                   )
                 )
@@ -68977,14 +69006,19 @@ var Main = function (_React$Component) {
                     { className: 'material-icons' },
                     'insert_drive_file'
                   ),
-                  label: 'Output'
+                  label: 'Output',
+                  value: 2,
+                  style: this.props.editing < 0 ? { display: "none" } : {}
                 },
+                _react2.default.createElement(_pdEditorToolBar2.default, {
+                  name: this.getEditorName(this.props.editing)
+                }),
                 _react2.default.createElement(
                   _Paper2.default,
                   { zDepth: 0, style: { padding: 8 } },
                   _react2.default.createElement(
                     'pre',
-                    { className: 'codeblock' },
+                    { className: 'codeblock', style: { margin: 0 } },
                     this.props.editing > -1 && this.props.steps[this.props.editing].out ? _jsYaml2.default.safeDump(this.props.steps[this.props.editing].out) : "Not Applicable"
                   )
                 )
@@ -68995,14 +69029,14 @@ var Main = function (_React$Component) {
           _Paper2.default,
           { id: 'welcome', style: { flex: "1 1 auto", display: "flex", alignItems: "stretch" } },
           _react2.default.createElement(_pdWelcome2.default, {
-            dispatchInit: this.dispatchInit,
-            dispatchSessionUpload: this.dispatchSessionUpload,
+            dispatchEnterMain: this.dispatchEnterMain,
+            dispatchProjectUpload: this.dispatchProjectUpload,
             dispatchListUpload: this.dispatchListUpload
           })
         ),
         _react2.default.createElement(
           _Paper2.default,
-          { id: 'footer', style: { height: 50, background: "#F5F5F5" }, zDepth: 2 },
+          { id: 'footer', style: { height: 50, background: "#F5F5F5", zIndex: 10 }, zDepth: 2 },
           _react2.default.createElement(
             _Subheader2.default,
             null,
@@ -69039,6 +69073,14 @@ var _Drawer = require('material-ui/Drawer');
 
 var _Drawer2 = _interopRequireDefault(_Drawer);
 
+var _IconMenu = require('material-ui/IconMenu');
+
+var _IconMenu2 = _interopRequireDefault(_IconMenu);
+
+var _IconButton = require('material-ui/IconButton');
+
+var _IconButton2 = _interopRequireDefault(_IconButton);
+
 var _MenuItem = require('material-ui/MenuItem');
 
 var _MenuItem2 = _interopRequireDefault(_MenuItem);
@@ -69046,10 +69088,6 @@ var _MenuItem2 = _interopRequireDefault(_MenuItem);
 var _Subheader = require('material-ui/Subheader');
 
 var _Subheader2 = _interopRequireDefault(_Subheader);
-
-var _FlatButton = require('material-ui/FlatButton');
-
-var _FlatButton2 = _interopRequireDefault(_FlatButton);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -69075,7 +69113,7 @@ var PdAppBar = function (_React$Component) {
   _createClass(PdAppBar, [{
     key: 'handleToggle',
     value: function handleToggle() {
-      if (this.props.init) {
+      if (this.props.enterMain) {
         this.setState({ open: !this.state.open });
       }
     }
@@ -69089,13 +69127,31 @@ var PdAppBar = function (_React$Component) {
         null,
         _react2.default.createElement(_AppBar2.default, {
           title: 'PipelineDog',
-          onLeftIconButtonTouchTap: this.handleToggle.bind(this),
-          iconElementRight: _react2.default.createElement(_FlatButton2.default, {
-            label: 'Save Session',
-            onTouchTap: this.props.dispatchSaveSession
-          })
+          onLeftIconButtonTouchTap: this.handleToggle,
+          iconElementRight: _react2.default.createElement(
+            _IconMenu2.default,
+            {
+              iconButtonElement: _react2.default.createElement(
+                _IconButton2.default,
+                { iconClassName: 'material-icons' },
+                'more_vert'
+              ),
+              targetOrigin: { horizontal: 'right', vertical: 'top' },
+              anchorOrigin: { horizontal: 'right', vertical: 'top' }
+            },
+            _react2.default.createElement(_MenuItem2.default, {
+              disabled: !this.props.enterMain,
+              primaryText: 'Save Project',
+              onTouchTap: this.props.dispatchSaveProject
+            }),
+            _react2.default.createElement(_MenuItem2.default, {
+              disabled: !this.props.enterMain,
+              primaryText: 'Export Command',
+              onTouchTap: this.props.dispatchExportCommand
+            })
+          )
         }),
-        this.props.init ? _react2.default.createElement(
+        _react2.default.createElement(
           _Drawer2.default,
           {
             docked: false,
@@ -69112,9 +69168,23 @@ var PdAppBar = function (_React$Component) {
           _react2.default.createElement(
             _MenuItem2.default,
             { onTouchTap: function onTouchTap() {
-                _this2.handleToggle();
+                _this2.handleToggle();_this2.props.dispatchProjectCreate();
               } },
-            'Export Project'
+            'New Project'
+          ),
+          _react2.default.createElement(
+            _MenuItem2.default,
+            { onTouchTap: function onTouchTap() {
+                _this2.handleToggle();_this2.props.dispatchProjectSave();
+              } },
+            'Save Project'
+          ),
+          _react2.default.createElement(
+            _MenuItem2.default,
+            { onTouchTap: function onTouchTap() {
+                _this2.handleToggle();_this2.props.dispatchExportCommand();
+              } },
+            'Export Command'
           ),
           _react2.default.createElement(
             _MenuItem2.default,
@@ -69137,7 +69207,7 @@ var PdAppBar = function (_React$Component) {
               } },
             'About PipelineDog'
           )
-        ) : _react2.default.createElement('div', null)
+        )
       );
     }
   }]);
@@ -69147,7 +69217,7 @@ var PdAppBar = function (_React$Component) {
 
 exports.default = PdAppBar;
 
-},{"material-ui/AppBar":233,"material-ui/Drawer":239,"material-ui/FlatButton":244,"material-ui/MenuItem":259,"material-ui/Subheader":275,"react":494}],515:[function(require,module,exports){
+},{"material-ui/AppBar":233,"material-ui/Drawer":239,"material-ui/IconButton":248,"material-ui/IconMenu":250,"material-ui/MenuItem":259,"material-ui/Subheader":275,"react":494}],515:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -69587,12 +69657,12 @@ var PdWelcome = function (_React$Component) {
     _this.state = {
       stepIndex: 0,
       listDropText: "Drop your list file or click to select.",
-      sessionDropText: "Drop your session file or click to select."
+      projectDropText: "Drop your session file or click to select."
     };
     _this.handleNext = _this.handleNext.bind(_this);
     _this.handlePrev = _this.handlePrev.bind(_this);
     _this.handleListDrop = _this.handleListDrop.bind(_this);
-    _this.handleSessionDrop = _this.handleSessionDrop.bind(_this);
+    _this.handleProjectDrop = _this.handleProjectDrop.bind(_this);
     _this.getStepContent = _this.getContent.bind(_this);
     return _this;
   }
@@ -69606,7 +69676,7 @@ var PdWelcome = function (_React$Component) {
         stepIndex: stepIndex + 1
       });
       if (stepIndex >= 2) {
-        this.props.dispatchInit();
+        this.props.dispatchEnterMain();
       }
     }
   }, {
@@ -69624,9 +69694,9 @@ var PdWelcome = function (_React$Component) {
       this.setState({ listDropText: "Uploaded Sucessfully: " + files[0].name });
     }
   }, {
-    key: 'handleSessionDrop',
-    value: function handleSessionDrop(files) {
-      this.setState({ sessionDropText: "Uploaded Sucessfully: " + files[0].name });
+    key: 'handleProjectDrop',
+    value: function handleProjectDrop(files) {
+      this.setState({ projectDropText: "Uploaded Sucessfully: " + files[0].name });
     }
   }, {
     key: 'getContent',
@@ -69653,13 +69723,13 @@ var PdWelcome = function (_React$Component) {
               {
                 multiple: false,
                 onDrop: function onDrop(files) {
-                  _this2.props.dispatchSessionUpload(files);_this2.handleSessionDrop(files);
+                  _this2.props.dispatchProjectUpload(files);_this2.handleProjectDrop(files);
                 }
               },
               _react2.default.createElement(
                 'div',
                 { style: { padding: 16, textAlign: "center" } },
-                this.state.sessionDropText
+                this.state.projectDropText
               )
             )
           );
@@ -69736,7 +69806,7 @@ var PdWelcome = function (_React$Component) {
               { onClick: function onClick() {
                   return _this3.setState({ stepIndex: 0 });
                 } },
-              'Upload a session file'
+              'Upload a project file'
             )
           ),
           _react2.default.createElement(
@@ -69885,7 +69955,29 @@ var Parser = function () {
     }
   }, {
     key: 'combineSteps',
-    value: function combineSteps(stepsObj) {}
+    value: function combineSteps(stepsObj) {
+      var result = "";
+      var previousNum = void 0;
+      var currentNum = void 0;
+      stepsObj.sort(function (a, b) {
+        return Number(a.id.replace('-', '')) - Number(b.id.replace('-', ''));
+      }).map(function (obj, idx) {
+        if (idx === 0) previousNum = Number(obj.id.split('-')[0]);
+        currentNum = Number(obj.id.split('-')[0]);
+        if (idx !== 0) {
+          if (currentNum !== previousNum && stepsObj[idx - 1].command) {
+            result += 'wait\n';
+            previousNum = currentNum;
+          }
+          result += '\n';
+        }
+        result += obj.id ? '# Step ID: ' + obj.id + '\n' : "";
+        result += obj.name ? '# Step Name: ' + obj.name + '\n' : "";
+        result += obj.comment ? '# Comment: ' + obj.comment + '\n' : "";
+        result += obj.command ? '# Command: \n' + obj.command + '\n' : "";
+      });
+      return result;
+    }
   }, {
     key: 'replaceVars',
     value: function replaceVars(rawObj) {
@@ -69962,7 +70054,6 @@ var Parser = function () {
       };
       var varKey = void 0;
       while (varKey = haveVar()) {
-        console.log(varKey);
         flatObj[varKey] = processValue(flatObj[varKey]);
       }
 
@@ -70188,20 +70279,20 @@ var Parser = function () {
         }
 
         //sep key
-        var returnStr = "";
+        var sepStr = "";
         if (out) {
-          returnStr = modLines.join('\n');
+          sepStr = modLines.join('\n');
         } else if (LEASHObj.sep) {
-          returnStr = modLines.join(LEASHObj.sep);
+          sepStr = modLines.join(LEASHObj.sep);
         } else {
-          returnStr = modLines.join(' ');
+          sepStr = modLines.join(' ');
         }
 
-        return returnStr;
+        return sepStr;
       };
 
       //generate commands
-      var command = "";
+      var command = [];
 
       var _loop = function _loop(i) {
         //parse one command without loop
@@ -70215,12 +70306,13 @@ var Parser = function () {
             }
           }
         });
-        command += run + "&\n";
+        command.push(run + "&");
       };
 
       for (var i = 0; i < loopNum; i++) {
         _loop(i);
       }
+      command = command.join('\n');
 
       //generate out
       var outObj = {};
@@ -70345,32 +70437,64 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var Store = function () {
   function Store() {
+    var _this = this;
+
     _classCallCheck(this, Store);
+
+    this.on('afterEach', function () {
+      try {
+        localStorage.setItem('state', JSON.stringify(_this.state));
+      } catch (e) {
+        console.log(e);
+      }
+    });
 
     this.bindListeners({
       onEditorChange: _actions2.default.editorChange,
-      onInit: _actions2.default.init,
-      onSessionUpload: _actions2.default.sessionUpload,
+      onEnterMain: _actions2.default.enterMain,
+      onProjectUpload: _actions2.default.projectUpload,
+      onProjectCreate: _actions2.default.projectCreate,
       onListUpload: _actions2.default.listUpload,
       onStepChange: _actions2.default.stepChange,
       onCreateStep: _actions2.default.createStep,
       onDeleteStep: _actions2.default.deleteStep,
-      onSaveSession: _actions2.default.saveSession
+      onProjectSave: _actions2.default.projectSave,
+      onExportCommand: _actions2.default.exportCommand,
+      onTabChange: _actions2.default.tabChange,
+      onAppStart: _actions2.default.appStart
     });
 
-    this.state = {
-      steps: [{ id: '1-2', out: { default: "aaa.bam\nbbb.bam\nccc.bam" } }],
-      init: 0,
-      flist: "/home/usr/b1.bam\n/home/usr/b2.bam\n/home/usr/b3.bam",
-      flistArr: [],
-      gvar: "#Suggested global variables\n\nIN_DIR: \nOUT_DIR: \n",
-      editing: -2,
-      result: "",
-      alertOpen: false
-    };
+    this.state = {};
   }
 
   _createClass(Store, [{
+    key: 'onAppStart',
+    value: function onAppStart() {
+      var localState = {};
+      if (localState = localStorage.getItem('state')) {
+        this.setState(JSON.parse(localState));
+      } else {
+        this.setState({
+          steps: [{
+            id: '1-1',
+            name: 'Default Step',
+            code: '#Enter code here\n',
+            command: "",
+            out: { default: "/home/usr/out1.out\n/home/usr/out2.out\n/home/usr/out3.out" },
+            comment: ""
+          }],
+          enterMain: 0,
+          tab: 0,
+          flist: "/home/usr/b1.bam\n/home/usr/b2.bam\n/home/usr/b3.bam",
+          flistArr: [],
+          gvar: "#Suggested global variables\nIN_DIR: \nOUT_DIR:",
+          editing: -2,
+          result: "",
+          alertOpen: false
+        });
+      }
+    }
+  }, {
     key: 'onCreateStep',
     value: function onCreateStep() {
       var steps = this.state.steps;
@@ -70378,10 +70502,6 @@ var Store = function () {
         id: "",
         name: "",
         code: "", //code
-        //codeObj: {}, //JSON object parsed from the code
-        //parsedOptions: {}, //LEASH converted options of the tool
-        //expressions: [], //direct LEASH parsing result
-        //options: [], //keys for options
         command: "", //the command to finally run
         //valid: true, //if the JSON is valid
         out: {}, //the output array
@@ -70401,16 +70521,24 @@ var Store = function () {
       this.setState({ steps: steps, editing: editing });
     }
   }, {
-    key: 'onInit',
-    value: function onInit() {
-      this.setState({ init: 1 });
+    key: 'onEnterMain',
+    value: function onEnterMain() {
+      this.setState({ enterMain: 1 });
     }
   }, {
-    key: 'onSaveSession',
-    value: function onSaveSession() {}
+    key: 'onTabChange',
+    value: function onTabChange(value) {
+      this.setState({ tab: value });
+    }
   }, {
-    key: 'onSessionUpload',
-    value: function onSessionUpload(files) {
+    key: 'onProjectCreate',
+    value: function onProjectCreate() {}
+  }, {
+    key: 'onProjectSave',
+    value: function onProjectSave() {}
+  }, {
+    key: 'onProjectUpload',
+    value: function onProjectUpload(files) {
       var reader = new FileReader();
       reader.onloadend = function (e) {
         console.log(_jsYaml2.default.safeLoad(reader.result));
@@ -70421,11 +70549,11 @@ var Store = function () {
   }, {
     key: 'onListUpload',
     value: function onListUpload(files) {
-      var _this = this;
+      var _this2 = this;
 
       var reader = new FileReader();
       reader.onloadend = function (e) {
-        _this.setState({ list: reader.result });
+        _this2.setState({ list: reader.result });
       };
       reader.readAsText(files[0]);
     }
@@ -70461,15 +70589,25 @@ var Store = function () {
         } catch (e) {
           console.log(e);
         }
-        console.log(steps);
+
         this.setState({ steps: steps });
       }
     }
   }, {
     key: 'onStepChange',
     value: function onStepChange(index) {
-      //add onEditorChange later to refresh output
-      this.setState({ editing: index });
+      this.setState({ editing: index, tab: 0 });
+    }
+  }, {
+    key: 'onExportCommand',
+    value: function onExportCommand() {
+      try {
+        var parser = new _parser2.default();
+        var result = parser.combineSteps(this.state.steps);
+        console.log(result);
+      } catch (e) {
+        console.log(e);
+      }
     }
   }]);
 

@@ -17,6 +17,7 @@ class Main extends React.Component {
   
   constructor(props) {
     super(props)
+    Actions.appStart()
   }
 
   getEditorText(index) {
@@ -38,14 +39,17 @@ class Main extends React.Component {
     }
   }
 
-  dispatchInit() {
-    Actions.init()
+  dispatchEnterMain() {
+    Actions.enterMain()
   }
-  dispatchSessionUpload(file) {
-    Actions.sessionUpload(file)
+  dispatchProjectUpload(file) {
+    Actions.ProjectUpload(file)
   }
-  dispatchSaveSession() {
-    Actions.saveSession()
+  dispatchProjectCreate() {
+    Actions.projectCreate()
+  }
+  dispatchProjectSave() {
+    Actions.projectSave()
   }
   dispatchListUpload(file) {
     Actions.listUpload(file)
@@ -62,20 +66,31 @@ class Main extends React.Component {
   dispatchEditorChange(newText) {
     Actions.editorChange(newText)
   }
+  dispatchExportCommand() {
+    Actions.exportCommand()
+  }
+  dispatchTabChange(value) {
+    Actions.tabChange(value)
+  }
 
   render() {
     return (
       <div id="container" style={{display: "flex", flexDirection: "column", alignItems: "stretch"}}>
 
         <div id="header" style={{flex: "0 0 auto", zIndex: 99}}>
-          <PdAppBar init={this.props.init} dispatchSaveSession={this.dispatchSaveSession}/>
+          <PdAppBar 
+            enterMain={this.props.enterMain} 
+            dispatchProjectCreate={this.dispatchProjectCreate}
+            dispatchProjectSave={this.dispatchProjectSave}
+            dispatchExportCommand={this.dispatchExportCommand}
+          />
         </div>
 
-        {this.props.init ? 
+        {this.props.enterMain ? 
 
         <div id="content" style={{flex: "1 1 auto", display: "flex", alignItems: "stretch"}}>
           
-          <Paper style={{flex: "0 0 25%"}} zDepth={0}>
+          <Paper style={{flex: "0 0 25%", overflow: "scroll"}} zDepth={0}>
             <PdStepList
               steps={this.props.steps}
               dispatchStepChange={this.dispatchStepChange}
@@ -85,12 +100,12 @@ class Main extends React.Component {
             />
           </Paper>
 
-          <Paper style={{flex: "1 1 auto"}} zDepth={1}>
-            <Tabs>
-
+          <Paper style={{flex: "1 1 auto", zIndex: 9}} zDepth={1}>
+            <Tabs value={this.props.tab} onChange={this.dispatchTabChange}>
               <Tab 
                 icon={<FontIcon className="material-icons">edit</FontIcon>}
                 label="Editor"
+                value={0}
               >
                 <PdEditorToolBar 
                   name={this.getEditorName(this.props.editing)}
@@ -105,10 +120,15 @@ class Main extends React.Component {
              
               <Tab 
                 icon={<FontIcon className="material-icons">code</FontIcon>}
-                label="Command" 
+                label="Command"
+                value={1}
+                style={this.props.editing < 0 ? {display: "none"} : {}} 
               >
+                <PdEditorToolBar 
+                  name={this.getEditorName(this.props.editing)}
+                />
                 <Paper zDepth={0} style={{padding: 8}}>
-                  <pre className="codeblock">
+                  <pre className="codeblock" style={{margin: 0}}>
                     {this.props.editing > -1 ? this.props.steps[this.props.editing].command : "Not Applicable"}
                   </pre>
                 </Paper>
@@ -117,9 +137,14 @@ class Main extends React.Component {
               <Tab 
                 icon={<FontIcon className="material-icons">insert_drive_file</FontIcon>}
                 label="Output" 
+                value={2}
+                style={this.props.editing < 0 ? {display: "none"} : {}}
               >
+                <PdEditorToolBar 
+                  name={this.getEditorName(this.props.editing)}
+                />
                 <Paper zDepth={0} style={{padding: 8}}>
-                  <pre className="codeblock">
+                  <pre className="codeblock" style={{margin: 0}}>
                     {this.props.editing > -1 && this.props.steps[this.props.editing].out ? yaml.safeDump(this.props.steps[this.props.editing].out) : "Not Applicable"}
                   </pre>
                 </Paper>
@@ -133,14 +158,14 @@ class Main extends React.Component {
 
         <Paper id="welcome" style={{flex: "1 1 auto", display: "flex", alignItems: "stretch"}}>
           <PdWelcome 
-            dispatchInit={this.dispatchInit}
-            dispatchSessionUpload={this.dispatchSessionUpload}
+            dispatchEnterMain={this.dispatchEnterMain}
+            dispatchProjectUpload={this.dispatchProjectUpload}
             dispatchListUpload={this.dispatchListUpload}
           />
         </Paper>
         }
         
-        <Paper id="footer" style={{height: 50, background: "#F5F5F5"}} zDepth={2}>
+        <Paper id="footer" style={{height: 50, background: "#F5F5F5", zIndex: 10}} zDepth={2}>
           <Subheader>
             2016 PipelineDog
           </Subheader>

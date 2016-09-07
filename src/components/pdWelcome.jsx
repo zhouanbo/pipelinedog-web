@@ -13,12 +13,12 @@ export default class PdWelcome extends React.Component {
     this.state = {
       stepIndex: 0,
       listDropText: "Drop your list file or click to select.",
-      sessionDropText: "Drop your session file or click to select."
+      projectDropText: "Drop your session file or click to select."
     }
     this.handleNext = this.handleNext.bind(this)
     this.handlePrev = this.handlePrev.bind(this) 
     this.handleListDrop = this.handleListDrop.bind(this)
-    this.handleSessionDrop = this.handleSessionDrop.bind(this)
+    this.handleProjectDrop = this.handleProjectDrop.bind(this)
     this.getStepContent = this.getContent.bind(this)
   }
 
@@ -28,7 +28,7 @@ export default class PdWelcome extends React.Component {
       stepIndex: stepIndex + 1,
     })
     if (stepIndex >= 2) {
-      this.props.dispatchInit()
+      this.props.dispatchEnterMain()
     }
   }
 
@@ -43,8 +43,8 @@ export default class PdWelcome extends React.Component {
     this.setState({listDropText: "Uploaded Sucessfully: "+files[0].name})
   }
 
-  handleSessionDrop(files) {
-    this.setState({sessionDropText: "Uploaded Sucessfully: "+files[0].name})
+  handleProjectDrop(files) {
+    this.setState({projectDropText: "Uploaded Sucessfully: "+files[0].name})
   }
 
   getContent(stepIndex) {
@@ -56,9 +56,9 @@ export default class PdWelcome extends React.Component {
             <h4>You can continue as a new project or upload a session file.</h4>
             <DropZone 
               multiple={false} 
-              onDrop={(files)=>{this.props.dispatchSessionUpload(files);this.handleSessionDrop(files)}}
+              onDrop={(files)=>{this.props.dispatchProjectUpload(files);this.handleProjectDrop(files)}}
             >
-              <div style={{padding: 16, textAlign: "center", }}>{this.state.sessionDropText}</div>
+              <div style={{padding: 16, textAlign: "center", }}>{this.state.projectDropText}</div>
             </DropZone>
           </Paper>
         )
@@ -95,7 +95,7 @@ export default class PdWelcome extends React.Component {
       <div style={{width: '100%', maxWidth: 700, margin: 'auto'}}>
         <Stepper linear={false} activeStep={stepIndex}>
           <Step>
-            <StepButton onClick={() => this.setState({stepIndex: 0})}>Upload a session file</StepButton>
+            <StepButton onClick={() => this.setState({stepIndex: 0})}>Upload a project file</StepButton>
           </Step>
           <Step>
             <StepButton onClick={() => this.setState({stepIndex: 1})}>Upload a list file</StepButton>

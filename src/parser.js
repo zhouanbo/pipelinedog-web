@@ -55,7 +55,27 @@ export default class Parser {
   }
 
   combineSteps(stepsObj) {
-
+    let result = ""
+    let previousNum
+    let currentNum
+    stepsObj.sort((a,b)=>{
+      return Number(a.id.replace('-',''))-Number(b.id.replace('-',''))
+    }).map((obj, idx) => {
+      if (idx === 0) previousNum = Number(obj.id.split('-')[0])
+      currentNum = Number(obj.id.split('-')[0])
+      if (idx !== 0) {
+        if (currentNum !== previousNum && stepsObj[idx-1].command) {
+          result += `wait\n`
+          previousNum = currentNum
+        } 
+        result += '\n'
+      }
+      result += obj.id ? `# Step ID: ${obj.id}\n`: ""
+      result += obj.name ? `# Step Name: ${obj.name}\n`: ""
+      result += obj.comment ? `# Comment: ${obj.comment}\n` : ""
+      result += obj.command ? `# Command: \n${obj.command}\n` : ""
+    })
+    return result
   }
 
   replaceVars(rawObj) {
@@ -128,7 +148,6 @@ export default class Parser {
     }
     let varKey
     while (varKey = haveVar()) {
-      console.log(varKey)
       flatObj[varKey] = processValue(flatObj[varKey])
     }
 
@@ -319,21 +338,21 @@ export default class Parser {
       }
 
       //sep key
-      let returnStr = ""
+      let sepStr = ""
       if (out) {
-        returnStr = modLines.join('\n')
+        sepStr = modLines.join('\n')
       } else if (LEASHObj.sep) {
-        returnStr = modLines.join(LEASHObj.sep)
+        sepStr = modLines.join(LEASHObj.sep)
       } else {
-        returnStr = modLines.join(' ')
+        sepStr = modLines.join(' ')
       }
       
-      return returnStr
+      return sepStr
       
     }
 
     //generate commands
-    let command = ""
+    let command = []
     for (let i = 0; i < loopNum; i++) {
       //parse one command without loop
       let run = stepObj.run
@@ -346,8 +365,9 @@ export default class Parser {
           }
         }
       })
-      command += run+"&\n"
+      command.push(run+"&")
     }
+    command = command.join('\n')
     
     //generate out
     let outObj = {}

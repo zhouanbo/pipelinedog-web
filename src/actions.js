@@ -7,12 +7,16 @@ class Actions {
       'createStep',
       'deleteStep',
       'editorChange',
-      'init',
-      'sessionUpload',
+      'enterMain',
+      'projectUpload',
       'listUpload',
       'stepChange',
-      'saveSession',
-      'editorChange'
+      'projectSave',
+      'projectCreate',
+      'editorChange',
+      'exportCommand',
+      'tabChange',
+      'appStart'
       )
   }
 }
