@@ -7,7 +7,24 @@ import Parser from './parser'
 class Store {
   
   constructor() {
-
+    this.startState = {
+      steps: [{
+        id:'1-1', 
+        name: 'Default Step',
+        code: '#Enter code here\n',
+        command: "", 
+        out: {default: "/home/usr/out1.out\n/home/usr/out2.out\n/home/usr/out3.out"},
+        comment: ""
+      }],
+      enterMain: 0,
+      tab: 0,
+      flist: "/home/usr/b1.bam\n/home/usr/b2.bam\n/home/usr/b3.bam",
+      flistArr: [],
+      gvar: "#Suggested global variables\nIN_DIR: \nOUT_DIR:",
+      editing: -2,
+      result: "",
+      alertOpen: false,
+    }
     this.on('afterEach', () => {
       try {
         localStorage.setItem('state', JSON.stringify(this.state))
@@ -15,7 +32,6 @@ class Store {
         console.log(e)
       }
     })
-
     this.bindListeners({
       onEditorChange: Actions.editorChange,
       onEnterMain: Actions.enterMain,
@@ -27,36 +43,13 @@ class Store {
       onDeleteStep: Actions.deleteStep,
       onProjectSave: Actions.projectSave,
       onExportCommand: Actions.exportCommand,
-      onTabChange: Actions.tabChange,
-      onAppStart: Actions.appStart
+      onTabChange: Actions.tabChange
     })
-
-    this.state = {}
-  }
-
-  onAppStart() {
     let localState = {}
     if (localState = localStorage.getItem('state')) {
-      this.setState(JSON.parse(localState))
+      this.state = JSON.parse(localState)
     } else {
-      this.setState({
-        steps: [{
-          id:'1-1', 
-          name: 'Default Step',
-          code: '#Enter code here\n',
-          command: "", 
-          out: {default: "/home/usr/out1.out\n/home/usr/out2.out\n/home/usr/out3.out"},
-          comment: ""
-        }],
-        enterMain: 0,
-        tab: 0,
-        flist: "/home/usr/b1.bam\n/home/usr/b2.bam\n/home/usr/b3.bam",
-        flistArr: [],
-        gvar: "#Suggested global variables\nIN_DIR: \nOUT_DIR:",
-        editing: -2,
-        result: "",
-        alertOpen: false,
-      })
+      this.state = this.startState
     }
   }
   onCreateStep() {
@@ -88,7 +81,7 @@ class Store {
     this.setState({tab: value})
   }
   onProjectCreate() {
-
+    this.setState(this.startState)
   }
   onProjectSave() {
     

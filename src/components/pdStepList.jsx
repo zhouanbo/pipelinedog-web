@@ -14,7 +14,7 @@ export default class PdStepList extends React.Component {
       alertOpen: false,
       alertStep: {},
       alertIndex: 0
-    };
+    }
     this.handleAlertOpen = this.handleAlertOpen.bind(this)
     this.handleAlertClose = this.handleAlertClose.bind(this)
   }

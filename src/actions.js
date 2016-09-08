@@ -15,8 +15,7 @@ class Actions {
       'projectCreate',
       'editorChange',
       'exportCommand',
-      'tabChange',
-      'appStart'
+      'tabChange'
       )
   }
 }

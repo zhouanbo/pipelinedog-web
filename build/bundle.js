@@ -68693,7 +68693,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var Actions = function Actions() {
   _classCallCheck(this, Actions);
 
-  this.generateActions('uploadFile', 'createStep', 'deleteStep', 'editorChange', 'enterMain', 'projectUpload', 'listUpload', 'stepChange', 'projectSave', 'projectCreate', 'editorChange', 'exportCommand', 'tabChange', 'appStart');
+  this.generateActions('uploadFile', 'createStep', 'deleteStep', 'editorChange', 'enterMain', 'projectUpload', 'listUpload', 'stepChange', 'projectSave', 'projectCreate', 'editorChange', 'exportCommand', 'tabChange');
 };
 
 exports.default = _alt2.default.createActions(Actions);
@@ -68831,10 +68831,7 @@ var Main = function (_React$Component) {
   function Main(props) {
     _classCallCheck(this, Main);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Main).call(this, props));
-
-    _actions2.default.appStart();
-    return _this;
+    return _possibleConstructorReturn(this, Object.getPrototypeOf(Main).call(this, props));
   }
 
   _createClass(Main, [{
@@ -70441,6 +70438,24 @@ var Store = function () {
 
     _classCallCheck(this, Store);
 
+    this.startState = {
+      steps: [{
+        id: '1-1',
+        name: 'Default Step',
+        code: '#Enter code here\n',
+        command: "",
+        out: { default: "/home/usr/out1.out\n/home/usr/out2.out\n/home/usr/out3.out" },
+        comment: ""
+      }],
+      enterMain: 0,
+      tab: 0,
+      flist: "/home/usr/b1.bam\n/home/usr/b2.bam\n/home/usr/b3.bam",
+      flistArr: [],
+      gvar: "#Suggested global variables\nIN_DIR: \nOUT_DIR:",
+      editing: -2,
+      result: "",
+      alertOpen: false
+    };
     this.on('afterEach', function () {
       try {
         localStorage.setItem('state', JSON.stringify(_this.state));
@@ -70448,7 +70463,6 @@ var Store = function () {
         console.log(e);
       }
     });
-
     this.bindListeners({
       onEditorChange: _actions2.default.editorChange,
       onEnterMain: _actions2.default.enterMain,
@@ -70460,41 +70474,17 @@ var Store = function () {
       onDeleteStep: _actions2.default.deleteStep,
       onProjectSave: _actions2.default.projectSave,
       onExportCommand: _actions2.default.exportCommand,
-      onTabChange: _actions2.default.tabChange,
-      onAppStart: _actions2.default.appStart
+      onTabChange: _actions2.default.tabChange
     });
-
-    this.state = {};
+    var localState = {};
+    if (localState = localStorage.getItem('state')) {
+      this.state = JSON.parse(localState);
+    } else {
+      this.state = this.startState;
+    }
   }
 
   _createClass(Store, [{
-    key: 'onAppStart',
-    value: function onAppStart() {
-      var localState = {};
-      if (localState = localStorage.getItem('state')) {
-        this.setState(JSON.parse(localState));
-      } else {
-        this.setState({
-          steps: [{
-            id: '1-1',
-            name: 'Default Step',
-            code: '#Enter code here\n',
-            command: "",
-            out: { default: "/home/usr/out1.out\n/home/usr/out2.out\n/home/usr/out3.out" },
-            comment: ""
-          }],
-          enterMain: 0,
-          tab: 0,
-          flist: "/home/usr/b1.bam\n/home/usr/b2.bam\n/home/usr/b3.bam",
-          flistArr: [],
-          gvar: "#Suggested global variables\nIN_DIR: \nOUT_DIR:",
-          editing: -2,
-          result: "",
-          alertOpen: false
-        });
-      }
-    }
-  }, {
     key: 'onCreateStep',
     value: function onCreateStep() {
       var steps = this.state.steps;
@@ -70532,7 +70522,9 @@ var Store = function () {
     }
   }, {
     key: 'onProjectCreate',
-    value: function onProjectCreate() {}
+    value: function onProjectCreate() {
+      this.setState(this.startState);
+    }
   }, {
     key: 'onProjectSave',
     value: function onProjectSave() {}

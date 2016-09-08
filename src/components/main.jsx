@@ -17,7 +17,6 @@ class Main extends React.Component {
   
   constructor(props) {
     super(props)
-    Actions.appStart()
   }
 
   getEditorText(index) {
