@@ -6,12 +6,44 @@ import FontIcon from 'material-ui/FontIcon'
 import DropDownMenu from 'material-ui/DropDownMenu'
 import RaisedButton from 'material-ui/RaisedButton'
 import MenuItem from 'material-ui/MenuItem'
+import Dialog from 'material-ui/Dialog'
+import FlatButton from 'material-ui/FlatButton'
+import DropZone from 'react-dropzone'
 
 export default class PdEditorToolBar extends React.Component {
-  
+  constructor(props) {
+    super(props)
+    this.state = {
+      uploadOpen: false
+    }
+  }
+
   render() {
     return (
       <Toolbar>
+
+        <Dialog
+          actions={[
+            <FlatButton
+              label="Close"
+              primary={true}
+              onTouchTap={()=>{this.setState({uploadOpen: false})}}
+            />
+          ]}
+          modal={true}
+          open={this.state.uploadOpen}
+          onRequestClose={()=>{this.setState({uploadOpen: false})}}
+        >
+          <h4>Upload File</h4>
+          <h5>Notice: You current edit will be lost.</h5>
+          <DropZone 
+            multiple={false} 
+            onDrop={(files)=>{this.props.dispatchStepUpload(files);this.setState({uploadOpen: false})}}
+          >
+            <div style={{padding: 16, textAlign: "center", }}>Drop your file or click to select.</div>
+          </DropZone>
+        </Dialog>
+
         <ToolbarGroup firstChild={true}>
           <h4 style={{marginLeft: 16, color: "#757575"}}>{!this.props.name?"Unnamed Step":this.props.name}</h4>
         </ToolbarGroup>
@@ -22,13 +54,7 @@ export default class PdEditorToolBar extends React.Component {
             primary={true}
             icon={<FontIcon className="material-icons">file_upload</FontIcon>}
             style={{marginLeft: 0}} 
-          />
-          <RaisedButton 
-            label="Export" 
-            labelPosition="before"
-            primary={true} 
-            icon={<FontIcon className="material-icons">file_download</FontIcon>}
-            style={{marginLeft: 0}}
+            onTouchTap={()=>{this.setState({uploadOpen: true})}}
           />
         </ToolbarGroup>
       </Toolbar>

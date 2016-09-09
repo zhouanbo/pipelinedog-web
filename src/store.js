@@ -44,7 +44,8 @@ class Store {
       onDeleteStep: Actions.deleteStep,
       onProjectSave: Actions.projectSave,
       onExportCommand: Actions.exportCommand,
-      onTabChange: Actions.tabChange
+      onTabChange: Actions.tabChange,
+      onStepUpload: Actions.stepUpload
     })
     let localState = {}
     if (localState = localStorage.getItem('state')) {
@@ -106,8 +107,14 @@ class Store {
         console.log(e)
       }
     }
+    reader.readAsText(files[0])  
+  }
+  onStepUpload(files) {
+    const reader = new FileReader()
+    reader.onloadend = (e) => {
+      this.onEditorChange(reader.result)
+    }
     reader.readAsText(files[0])
-    
   }
   onListUpload(files) {
     const reader = new FileReader()

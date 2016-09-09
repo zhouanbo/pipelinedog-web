@@ -44,6 +44,9 @@ class Main extends React.Component {
   dispatchProjectUpload(file) {
     Actions.projectUpload(file)
   }
+  dispatchStepUpload(file) {
+    Actions.stepUpload(file)
+  }
   dispatchProjectCreate() {
     Actions.projectCreate()
   }
@@ -114,6 +117,7 @@ class Main extends React.Component {
               >
                 <PdEditorToolBar 
                   name={this.getEditorName(this.props.editing)}
+                  dispatchStepUpload={this.dispatchStepUpload}
                 />
                 <div id="editor" style={{overflow: "scroll"}}>
                   <PdEditor

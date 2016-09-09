@@ -69825,7 +69825,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var Actions = function Actions() {
   _classCallCheck(this, Actions);
 
-  this.generateActions('uploadFile', 'createStep', 'deleteStep', 'sortStep', 'editorChange', 'enterMain', 'projectUpload', 'listUpload', 'stepChange', 'projectSave', 'projectCreate', 'editorChange', 'exportCommand', 'tabChange');
+  this.generateActions('uploadFile', 'createStep', 'deleteStep', 'sortStep', 'stepUpload', 'editorChange', 'enterMain', 'projectUpload', 'listUpload', 'stepChange', 'projectSave', 'projectCreate', 'editorChange', 'exportCommand', 'tabChange');
 };
 
 exports.default = _alt2.default.createActions(Actions);
@@ -69999,6 +69999,11 @@ var Main = function (_React$Component) {
       _actions2.default.projectUpload(file);
     }
   }, {
+    key: 'dispatchStepUpload',
+    value: function dispatchStepUpload(file) {
+      _actions2.default.stepUpload(file);
+    }
+  }, {
     key: 'dispatchProjectCreate',
     value: function dispatchProjectCreate() {
       _actions2.default.projectCreate();
@@ -70099,7 +70104,8 @@ var Main = function (_React$Component) {
                   value: 0
                 },
                 _react2.default.createElement(_pdEditorToolBar2.default, {
-                  name: this.getEditorName(this.props.editing)
+                  name: this.getEditorName(this.props.editing),
+                  dispatchStepUpload: this.dispatchStepUpload
                 }),
                 _react2.default.createElement(
                   'div',
@@ -70622,6 +70628,18 @@ var _MenuItem = require('material-ui/MenuItem');
 
 var _MenuItem2 = _interopRequireDefault(_MenuItem);
 
+var _Dialog = require('material-ui/Dialog');
+
+var _Dialog2 = _interopRequireDefault(_Dialog);
+
+var _FlatButton = require('material-ui/FlatButton');
+
+var _FlatButton2 = _interopRequireDefault(_FlatButton);
+
+var _reactDropzone = require('react-dropzone');
+
+var _reactDropzone2 = _interopRequireDefault(_reactDropzone);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -70633,18 +70651,66 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var PdEditorToolBar = function (_React$Component) {
   _inherits(PdEditorToolBar, _React$Component);
 
-  function PdEditorToolBar() {
+  function PdEditorToolBar(props) {
     _classCallCheck(this, PdEditorToolBar);
 
-    return _possibleConstructorReturn(this, Object.getPrototypeOf(PdEditorToolBar).apply(this, arguments));
+    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(PdEditorToolBar).call(this, props));
+
+    _this.state = {
+      uploadOpen: false
+    };
+    return _this;
   }
 
   _createClass(PdEditorToolBar, [{
     key: 'render',
     value: function render() {
+      var _this2 = this;
+
       return _react2.default.createElement(
         _Toolbar.Toolbar,
         null,
+        _react2.default.createElement(
+          _Dialog2.default,
+          {
+            actions: [_react2.default.createElement(_FlatButton2.default, {
+              label: 'Close',
+              primary: true,
+              onTouchTap: function onTouchTap() {
+                _this2.setState({ uploadOpen: false });
+              }
+            })],
+            modal: true,
+            open: this.state.uploadOpen,
+            onRequestClose: function onRequestClose() {
+              _this2.setState({ uploadOpen: false });
+            }
+          },
+          _react2.default.createElement(
+            'h4',
+            null,
+            'Upload File'
+          ),
+          _react2.default.createElement(
+            'h5',
+            null,
+            'Notice: You current edit will be lost.'
+          ),
+          _react2.default.createElement(
+            _reactDropzone2.default,
+            {
+              multiple: false,
+              onDrop: function onDrop(files) {
+                _this2.props.dispatchStepUpload(files);_this2.setState({ uploadOpen: false });
+              }
+            },
+            _react2.default.createElement(
+              'div',
+              { style: { padding: 16, textAlign: "center" } },
+              'Drop your file or click to select.'
+            )
+          )
+        ),
         _react2.default.createElement(
           _Toolbar.ToolbarGroup,
           { firstChild: true },
@@ -70666,18 +70732,10 @@ var PdEditorToolBar = function (_React$Component) {
               { className: 'material-icons' },
               'file_upload'
             ),
-            style: { marginLeft: 0 }
-          }),
-          _react2.default.createElement(_RaisedButton2.default, {
-            label: 'Export',
-            labelPosition: 'before',
-            primary: true,
-            icon: _react2.default.createElement(
-              _FontIcon2.default,
-              { className: 'material-icons' },
-              'file_download'
-            ),
-            style: { marginLeft: 0 }
+            style: { marginLeft: 0 },
+            onTouchTap: function onTouchTap() {
+              _this2.setState({ uploadOpen: true });
+            }
           })
         )
       );
@@ -70689,7 +70747,7 @@ var PdEditorToolBar = function (_React$Component) {
 
 exports.default = PdEditorToolBar;
 
-},{"material-ui/DropDownMenu":241,"material-ui/FontIcon":246,"material-ui/IconButton":248,"material-ui/IconMenu":250,"material-ui/MenuItem":259,"material-ui/RaisedButton":266,"material-ui/Toolbar":293,"react":500}],523:[function(require,module,exports){
+},{"material-ui/Dialog":235,"material-ui/DropDownMenu":241,"material-ui/FlatButton":244,"material-ui/FontIcon":246,"material-ui/IconButton":248,"material-ui/IconMenu":250,"material-ui/MenuItem":259,"material-ui/RaisedButton":266,"material-ui/Toolbar":293,"react":500,"react-dropzone":345}],523:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -71820,7 +71878,8 @@ var Store = function () {
       onDeleteStep: _actions2.default.deleteStep,
       onProjectSave: _actions2.default.projectSave,
       onExportCommand: _actions2.default.exportCommand,
-      onTabChange: _actions2.default.tabChange
+      onTabChange: _actions2.default.tabChange,
+      onStepUpload: _actions2.default.stepUpload
     });
     var localState = {};
     if (localState = localStorage.getItem('state')) {
@@ -71908,13 +71967,24 @@ var Store = function () {
       reader.readAsText(files[0]);
     }
   }, {
-    key: 'onListUpload',
-    value: function onListUpload(files) {
+    key: 'onStepUpload',
+    value: function onStepUpload(files) {
       var _this3 = this;
 
       var reader = new FileReader();
       reader.onloadend = function (e) {
-        _this3.setState({ list: reader.result });
+        _this3.onEditorChange(reader.result);
+      };
+      reader.readAsText(files[0]);
+    }
+  }, {
+    key: 'onListUpload',
+    value: function onListUpload(files) {
+      var _this4 = this;
+
+      var reader = new FileReader();
+      reader.onloadend = function (e) {
+        _this4.setState({ list: reader.result });
       };
       reader.readAsText(files[0]);
     }
