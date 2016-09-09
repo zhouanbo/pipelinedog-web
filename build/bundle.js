@@ -68693,7 +68693,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var Actions = function Actions() {
   _classCallCheck(this, Actions);
 
-  this.generateActions('uploadFile', 'createStep', 'deleteStep', 'editorChange', 'enterMain', 'projectUpload', 'listUpload', 'stepChange', 'projectSave', 'projectCreate', 'editorChange', 'exportCommand', 'tabChange');
+  this.generateActions('uploadFile', 'createStep', 'deleteStep', 'sortStep', 'editorChange', 'enterMain', 'projectUpload', 'listUpload', 'stepChange', 'projectSave', 'projectCreate', 'editorChange', 'exportCommand', 'tabChange');
 };
 
 exports.default = _alt2.default.createActions(Actions);
@@ -68892,6 +68892,11 @@ var Main = function (_React$Component) {
       _actions2.default.createStep();
     }
   }, {
+    key: 'dispatchSortStep',
+    value: function dispatchSortStep() {
+      _actions2.default.sortStep();
+    }
+  }, {
     key: 'dispatchDeleteStep',
     value: function dispatchDeleteStep(index) {
       _actions2.default.deleteStep(index);
@@ -68938,6 +68943,7 @@ var Main = function (_React$Component) {
               dispatchStepChange: this.dispatchStepChange,
               dispatchCreateStep: this.dispatchCreateStep,
               dispatchDeleteStep: this.dispatchDeleteStep,
+              dispatchSortStep: this.dispatchSortStep,
               editing: this.props.editing
             })
           ),
@@ -69557,10 +69563,20 @@ var PdStepList = function (_React$Component) {
           {
             onTouchTap: this.props.dispatchCreateStep,
             iconClassName: 'material-icons',
-            style: { marginTop: -50, float: "right" },
-            tooltip: 'Add Step'
+            style: { marginTop: -50, marginRight: 35, float: "right" },
+            tooltip: 'Add'
           },
           'note_add'
+        ),
+        _react2.default.createElement(
+          _IconButton2.default,
+          {
+            onTouchTap: this.props.dispatchSortStep,
+            iconClassName: 'material-icons',
+            style: { marginTop: -50, float: "right" },
+            tooltip: 'Sort'
+          },
+          'sort'
         ),
         this.props.steps.map(function (step, index) {
           return _react2.default.createElement(_List.ListItem, {
@@ -69954,7 +69970,7 @@ var Parser = function () {
       var result = "";
       var previousNum = void 0;
       var currentNum = void 0;
-      steps.sort(function (a, b) {
+      steps.concat().sort(function (a, b) {
         return Number(a.id.replace('-', '')) - Number(b.id.replace('-', ''));
       }).map(function (step, idx) {
         if (idx === 0) previousNum = Number(step.id.split('-')[0]);
@@ -69993,12 +70009,25 @@ var Parser = function () {
   }, {
     key: 'combineSteps',
     value: function combineSteps(gvar, steps) {
-
-      steps.map(function (step) {});
+      var rText = gvar;
+      steps.map(function (step) {
+        rText += '\n\n' + step.code;
+      });
+      return rText;
     }
   }, {
     key: 'resolveSteps',
-    value: function resolveSteps(text) {}
+    value: function resolveSteps(obj) {
+      var isStep = function isStep(testObj) {
+        var stepTest = false;
+        Object.keys(testObj).map(function (testKey) {
+          if (testKey.indexOf('~') === 0) {
+            stepTest = true;
+          }
+        });
+        return stepTest;
+      };
+    }
   }, {
     key: 'replaceVars',
     value: function replaceVars(rawObj) {
@@ -70495,6 +70524,7 @@ var Store = function () {
       onListUpload: _actions2.default.listUpload,
       onStepChange: _actions2.default.stepChange,
       onCreateStep: _actions2.default.createStep,
+      onSortStep: _actions2.default.sortStep,
       onDeleteStep: _actions2.default.deleteStep,
       onProjectSave: _actions2.default.projectSave,
       onExportCommand: _actions2.default.exportCommand,
@@ -70524,6 +70554,14 @@ var Store = function () {
       this.setState({ steps: steps });
     }
   }, {
+    key: 'onSortStep',
+    value: function onSortStep() {
+      this.state.steps.sort(function (a, b) {
+        return Number(a.id.replace('-', '')) - Number(b.id.replace('-', ''));
+      });
+      this.setState({ editing: -2 });
+    }
+  }, {
     key: 'onDeleteStep',
     value: function onDeleteStep(index) {
       var steps = this.state.steps;
@@ -70551,7 +70589,9 @@ var Store = function () {
     }
   }, {
     key: 'onProjectSave',
-    value: function onProjectSave() {}
+    value: function onProjectSave() {
+      console.log(new _parser2.default().combineSteps(this.state.gvar, this.state.steps));
+    }
   }, {
     key: 'onProjectUpload',
     value: function onProjectUpload(files) {

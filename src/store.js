@@ -40,6 +40,7 @@ class Store {
       onListUpload: Actions.listUpload,
       onStepChange: Actions.stepChange,
       onCreateStep: Actions.createStep,
+      onSortStep: Actions.sortStep,
       onDeleteStep: Actions.deleteStep,
       onProjectSave: Actions.projectSave,
       onExportCommand: Actions.exportCommand,
@@ -65,6 +66,12 @@ class Store {
     })
     this.setState({steps})
   }
+  onSortStep() {
+    this.state.steps.sort((a,b)=>{
+      return Number(a.id.replace('-',''))-Number(b.id.replace('-',''))
+    })
+    this.setState({editing: -2})
+  }
   onDeleteStep(index) {
     let steps = this.state.steps
     let editing = this.state.editing
@@ -84,7 +91,7 @@ class Store {
     this.setState(this.startState)
   }
   onProjectSave() {
-    
+    console.log(new Parser().combineSteps(this.state.gvar, this.state.steps))
   }
   onProjectUpload(files) {
     const reader = new FileReader()

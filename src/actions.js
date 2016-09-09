@@ -6,6 +6,7 @@ class Actions {
       'uploadFile',
       'createStep',
       'deleteStep',
+      'sortStep',
       'editorChange',
       'enterMain',
       'projectUpload',

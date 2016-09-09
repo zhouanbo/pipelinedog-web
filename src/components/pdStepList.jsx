@@ -94,10 +94,18 @@ export default class PdStepList extends React.Component {
         <IconButton
           onTouchTap={this.props.dispatchCreateStep}
           iconClassName="material-icons" 
-          style={{marginTop: -50, float: "right"}}
-          tooltip="Add Step"
+          style={{marginTop: -50, marginRight: 35, float: "right"}}
+          tooltip="Add"
         >
           note_add
+        </IconButton>
+        <IconButton
+          onTouchTap={this.props.dispatchSortStep}
+          iconClassName="material-icons" 
+          style={{marginTop: -50, float: "right"}}
+          tooltip="Sort"
+        >
+          sort
         </IconButton>
 
         {this.props.steps.map((step, index) => {

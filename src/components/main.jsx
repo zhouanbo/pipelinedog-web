@@ -59,6 +59,9 @@ class Main extends React.Component {
   dispatchCreateStep() {
     Actions.createStep()
   }
+  dispatchSortStep() {
+    Actions.sortStep()
+  }
   dispatchDeleteStep(index) {
     Actions.deleteStep(index)
   }
@@ -95,6 +98,7 @@ class Main extends React.Component {
               dispatchStepChange={this.dispatchStepChange}
               dispatchCreateStep={this.dispatchCreateStep}
               dispatchDeleteStep={this.dispatchDeleteStep}
+              dispatchSortStep={this.dispatchSortStep}
               editing={this.props.editing}
             />
           </Paper>

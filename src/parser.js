@@ -58,7 +58,7 @@ export default class Parser {
     let result = ""
     let previousNum
     let currentNum
-    steps.sort((a,b)=>{
+    steps.concat().sort((a,b)=>{
       return Number(a.id.replace('-',''))-Number(b.id.replace('-',''))
     }).map((step, idx) => {
       if (idx === 0) previousNum = Number(step.id.split('-')[0])
@@ -93,14 +93,25 @@ export default class Parser {
   }
 
   combineSteps(gvar, steps) {
-    
+    let rText = gvar
     steps.map(step => {
-
+      rText += `\n\n${step.code}`
     })
+    return rText
   }
 
-  resolveSteps(text) {
+  resolveSteps(obj) {
+    const isStep = (testObj) => {
+      let stepTest = false
+      Object.keys(testObj).map((testKey) => {
+        if (testKey.indexOf('~') === 0) {
+          stepTest = true
+        }
+      })
+      return stepTest
+    }
 
+    
   }
 
   replaceVars(rawObj) {
