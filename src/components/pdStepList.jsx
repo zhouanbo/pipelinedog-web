@@ -15,52 +15,32 @@ export default class PdStepList extends React.Component {
       alertStep: {},
       alertIndex: 0
     }
-    this.handleAlertOpen = this.handleAlertOpen.bind(this)
-    this.handleAlertClose = this.handleAlertClose.bind(this)
   }
 
-  handleAlertOpen(step, index) {
-    this.setState({
-      alertOpen: true,
-      alertStep: step,
-      alertIndex: index
-    });
-  };
-
-  handleAlertClose() {
-    this.setState({alertOpen: false});
-  };
-
   render() {
-
-    const alertActions = [
-      <FlatButton
-        label="Cancel"
-        primary={true}
-        onTouchTap={this.handleAlertClose}
-      />,
-      <FlatButton
-        label="OK"
-        primary={true}
-        onTouchTap={()=>{this.props.dispatchDeleteStep(this.state.alertIndex); this.handleAlertClose()}}
-      />
-    ];
-
     return (
-
       <List>
         <Subheader>Tabs</Subheader>
 
-        <div>
-          <Dialog
-            actions={alertActions}
-            modal={false}
-            open={this.state.alertOpen}
-            onRequestClose={this.handleAlertClose}
-          >
-            Are you sure to delete step "{this.state.alertStep.name === "" ? "Unnamed Step" : this.state.alertStep.name}"?
-          </Dialog>
-        </div>
+        <Dialog
+          actions={[
+            <FlatButton
+              label="Cancel"
+              primary={true}
+              onTouchTap={()=>{this.setState({alertOpen: false})}}
+            />,
+            <FlatButton
+              label="OK"
+              primary={true}
+              onTouchTap={()=>{this.props.dispatchDeleteStep(this.state.alertIndex); this.setState({alertOpen: false})}}
+            />
+          ]}
+          modal={false}
+          open={this.state.alertOpen}
+          onRequestClose={()=>{this.setState({alertOpen: false})}}
+        >
+          Are you sure to delete step "{this.state.alertStep.name === "" ? "Unnamed Step" : this.state.alertStep.name}"?
+        </Dialog>
 
         <ListItem
           onTouchTap={this.props.dispatchStepChange.bind(this, -2)}
@@ -128,7 +108,11 @@ export default class PdStepList extends React.Component {
                   className={"delete-icon-"+index}
                   iconClassName="material-icons" 
                   style={{marginTop: 5, marginRight: 21, display: "none"}}
-                  onTouchTap={this.handleAlertOpen.bind(this, step, index)}
+                  onTouchTap={()=>{this.setState({
+                    alertOpen: true,
+                    alertStep: step,
+                    alertIndex: index
+                  })}}
                   tooltip="Delete Step"
                 >
                   delete

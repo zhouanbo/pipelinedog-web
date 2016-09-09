@@ -22,8 +22,8 @@ class Store {
       flistArr: [],
       gvar: "#Suggested global variables\nIN_DIR: \nOUT_DIR:",
       editing: -2,
-      result: "",
-      alertOpen: false,
+      export: "",
+      save: ""
     }
     this.on('afterEach', () => {
       try {
@@ -91,7 +91,7 @@ class Store {
     this.setState(this.startState)
   }
   onProjectSave() {
-    console.log(new Parser().combineSteps(this.state.gvar, this.state.steps))
+    this.setState({save: new Parser().combineSteps(this.state.gvar, this.state.steps)})
   }
   onProjectUpload(files) {
     const reader = new FileReader()
@@ -152,8 +152,7 @@ class Store {
   }
   onExportCommand() {
     try {
-      let result = new Parser().combineCommands(this.state.steps)
-      console.log(result)
+      this.setState({export: new Parser().combineCommands(this.state.steps)})
     } catch (e) {
       console.log(e)
     }

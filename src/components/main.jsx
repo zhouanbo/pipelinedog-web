@@ -85,6 +85,8 @@ class Main extends React.Component {
             dispatchProjectCreate={this.dispatchProjectCreate}
             dispatchProjectSave={this.dispatchProjectSave}
             dispatchExportCommand={this.dispatchExportCommand}
+            export={this.props['export']}
+            save={this.props.save}
           />
         </div>
 
