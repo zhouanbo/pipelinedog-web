@@ -16,6 +16,7 @@ export default class Parser {
     let rawObj = {}
     try {
       rawObj = yaml.safeLoad(parseText)
+      console.log(rawObj)
     } catch (e) {
       console.log(e)
       return
@@ -100,18 +101,40 @@ export default class Parser {
     return rText
   }
 
-  resolveSteps(obj) {
+  resolveSteps(text) {
+
     const isStep = (testObj) => {
       let stepTest = false
-      Object.keys(testObj).map((testKey) => {
-        if (testKey.indexOf('~') === 0) {
-          stepTest = true
-        }
-      })
+      if (testObj && typeof(testObj) === 'object') {
+        Object.keys(testObj).map((testKey) => {
+          if (testKey.indexOf('~') === 0) {
+            stepTest = true
+          }
+        })
+      }
       return stepTest
     }
 
-    
+    let objs = yaml.safeLoad(text)
+    let steps = []
+    let objsKeys = Object.keys(objs)
+    objsKeys.map(key => {
+      let dumpObj = {}
+      dumpObj[key] = objs[key]
+      if (isStep(objs[key])) {
+        steps.push({
+          id: "",
+          name: "",
+          code: yaml.safeDump(dumpObj),
+          command: "",
+          out: {},
+          comment: ""
+        })
+        delete objs[key]
+      }
+    })
+    let gvar = yaml.safeDump(objs)
+    return {gvar, steps}
   }
 
   replaceVars(rawObj) {

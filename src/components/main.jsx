@@ -42,7 +42,7 @@ class Main extends React.Component {
     Actions.enterMain()
   }
   dispatchProjectUpload(file) {
-    Actions.ProjectUpload(file)
+    Actions.projectUpload(file)
   }
   dispatchProjectCreate() {
     Actions.projectCreate()

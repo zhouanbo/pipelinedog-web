@@ -68864,7 +68864,7 @@ var Main = function (_React$Component) {
   }, {
     key: 'dispatchProjectUpload',
     value: function dispatchProjectUpload(file) {
-      _actions2.default.ProjectUpload(file);
+      _actions2.default.projectUpload(file);
     }
   }, {
     key: 'dispatchProjectCreate',
@@ -69923,6 +69923,7 @@ var Parser = function () {
       var rawObj = {};
       try {
         rawObj = _jsYaml2.default.safeLoad(parseText);
+        console.log(rawObj);
       } catch (e) {
         console.log(e);
         return;
@@ -70017,16 +70018,40 @@ var Parser = function () {
     }
   }, {
     key: 'resolveSteps',
-    value: function resolveSteps(obj) {
+    value: function resolveSteps(text) {
+
       var isStep = function isStep(testObj) {
         var stepTest = false;
-        Object.keys(testObj).map(function (testKey) {
-          if (testKey.indexOf('~') === 0) {
-            stepTest = true;
-          }
-        });
+        if (testObj && (typeof testObj === 'undefined' ? 'undefined' : _typeof(testObj)) === 'object') {
+          Object.keys(testObj).map(function (testKey) {
+            if (testKey.indexOf('~') === 0) {
+              stepTest = true;
+            }
+          });
+        }
         return stepTest;
       };
+
+      var objs = _jsYaml2.default.safeLoad(text);
+      var steps = [];
+      var objsKeys = Object.keys(objs);
+      objsKeys.map(function (key) {
+        var dumpObj = {};
+        dumpObj[key] = objs[key];
+        if (isStep(objs[key])) {
+          steps.push({
+            id: "",
+            name: "",
+            code: _jsYaml2.default.safeDump(dumpObj),
+            command: "",
+            out: {},
+            comment: ""
+          });
+          delete objs[key];
+        }
+      });
+      var gvar = _jsYaml2.default.safeDump(objs);
+      return { gvar: gvar, steps: steps };
     }
   }, {
     key: 'replaceVars',
@@ -70595,21 +70620,34 @@ var Store = function () {
   }, {
     key: 'onProjectUpload',
     value: function onProjectUpload(files) {
+      var _this2 = this;
+
       var reader = new FileReader();
       reader.onloadend = function (e) {
-        console.log(_jsYaml2.default.safeLoad(reader.result));
-        //this.setState(yaml.safeLoad(reader.result))
+        var _resolveSteps = new _parser2.default().resolveSteps(reader.result);
+
+        var gvar = _resolveSteps.gvar;
+        var steps = _resolveSteps.steps;
+
+        _this2.setState({ gvar: gvar, steps: steps });
+        try {
+          var newSteps = new _parser2.default().parseAllSteps(gvar, _this2.state.flist, steps);
+          console.log(newSteps);
+          _this2.setState({ steps: newSteps ? newSteps : _this2.state.steps });
+        } catch (e) {
+          console.log(e);
+        }
       };
       reader.readAsText(files[0]);
     }
   }, {
     key: 'onListUpload',
     value: function onListUpload(files) {
-      var _this2 = this;
+      var _this3 = this;
 
       var reader = new FileReader();
       reader.onloadend = function (e) {
-        _this2.setState({ list: reader.result });
+        _this3.setState({ list: reader.result });
       };
       reader.readAsText(files[0]);
     }

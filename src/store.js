@@ -96,10 +96,18 @@ class Store {
   onProjectUpload(files) {
     const reader = new FileReader()
     reader.onloadend = (e) => {
-      console.log(yaml.safeLoad(reader.result))
-      //this.setState(yaml.safeLoad(reader.result))
+      let {gvar, steps} = new Parser().resolveSteps(reader.result)
+      this.setState({gvar, steps})
+      try {
+        let newSteps = new Parser().parseAllSteps(gvar, this.state.flist, steps)
+        console.log(newSteps)
+        this.setState({steps: newSteps ? newSteps : this.state.steps})
+      } catch(e) {
+        console.log(e)
+      }
     }
     reader.readAsText(files[0])
+    
   }
   onListUpload(files) {
     const reader = new FileReader()
