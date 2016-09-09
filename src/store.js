@@ -104,22 +104,27 @@ class Store {
   onEditorChange(newText) {
     let editing = this.state.editing
     if (editing === -2) {
-      this.setState({flist: newText})
+      try {
+        let newSteps = new Parser().parseAllSteps(this.state.gvar, newText, this.state.steps)
+        this.setState({steps: newSteps ? newSteps : this.state.steps})
+      } catch(e) {
+        this.setState({flist: newText})
+        console.log(e)
+      }
     } else if (editing === -1) {
-      this.setState({gvar: newText})
+      try {
+        this.setState({gvar: newText, steps: new Parser().parseAllSteps(newText, this.state.flist, this.state.steps)})
+      } catch (e) {
+        this.setState({gvar: newText})
+        console.log(e)
+      }
     } else {
       let steps = this.state.steps
-      steps[editing].code = newText
-      
+      steps[editing].code = newText     
       //call parser
       try {
-        let parser = new Parser()
-        let { id, name, command, out, comment } = parser.parseStep(newText, this.state.gvar, this.state.flist, this.state.steps)
-        steps[editing].command = command
-        steps[editing].id = id
-        steps[editing].name = name
-        steps[editing].out = out
-        steps[editing].comment = comment
+        let newStep = new Parser().parseStep(newText, this.state.gvar, this.state.flist, this.state.steps)
+        if (newStep) steps[editing] = newStep
       } catch (e) {
         console.log(e)
       }
@@ -132,8 +137,7 @@ class Store {
   }
   onExportCommand() {
     try {
-      let parser = new Parser()
-      let result = parser.combineSteps(this.state.steps)
+      let result = new Parser().combineCommands(this.state.steps)
       console.log(result)
     } catch (e) {
       console.log(e)

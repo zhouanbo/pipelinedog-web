@@ -13,7 +13,7 @@ export default class PdWelcome extends React.Component {
     this.state = {
       stepIndex: 0,
       listDropText: "Drop your list file or click to select.",
-      projectDropText: "Drop your session file or click to select."
+      projectDropText: "Drop your project file or click to select."
     }
     this.handleNext = this.handleNext.bind(this)
     this.handlePrev = this.handlePrev.bind(this) 
@@ -53,7 +53,7 @@ export default class PdWelcome extends React.Component {
         return (
           <Paper zDepth={0}>
             <h2>Welcome to PipelineDog!</h2>
-            <h4>You can continue as a new project or upload a session file.</h4>
+            <h4>You can continue as a new project or upload a project file.</h4>
             <DropZone 
               multiple={false} 
               onDrop={(files)=>{this.props.dispatchProjectUpload(files);this.handleProjectDrop(files)}}

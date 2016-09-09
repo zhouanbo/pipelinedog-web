@@ -9,7 +9,6 @@ export default class Parser {
 
   }
 
-  //Entry func
   parseStep(text, gvar, flist, steps) {
     //concat global vars with the step code
     let parseText = gvar + "\n" + text
@@ -48,34 +47,60 @@ export default class Parser {
     return { 
       id: stepObj.id,
       name: stepObj.name, 
+      code: text,
       command: command, 
       out: outObj, 
       comment: stepObj.comment 
     }
   }
 
-  combineSteps(stepsObj) {
+  combineCommands(steps) {
     let result = ""
     let previousNum
     let currentNum
-    stepsObj.sort((a,b)=>{
+    steps.sort((a,b)=>{
       return Number(a.id.replace('-',''))-Number(b.id.replace('-',''))
-    }).map((obj, idx) => {
-      if (idx === 0) previousNum = Number(obj.id.split('-')[0])
-      currentNum = Number(obj.id.split('-')[0])
+    }).map((step, idx) => {
+      if (idx === 0) previousNum = Number(step.id.split('-')[0])
+      currentNum = Number(step.id.split('-')[0])
       if (idx !== 0) {
-        if (currentNum !== previousNum && stepsObj[idx-1].command) {
+        if (currentNum !== previousNum && steps[idx-1].command) {
           result += `wait\n`
           previousNum = currentNum
         } 
         result += '\n'
       }
-      result += obj.id ? `# Step ID: ${obj.id}\n`: ""
-      result += obj.name ? `# Step Name: ${obj.name}\n`: ""
-      result += obj.comment ? `# Comment: ${obj.comment}\n` : ""
-      result += obj.command ? `# Command: \n${obj.command}\n` : ""
+      result += step.id ? `# Step ID: ${step.id}\n`: ""
+      result += step.name ? `# Step Name: ${step.name}\n`: ""
+      result += step.comment ? `# Comment: ${step.comment}\n` : ""
+      result += step.command ? `# Command: \n${step.command}\n` : ""
     })
     return result
+  }
+
+  parseAllSteps(gvar, flist, steps) {
+    let pass = true
+    let newSteps = steps.map(step => {
+      let newStep = this.parseStep(step.code, gvar, flist, steps)
+      if (newStep) {
+        return newStep
+      } else {
+        pass = false
+        return 0
+      }
+    })
+    return pass ? newSteps : steps
+  }
+
+  combineSteps(gvar, steps) {
+    
+    steps.map(step => {
+
+    })
+  }
+
+  resolveSteps(text) {
+
   }
 
   replaceVars(rawObj) {
@@ -189,7 +214,7 @@ export default class Parser {
       } else {
         steps.map((step) => { 
           Object.keys(step.out).map(outKey => {
-            let outStr = outKey === 'default' ? "" : "."+outKey
+            let outStr = outKey === 'default' ? "" : outKey
             if (inFile === "$"+step.id+".out"+outStr) {
               let subLine = []
               step.out[outKey].split('\n').map(line => {
@@ -395,7 +420,7 @@ export default class Parser {
         if (outKey === 'out') {
           outObj['default'] = result
         } else {
-          outObj[outKey.substr(outKey.indexOf('#')+1, outKey.length)] = result
+          outObj[outKey.substr(3, outKey.length)] = result
         }
       }
     })

@@ -69654,7 +69654,7 @@ var PdWelcome = function (_React$Component) {
     _this.state = {
       stepIndex: 0,
       listDropText: "Drop your list file or click to select.",
-      projectDropText: "Drop your session file or click to select."
+      projectDropText: "Drop your project file or click to select."
     };
     _this.handleNext = _this.handleNext.bind(_this);
     _this.handlePrev = _this.handlePrev.bind(_this);
@@ -69713,7 +69713,7 @@ var PdWelcome = function (_React$Component) {
             _react2.default.createElement(
               'h4',
               null,
-              'You can continue as a new project or upload a session file.'
+              'You can continue as a new project or upload a project file.'
             ),
             _react2.default.createElement(
               _reactDropzone2.default,
@@ -69898,9 +69898,6 @@ var Parser = function () {
     _classCallCheck(this, Parser);
   }
 
-  //Entry func
-
-
   _createClass(Parser, [{
     key: 'parseStep',
     value: function parseStep(text, gvar, flist, steps) {
@@ -69945,36 +69942,63 @@ var Parser = function () {
       return {
         id: stepObj.id,
         name: stepObj.name,
+        code: text,
         command: command,
         out: outObj,
         comment: stepObj.comment
       };
     }
   }, {
-    key: 'combineSteps',
-    value: function combineSteps(stepsObj) {
+    key: 'combineCommands',
+    value: function combineCommands(steps) {
       var result = "";
       var previousNum = void 0;
       var currentNum = void 0;
-      stepsObj.sort(function (a, b) {
+      steps.sort(function (a, b) {
         return Number(a.id.replace('-', '')) - Number(b.id.replace('-', ''));
-      }).map(function (obj, idx) {
-        if (idx === 0) previousNum = Number(obj.id.split('-')[0]);
-        currentNum = Number(obj.id.split('-')[0]);
+      }).map(function (step, idx) {
+        if (idx === 0) previousNum = Number(step.id.split('-')[0]);
+        currentNum = Number(step.id.split('-')[0]);
         if (idx !== 0) {
-          if (currentNum !== previousNum && stepsObj[idx - 1].command) {
+          if (currentNum !== previousNum && steps[idx - 1].command) {
             result += 'wait\n';
             previousNum = currentNum;
           }
           result += '\n';
         }
-        result += obj.id ? '# Step ID: ' + obj.id + '\n' : "";
-        result += obj.name ? '# Step Name: ' + obj.name + '\n' : "";
-        result += obj.comment ? '# Comment: ' + obj.comment + '\n' : "";
-        result += obj.command ? '# Command: \n' + obj.command + '\n' : "";
+        result += step.id ? '# Step ID: ' + step.id + '\n' : "";
+        result += step.name ? '# Step Name: ' + step.name + '\n' : "";
+        result += step.comment ? '# Comment: ' + step.comment + '\n' : "";
+        result += step.command ? '# Command: \n' + step.command + '\n' : "";
       });
       return result;
     }
+  }, {
+    key: 'parseAllSteps',
+    value: function parseAllSteps(gvar, flist, steps) {
+      var _this = this;
+
+      var pass = true;
+      var newSteps = steps.map(function (step) {
+        var newStep = _this.parseStep(step.code, gvar, flist, steps);
+        if (newStep) {
+          return newStep;
+        } else {
+          pass = false;
+          return 0;
+        }
+      });
+      return pass ? newSteps : steps;
+    }
+  }, {
+    key: 'combineSteps',
+    value: function combineSteps(gvar, steps) {
+
+      steps.map(function (step) {});
+    }
+  }, {
+    key: 'resolveSteps',
+    value: function resolveSteps(text) {}
   }, {
     key: 'replaceVars',
     value: function replaceVars(rawObj) {
@@ -70095,7 +70119,7 @@ var Parser = function () {
         } else {
           steps.map(function (step) {
             Object.keys(step.out).map(function (outKey) {
-              var outStr = outKey === 'default' ? "" : "." + outKey;
+              var outStr = outKey === 'default' ? "" : outKey;
               if (inFile === "$" + step.id + ".out" + outStr) {
                 (function () {
                   var subLine = [];
@@ -70115,7 +70139,7 @@ var Parser = function () {
     key: 'countLoop',
     value: function countLoop(stepObj, lines) {
       var _ref,
-          _this = this;
+          _this2 = this;
 
       var flatLines = (_ref = []).concat.apply(_ref, _toConsumableArray(lines));
       var loopNum = flatLines.length;
@@ -70126,7 +70150,7 @@ var Parser = function () {
             (function () {
               var _ref2;
 
-              var fileArr = _this.parseRange(stepObj[key]['file'], stepObj['in']).map(function (v) {
+              var fileArr = _this2.parseRange(stepObj[key]['file'], stepObj['in']).map(function (v) {
                 return v - 1;
               });
               var concatArr = lines.filter(function (v, i) {
@@ -70144,7 +70168,7 @@ var Parser = function () {
             lineArr[0] = lineStr;
             lineArr[1] = 1;
           }
-          var selectedLineNum = _this.parseRange(lineArr[0], flatLines).length;
+          var selectedLineNum = _this2.parseRange(lineArr[0], flatLines).length;
           var actualLineNum = selectedLineNum < flatLines.length ? selectedLineNum : flatLines.length;
           var newNum = Math.floor(actualLineNum / lineArr[1]);
           loopNum = newNum < loopNum ? newNum : loopNum;
@@ -70155,7 +70179,7 @@ var Parser = function () {
   }, {
     key: 'parseLEASH',
     value: function parseLEASH(stepObj, lines, loopNum) {
-      var _this2 = this;
+      var _this3 = this;
 
       var LEASH = function LEASH(LEASHObj, loop) {
         var out = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
@@ -70168,7 +70192,7 @@ var Parser = function () {
           (function () {
             var _ref3;
 
-            var fileArr = _this2.parseRange(LEASHObj['file'], stepObj['in']).map(function (v) {
+            var fileArr = _this3.parseRange(LEASHObj['file'], stepObj['in']).map(function (v) {
               return v - 1;
             });
             var concatArr = lines.filter(function (v, i) {
@@ -70192,7 +70216,7 @@ var Parser = function () {
         } else {
           lineArr[0] = lineStr;
         }
-        var selectedLineArr = _this2.parseRange(lineArr[0], flatLines).map(function (v) {
+        var selectedLineArr = _this3.parseRange(lineArr[0], flatLines).map(function (v) {
           return v - 1;
         });
         selectedLines = flatLines.filter(function (v, i) {
@@ -70250,7 +70274,7 @@ var Parser = function () {
                     case 'L':
                       var levelArr = _path2.default.dirname(modLine).split(_path2.default.sep);
                       var selectedLevelArr = [];
-                      _this2.parseRange(segArr[1], levelArr).map(function (index) {
+                      _this3.parseRange(segArr[1], levelArr).map(function (index) {
                         if (_path2.default.dirname(modLine).indexOf(_path2.default.sep) === 0) {
                           selectedLevelArr.push(levelArr[index]);
                         } else {
@@ -70262,7 +70286,7 @@ var Parser = function () {
                     case 'F':
                       var fileArr = _path2.default.basename(modLine).split('.');
                       var selectedFileArr = [];
-                      _this2.parseRange(segArr[1], fileArr).map(function (index) {
+                      _this3.parseRange(segArr[1], fileArr).map(function (index) {
                         selectedFileArr.push(fileArr[index - 1]);
                       });
                       modLine = _path2.default.resolve(_path2.default.dirname(modLine), selectedFileArr.join('.'));
@@ -70343,7 +70367,7 @@ var Parser = function () {
             if (outKey === 'out') {
               outObj['default'] = result;
             } else {
-              outObj[outKey.substr(outKey.indexOf('#') + 1, outKey.length)] = result;
+              outObj[outKey.substr(3, outKey.length)] = result;
             }
           })();
         }
@@ -70554,30 +70578,27 @@ var Store = function () {
     value: function onEditorChange(newText) {
       var editing = this.state.editing;
       if (editing === -2) {
-        this.setState({ flist: newText });
+        try {
+          var newSteps = new _parser2.default().parseAllSteps(this.state.gvar, newText, this.state.steps);
+          this.setState({ steps: newSteps ? newSteps : this.state.steps });
+        } catch (e) {
+          this.setState({ flist: newText });
+          console.log(e);
+        }
       } else if (editing === -1) {
-        this.setState({ gvar: newText });
+        try {
+          this.setState({ gvar: newText, steps: new _parser2.default().parseAllSteps(newText, this.state.flist, this.state.steps) });
+        } catch (e) {
+          this.setState({ gvar: newText });
+          console.log(e);
+        }
       } else {
         var steps = this.state.steps;
         steps[editing].code = newText;
-
         //call parser
         try {
-          var parser = new _parser2.default();
-
-          var _parser$parseStep = parser.parseStep(newText, this.state.gvar, this.state.flist, this.state.steps);
-
-          var id = _parser$parseStep.id;
-          var name = _parser$parseStep.name;
-          var command = _parser$parseStep.command;
-          var out = _parser$parseStep.out;
-          var comment = _parser$parseStep.comment;
-
-          steps[editing].command = command;
-          steps[editing].id = id;
-          steps[editing].name = name;
-          steps[editing].out = out;
-          steps[editing].comment = comment;
+          var newStep = new _parser2.default().parseStep(newText, this.state.gvar, this.state.flist, this.state.steps);
+          if (newStep) steps[editing] = newStep;
         } catch (e) {
           console.log(e);
         }
@@ -70594,8 +70615,7 @@ var Store = function () {
     key: 'onExportCommand',
     value: function onExportCommand() {
       try {
-        var parser = new _parser2.default();
-        var result = parser.combineSteps(this.state.steps);
+        var result = new _parser2.default().combineCommands(this.state.steps);
         console.log(result);
       } catch (e) {
         console.log(e);
