@@ -43,7 +43,7 @@ class Store {
       onSortStep: Actions.sortStep,
       onDeleteStep: Actions.deleteStep,
       onProjectSave: Actions.projectSave,
-      onExportCommand: Actions.exportCommand,
+      onExportPipeline: Actions.exportPipeline,
       onTabChange: Actions.tabChange,
       onStepUpload: Actions.stepUpload
     })
@@ -71,7 +71,7 @@ class Store {
     this.state.steps.sort((a,b)=>{
       return Number(a.id.replace('-',''))-Number(b.id.replace('-',''))
     })
-    this.setState({editing: -2})
+    this.setState({editing: -2, tab: 0})
   }
   onDeleteStep(index) {
     let steps = this.state.steps
@@ -157,7 +157,7 @@ class Store {
   onStepChange(index) {
     this.setState({editing: index, tab: 0})
   }
-  onExportCommand() {
+  onExportPipeline() {
     try {
       this.setState({export: new Parser().combineCommands(this.state.steps)})
     } catch (e) {

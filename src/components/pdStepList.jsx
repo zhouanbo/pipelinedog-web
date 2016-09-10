@@ -113,7 +113,7 @@ export default class PdStepList extends React.Component {
                     alertStep: step,
                     alertIndex: index
                   })}}
-                  tooltip="Delete Step"
+                  tooltip="Delete"
                 >
                   delete
                 </IconButton>

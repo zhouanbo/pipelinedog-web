@@ -69825,7 +69825,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var Actions = function Actions() {
   _classCallCheck(this, Actions);
 
-  this.generateActions('uploadFile', 'createStep', 'deleteStep', 'sortStep', 'stepUpload', 'editorChange', 'enterMain', 'projectUpload', 'listUpload', 'stepChange', 'projectSave', 'projectCreate', 'editorChange', 'exportCommand', 'tabChange');
+  this.generateActions('uploadFile', 'createStep', 'deleteStep', 'sortStep', 'stepUpload', 'editorChange', 'enterMain', 'projectUpload', 'listUpload', 'stepChange', 'projectSave', 'projectCreate', 'editorChange', 'exportPipeline', 'tabChange');
 };
 
 exports.default = _alt2.default.createActions(Actions);
@@ -70044,9 +70044,9 @@ var Main = function (_React$Component) {
       _actions2.default.editorChange(newText);
     }
   }, {
-    key: 'dispatchExportCommand',
-    value: function dispatchExportCommand() {
-      _actions2.default.exportCommand();
+    key: 'dispatchExportPipeline',
+    value: function dispatchExportPipeline() {
+      _actions2.default.exportPipeline();
     }
   }, {
     key: 'dispatchTabChange',
@@ -70066,7 +70066,7 @@ var Main = function (_React$Component) {
             enterMain: this.props.enterMain,
             dispatchProjectCreate: this.dispatchProjectCreate,
             dispatchProjectSave: this.dispatchProjectSave,
-            dispatchExportCommand: this.dispatchExportCommand,
+            dispatchExportPipeline: this.dispatchExportPipeline,
             'export': this.props['export'],
             save: this.props.save
           })
@@ -70439,9 +70439,9 @@ var PdAppBar = function (_React$Component) {
             }),
             _react2.default.createElement(_MenuItem2.default, {
               disabled: !this.props.enterMain,
-              primaryText: 'Export Command',
+              primaryText: 'Export Pipeline',
               onTouchTap: function onTouchTap() {
-                _this2.props.dispatchExportCommand();_this2.setState({ exportOpen: true });
+                _this2.props.dispatchExportPipeline();_this2.setState({ exportOpen: true });
               }
             })
           )
@@ -70477,9 +70477,9 @@ var PdAppBar = function (_React$Component) {
           _react2.default.createElement(
             _MenuItem2.default,
             { onTouchTap: function onTouchTap() {
-                _this2.handleToggle();_this2.props.dispatchExportCommand();_this2.setState({ exportOpen: true });
+                _this2.handleToggle();_this2.props.dispatchExportPipeline();_this2.setState({ exportOpen: true });
               } },
-            'Export Command'
+            'Export Pipeline'
           ),
           _react2.default.createElement(
             _MenuItem2.default,
@@ -70928,7 +70928,7 @@ var PdStepList = function (_React$Component) {
                     alertIndex: index
                   });
                 },
-                tooltip: 'Delete Step'
+                tooltip: 'Delete'
               },
               'delete'
             ),
@@ -71299,6 +71299,7 @@ var Parser = function () {
       steps.concat().sort(function (a, b) {
         return Number(a.id.replace('-', '')) - Number(b.id.replace('-', ''));
       }).map(function (step, idx) {
+        result += '#!/bin/bash\n\n';
         if (idx === 0) previousNum = Number(step.id.split('-')[0]);
         currentNum = Number(step.id.split('-')[0]);
         if (idx !== 0) {
@@ -71877,7 +71878,7 @@ var Store = function () {
       onSortStep: _actions2.default.sortStep,
       onDeleteStep: _actions2.default.deleteStep,
       onProjectSave: _actions2.default.projectSave,
-      onExportCommand: _actions2.default.exportCommand,
+      onExportPipeline: _actions2.default.exportPipeline,
       onTabChange: _actions2.default.tabChange,
       onStepUpload: _actions2.default.stepUpload
     });
@@ -71910,7 +71911,7 @@ var Store = function () {
       this.state.steps.sort(function (a, b) {
         return Number(a.id.replace('-', '')) - Number(b.id.replace('-', ''));
       });
-      this.setState({ editing: -2 });
+      this.setState({ editing: -2, tab: 0 });
     }
   }, {
     key: 'onDeleteStep',
@@ -72027,8 +72028,8 @@ var Store = function () {
       this.setState({ editing: index, tab: 0 });
     }
   }, {
-    key: 'onExportCommand',
-    value: function onExportCommand() {
+    key: 'onExportPipeline',
+    value: function onExportPipeline() {
       try {
         this.setState({ export: new _parser2.default().combineCommands(this.state.steps) });
       } catch (e) {

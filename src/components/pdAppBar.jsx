@@ -140,8 +140,8 @@ export default class PdAppBar extends React.Component {
               />
               <MenuItem 
                 disabled={!this.props.enterMain}
-                primaryText="Export Command" 
-                onTouchTap={()=>{this.props.dispatchExportCommand();this.setState({exportOpen: true})}}
+                primaryText="Export Pipeline" 
+                onTouchTap={()=>{this.props.dispatchExportPipeline();this.setState({exportOpen: true})}}
               />
             </IconMenu>
           }
@@ -154,7 +154,7 @@ export default class PdAppBar extends React.Component {
             <Subheader>PipelineDog</Subheader>
             <MenuItem onTouchTap={()=>{this.setState({alertOpen: true})}}>New Project</MenuItem>
             <MenuItem onTouchTap={()=>{this.handleToggle();this.props.dispatchProjectSave();this.setState({saveOpen: true})}}>Save Project</MenuItem>
-            <MenuItem onTouchTap={()=>{this.handleToggle(); this.props.dispatchExportCommand();this.setState({exportOpen: true})}}>Export Command</MenuItem>
+            <MenuItem onTouchTap={()=>{this.handleToggle(); this.props.dispatchExportPipeline();this.setState({exportOpen: true})}}>Export Pipeline</MenuItem>
             <MenuItem onTouchTap={()=>{this.handleToggle();window.open("https://github.com/zhouanbo/pipelinedog-web","_blank")}}>Github Repository</MenuItem>
             <MenuItem onTouchTap={()=>{this.handleToggle();this.setState({aboutOpen: true})}}>About PipelineDog</MenuItem>
         </Drawer>

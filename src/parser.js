@@ -62,6 +62,7 @@ export default class Parser {
     steps.concat().sort((a,b)=>{
       return Number(a.id.replace('-',''))-Number(b.id.replace('-',''))
     }).map((step, idx) => {
+      result += `#!/bin/bash\n\n`
       if (idx === 0) previousNum = Number(step.id.split('-')[0])
       currentNum = Number(step.id.split('-')[0])
       if (idx !== 0) {

@@ -16,7 +16,7 @@ class Actions {
       'projectSave',
       'projectCreate',
       'editorChange',
-      'exportCommand',
+      'exportPipeline',
       'tabChange'
       )
   }

@@ -71,8 +71,8 @@ class Main extends React.Component {
   dispatchEditorChange(newText) {
     Actions.editorChange(newText)
   }
-  dispatchExportCommand() {
-    Actions.exportCommand()
+  dispatchExportPipeline() {
+    Actions.exportPipeline()
   }
   dispatchTabChange(value) {
     Actions.tabChange(value)
@@ -87,7 +87,7 @@ class Main extends React.Component {
             enterMain={this.props.enterMain} 
             dispatchProjectCreate={this.dispatchProjectCreate}
             dispatchProjectSave={this.dispatchProjectSave}
-            dispatchExportCommand={this.dispatchExportCommand}
+            dispatchExportPipeline={this.dispatchExportPipeline}
             export={this.props['export']}
             save={this.props.save}
           />
