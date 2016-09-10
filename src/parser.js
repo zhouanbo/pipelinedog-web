@@ -56,13 +56,12 @@ export default class Parser {
   }
 
   combineCommands(steps) {
-    let result = ""
+    let result = `#!/bin/bash\n\n`
     let previousNum
     let currentNum
     steps.concat().sort((a,b)=>{
       return Number(a.id.replace('-',''))-Number(b.id.replace('-',''))
     }).map((step, idx) => {
-      result += `#!/bin/bash\n\n`
       if (idx === 0) previousNum = Number(step.id.split('-')[0])
       currentNum = Number(step.id.split('-')[0])
       if (idx !== 0) {

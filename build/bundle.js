@@ -71293,13 +71293,12 @@ var Parser = function () {
   }, {
     key: 'combineCommands',
     value: function combineCommands(steps) {
-      var result = "";
+      var result = '#!/bin/bash\n\n';
       var previousNum = void 0;
       var currentNum = void 0;
       steps.concat().sort(function (a, b) {
         return Number(a.id.replace('-', '')) - Number(b.id.replace('-', ''));
       }).map(function (step, idx) {
-        result += '#!/bin/bash\n\n';
         if (idx === 0) previousNum = Number(step.id.split('-')[0]);
         currentNum = Number(step.id.split('-')[0]);
         if (idx !== 0) {
