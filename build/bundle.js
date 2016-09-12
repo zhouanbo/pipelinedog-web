@@ -71494,7 +71494,7 @@ var Parser = function () {
           (function () {
             var subLine = [];
             flist.split('\n').map(function (line) {
-              subLine.push(line);
+              if (line !== "") subLine.push(line);
             });
             lines.push(subLine);
           })();
@@ -71989,7 +71989,7 @@ var Store = function () {
 
       var reader = new FileReader();
       reader.onloadend = function (e) {
-        _this4.setState({ list: reader.result });
+        _this4.setState({ flist: reader.result });
       };
       reader.readAsText(files[0]);
     }

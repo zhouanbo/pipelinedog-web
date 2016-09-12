@@ -119,7 +119,7 @@ class Store {
   onListUpload(files) {
     const reader = new FileReader()
     reader.onloadend = (e) => {
-      this.setState({list: reader.result})
+      this.setState({flist: reader.result})
     }
     reader.readAsText(files[0])
   }

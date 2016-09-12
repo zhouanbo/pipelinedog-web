@@ -244,7 +244,7 @@ export default class Parser {
       if (inFile === "$LIST_FILE") {
         let subLine = []
         flist.split('\n').map(line => {
-          subLine.push(line)
+          if (line !== "") subLine.push(line)
         })
         lines.push(subLine)
       } else {
