@@ -71858,7 +71858,6 @@ var Store = function () {
       enterMain: 0,
       tab: 0,
       flist: "/home/usr/b1.bam\n/home/usr/b2.bam\n/home/usr/b3.bam",
-      flistArr: [],
       gvar: "#Suggested global variables\nIN_DIR: \nOUT_DIR:",
       editing: -2,
       export: "",
@@ -71941,9 +71940,8 @@ var Store = function () {
   }, {
     key: 'onProjectCreate',
     value: function onProjectCreate() {
-      localStorage.setItem('state', this.startState);
-      this.state = this.startState;
-      this.setState(this.state);
+      localStorage.clear();
+      this.setState(this.startState);
       console.log("state reset");
     }
   }, {
@@ -72001,8 +71999,7 @@ var Store = function () {
       var editing = this.state.editing;
       if (editing === -2) {
         try {
-          var newSteps = new _parser2.default().parseAllSteps(this.state.gvar, newText, this.state.steps);
-          this.setState({ steps: newSteps ? newSteps : this.state.steps });
+          this.setState({ flist: newText, steps: new _parser2.default().parseAllSteps(this.state.gvar, newText, this.state.steps) });
         } catch (e) {
           this.setState({ flist: newText });
           console.log(e);

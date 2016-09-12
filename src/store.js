@@ -19,7 +19,6 @@ class Store {
       enterMain: 0,
       tab: 0,
       flist: "/home/usr/b1.bam\n/home/usr/b2.bam\n/home/usr/b3.bam",
-      flistArr: [],
       gvar: "#Suggested global variables\nIN_DIR: \nOUT_DIR:",
       editing: -2,
       export: "",
@@ -89,9 +88,8 @@ class Store {
     this.setState({tab: value})
   }
   onProjectCreate() {
-    localStorage.setItem('state', this.startState)
-    this.state = this.startState
-    this.setState(this.state)
+    localStorage.clear()
+    this.setState(this.startState)
     console.log("state reset")
   }
   onProjectSave() {
@@ -129,8 +127,7 @@ class Store {
     let editing = this.state.editing
     if (editing === -2) {
       try {
-        let newSteps = new Parser().parseAllSteps(this.state.gvar, newText, this.state.steps)
-        this.setState({steps: newSteps ? newSteps : this.state.steps})
+        this.setState({flist: newText, steps: new Parser().parseAllSteps(this.state.gvar, newText, this.state.steps)})
       } catch(e) {
         this.setState({flist: newText})
         console.log(e)
