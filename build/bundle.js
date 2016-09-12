@@ -71248,7 +71248,6 @@ var Parser = function () {
       var rawObj = {};
       try {
         rawObj = _jsYaml2.default.safeLoad(parseText);
-        console.log(rawObj);
       } catch (e) {
         console.log(e);
         return;
@@ -71259,8 +71258,8 @@ var Parser = function () {
       var stepObj = rvObj[Object.keys(rvObj)[0]];
       //check stepOjb status
       if (!stepObj || !stepObj['in'] || !stepObj['run']) return;
-      console.log("stepObj:");
-      console.log(stepObj);
+      //console.log("stepObj:")
+      //console.log(stepObj)
       //set step ID
       var haveID = false;
       steps.map(function (step) {
@@ -71269,10 +71268,10 @@ var Parser = function () {
       if (!haveID) stepObj.id = Object.keys(rvObj)[0];
       //process input lines
       var lines = this.processInArr(stepObj, flist, steps);
-      //console.log("inLines:\n"+lines)
+      console.log("inLines:\n" + lines);
       //count loops for this step
       var loopNum = this.countLoop(stepObj, lines);
-      //console.log("loopNum:\n"+loopNum)
+      console.log("loopNum:\n" + loopNum);
       //parse the LEASH expressions
 
       var _parseLEASH = this.parseLEASH(stepObj, lines, loopNum);
@@ -71636,7 +71635,7 @@ var Parser = function () {
         var modLines = modsLines;
         if (LEASHObj.mod) {
           (function () {
-            var matchArr = LEASHObj.mod.match(/\w'\w+'/g);
+            var matchArr = LEASHObj.mod.match(/\w'.+'/g);
             modLines = modLines.map(function (line) {
               var modLine = line;
               matchArr.map(function (seg) {
@@ -71720,7 +71719,7 @@ var Parser = function () {
         if (outKey.indexOf('out') === 0) {
           (function () {
             var outStr = stepObj[outKey];
-            var result = "";
+            var result = [];
 
             var _loop2 = function _loop2(_i) {
               //decide to parse LEASH or string
@@ -71737,16 +71736,16 @@ var Parser = function () {
               } else {
                 outStr = LEASH(outStr, _i, true);
               }
-              result += outStr + '\n';
+              result.push(outStr);
             };
 
             for (var _i = 0; _i < loopNum; _i++) {
               _loop2(_i);
             }
             if (outKey === 'out') {
-              outObj['default'] = result;
+              outObj['default'] = result.join('\n');
             } else {
-              outObj[outKey.substr(3, outKey.length)] = result;
+              outObj[outKey.substr(3, outKey.length)] = result.join('\n');
             }
           })();
         }

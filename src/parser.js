@@ -16,7 +16,6 @@ export default class Parser {
     let rawObj = {}
     try {
       rawObj = yaml.safeLoad(parseText)
-      console.log(rawObj)
     } catch (e) {
       console.log(e)
       return
@@ -27,8 +26,8 @@ export default class Parser {
     let stepObj = rvObj[Object.keys(rvObj)[0]]
     //check stepOjb status
     if (!stepObj || !stepObj['in'] || !stepObj['run']) return
-    console.log("stepObj:")
-    console.log(stepObj)
+    //console.log("stepObj:")
+    //console.log(stepObj)
     //set step ID
     let haveID = false
     steps.map(step => {
@@ -37,10 +36,10 @@ export default class Parser {
     if (!haveID) stepObj.id = Object.keys(rvObj)[0]
     //process input lines
     let lines = this.processInArr(stepObj, flist, steps)
-    //console.log("inLines:\n"+lines)
+    console.log("inLines:\n"+lines)
     //count loops for this step
     let loopNum = this.countLoop(stepObj, lines)
-    //console.log("loopNum:\n"+loopNum)
+    console.log("loopNum:\n"+loopNum)
     //parse the LEASH expressions
     let { command, outObj } = this.parseLEASH(stepObj, lines, loopNum)
     //console.log("command:\n"+command)
@@ -352,7 +351,7 @@ export default class Parser {
       //mod key
       let modLines = modsLines
       if (LEASHObj.mod) {
-        let matchArr = LEASHObj.mod.match(/\w'\w+'/g)
+        let matchArr = LEASHObj.mod.match(/\w'.+'/g)
         modLines = modLines.map(line => {
           let modLine = line
           matchArr.map(seg => {
@@ -433,7 +432,7 @@ export default class Parser {
     Object.keys(stepObj).map(outKey => {
       if (outKey.indexOf('out') === 0) {
         let outStr = stepObj[outKey]
-        let result = ""
+        let result = []
         for (let i = 0; i < loopNum; i++) {
           //decide to parse LEASH or string
           if (typeof(outStr) === 'string') {
@@ -449,12 +448,12 @@ export default class Parser {
           } else {
             outStr = LEASH(outStr, i, true)
           }
-          result += outStr+'\n'
+          result.push(outStr)
         }
         if (outKey === 'out') {
-          outObj['default'] = result
+          outObj['default'] = result.join('\n')
         } else {
-          outObj[outKey.substr(3, outKey.length)] = result
+          outObj[outKey.substr(3, outKey.length)] = result.join('\n')
         }
       }
     })
