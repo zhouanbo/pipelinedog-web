@@ -120,6 +120,7 @@ class Store {
     const reader = new FileReader()
     reader.onloadend = (e) => {
       this.setState({flist: reader.result})
+      this.onEditorChange(reader.result)
     }
     reader.readAsText(files[0])
   }

@@ -71990,6 +71990,7 @@ var Store = function () {
       var reader = new FileReader();
       reader.onloadend = function (e) {
         _this4.setState({ flist: reader.result });
+        _this4.onEditorChange(reader.result);
       };
       reader.readAsText(files[0]);
     }
