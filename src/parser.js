@@ -260,6 +260,7 @@ export default class Parser {
         })
       }
     })
+
     return lines
   }
 
@@ -432,6 +433,7 @@ export default class Parser {
     Object.keys(stepObj).map(outKey => {
       if (outKey.indexOf('out') === 0) {
         let outStr = stepObj[outKey]
+        let rStr = ""
         let result = []
         for (let i = 0; i < loopNum; i++) {
           //decide to parse LEASH or string
@@ -440,15 +442,15 @@ export default class Parser {
               if (key.indexOf('~') === 0) {
                 let pos = outStr.indexOf(key)
                 while (pos !== -1) {
-                  outStr = outStr.replace(key, LEASH(stepObj[key], i))
+                  rStr = outStr.replace(key, LEASH(stepObj[key], i))
                   pos = outStr.indexOf(key, pos + 1)
                 }
               }
             })
           } else {
-            outStr = LEASH(outStr, i, true)
+            rStr = LEASH(outStr, i, true)
           }
-          result.push(outStr)
+          result.push(rStr)
         }
         if (outKey === 'out') {
           outObj['default'] = result.join('\n')

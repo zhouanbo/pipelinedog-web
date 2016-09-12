@@ -71511,6 +71511,7 @@ var Parser = function () {
           });
         }
       });
+
       return lines;
     }
   }, {
@@ -71719,6 +71720,7 @@ var Parser = function () {
         if (outKey.indexOf('out') === 0) {
           (function () {
             var outStr = stepObj[outKey];
+            var rStr = "";
             var result = [];
 
             var _loop2 = function _loop2(_i) {
@@ -71728,15 +71730,15 @@ var Parser = function () {
                   if (key.indexOf('~') === 0) {
                     var pos = outStr.indexOf(key);
                     while (pos !== -1) {
-                      outStr = outStr.replace(key, LEASH(stepObj[key], _i));
+                      rStr = outStr.replace(key, LEASH(stepObj[key], _i));
                       pos = outStr.indexOf(key, pos + 1);
                     }
                   }
                 });
               } else {
-                outStr = LEASH(outStr, _i, true);
+                rStr = LEASH(outStr, _i, true);
               }
-              result.push(outStr);
+              result.push(rStr);
             };
 
             for (var _i = 0; _i < loopNum; _i++) {
