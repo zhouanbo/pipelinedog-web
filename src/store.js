@@ -89,7 +89,10 @@ class Store {
     this.setState({tab: value})
   }
   onProjectCreate() {
-    this.setState(this.startState)
+    localStorage.setItem('state', this.startState)
+    this.state = this.startState
+    this.setState(this.state)
+    console.log("state reset")
   }
   onProjectSave() {
     this.setState({save: new Parser().combineSteps(this.state.gvar, this.state.steps)})
@@ -101,8 +104,7 @@ class Store {
       this.setState({gvar, steps})
       try {
         let newSteps = new Parser().parseAllSteps(gvar, this.state.flist, steps)
-        console.log(newSteps)
-        this.setState({steps: newSteps ? newSteps : this.state.steps})
+        if (newSteps) this.setState({steps: newSteps})
       } catch(e) {
         console.log(e)
       }

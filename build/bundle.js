@@ -71258,8 +71258,8 @@ var Parser = function () {
       var stepObj = rvObj[Object.keys(rvObj)[0]];
       //check stepOjb status
       if (!stepObj || !stepObj['in'] || !stepObj['run']) return;
-      //console.log("stepObj:")
-      //console.log(stepObj)
+      console.log("stepObj:");
+      console.log(stepObj);
       //set step ID
       var haveID = false;
       steps.map(function (step) {
@@ -71271,14 +71271,15 @@ var Parser = function () {
       console.log("inLines:\n" + lines);
       //count loops for this step
       var loopNum = this.countLoop(stepObj, lines);
-      console.log("loopNum:\n" + loopNum);
+      //console.log("loopNum:\n"+loopNum)
       //parse the LEASH expressions
 
       var _parseLEASH = this.parseLEASH(stepObj, lines, loopNum);
 
       var command = _parseLEASH.command;
       var outObj = _parseLEASH.outObj;
-      //console.log("command:\n"+command)
+
+      console.log("command:\n" + command);
 
       return {
         id: stepObj.id,
@@ -71320,10 +71321,11 @@ var Parser = function () {
       var _this = this;
 
       var pass = true;
-      var newSteps = steps.map(function (step) {
+      var newSteps = steps;
+      newSteps.forEach(function (step, index) {
         var newStep = _this.parseStep(step.code, gvar, flist, steps);
         if (newStep) {
-          return newStep;
+          newSteps[index] = newStep;
         } else {
           pass = false;
           return 0;
@@ -71334,16 +71336,15 @@ var Parser = function () {
   }, {
     key: 'combineSteps',
     value: function combineSteps(gvar, steps) {
-      var rText = gvar;
+      var rText = gvar ? gvar + "\n" : "";
       steps.map(function (step) {
-        rText += '\n\n' + step.code;
+        rText += step.code + '\n';
       });
       return rText;
     }
   }, {
     key: 'resolveSteps',
     value: function resolveSteps(text) {
-
       var isStep = function isStep(testObj) {
         var stepTest = false;
         if (testObj && (typeof testObj === 'undefined' ? 'undefined' : _typeof(testObj)) === 'object') {
@@ -71375,6 +71376,9 @@ var Parser = function () {
         }
       });
       var gvar = _jsYaml2.default.safeDump(objs);
+
+      if (gvar === "{}\n") gvar = "";
+      console.log(gvar);
       return { gvar: gvar, steps: steps };
     }
   }, {
@@ -71937,7 +71941,10 @@ var Store = function () {
   }, {
     key: 'onProjectCreate',
     value: function onProjectCreate() {
-      this.setState(this.startState);
+      localStorage.setItem('state', this.startState);
+      this.state = this.startState;
+      this.setState(this.state);
+      console.log("state reset");
     }
   }, {
     key: 'onProjectSave',
@@ -71959,8 +71966,7 @@ var Store = function () {
         _this2.setState({ gvar: gvar, steps: steps });
         try {
           var newSteps = new _parser2.default().parseAllSteps(gvar, _this2.state.flist, steps);
-          console.log(newSteps);
-          _this2.setState({ steps: newSteps ? newSteps : _this2.state.steps });
+          if (newSteps) _this2.setState({ steps: newSteps });
         } catch (e) {
           console.log(e);
         }

@@ -26,8 +26,8 @@ export default class Parser {
     let stepObj = rvObj[Object.keys(rvObj)[0]]
     //check stepOjb status
     if (!stepObj || !stepObj['in'] || !stepObj['run']) return
-    //console.log("stepObj:")
-    //console.log(stepObj)
+    console.log("stepObj:")
+    console.log(stepObj)
     //set step ID
     let haveID = false
     steps.map(step => {
@@ -39,10 +39,10 @@ export default class Parser {
     console.log("inLines:\n"+lines)
     //count loops for this step
     let loopNum = this.countLoop(stepObj, lines)
-    console.log("loopNum:\n"+loopNum)
+    //console.log("loopNum:\n"+loopNum)
     //parse the LEASH expressions
     let { command, outObj } = this.parseLEASH(stepObj, lines, loopNum)
-    //console.log("command:\n"+command)
+    console.log("command:\n"+command)
 
     return { 
       id: stepObj.id,
@@ -80,10 +80,11 @@ export default class Parser {
 
   parseAllSteps(gvar, flist, steps) {
     let pass = true
-    let newSteps = steps.map(step => {
+    let newSteps = steps
+    newSteps.forEach((step, index) => {
       let newStep = this.parseStep(step.code, gvar, flist, steps)
       if (newStep) {
-        return newStep
+        newSteps[index] = newStep
       } else {
         pass = false
         return 0
@@ -93,15 +94,14 @@ export default class Parser {
   }
 
   combineSteps(gvar, steps) {
-    let rText = gvar
+    let rText = gvar?gvar+"\n":""
     steps.map(step => {
-      rText += `\n\n${step.code}`
+      rText += `${step.code}\n`
     })
     return rText
   }
 
   resolveSteps(text) {
-
     const isStep = (testObj) => {
       let stepTest = false
       if (testObj && typeof(testObj) === 'object') {
@@ -133,6 +133,9 @@ export default class Parser {
       }
     })
     let gvar = yaml.safeDump(objs)
+
+    if (gvar === "{}\n") gvar = ""
+        console.log(gvar)
     return {gvar, steps}
   }
 
