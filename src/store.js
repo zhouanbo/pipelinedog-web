@@ -13,7 +13,7 @@ class Store {
         name: 'Default Step',
         code: '#Enter code here\n',
         command: "", 
-        out: {default: "/home/usr/out1.out\n/home/usr/out2.out\n/home/usr/out3.out"},
+        out: {},
         comment: ""
       }],
       enterMain: 0,
@@ -89,6 +89,7 @@ class Store {
   }
   onProjectCreate() {
     localStorage.clear()
+    this.state = {}
     this.setState(this.startState)
     console.log("state reset")
   }
