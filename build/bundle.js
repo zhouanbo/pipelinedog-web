@@ -71989,7 +71989,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var getStartState = function getStartState() {
   return {
     steps: [{
-      id: '1-1',
+      id: '',
       name: 'Default Step',
       code: '#Enter code here\n',
       command: "",
