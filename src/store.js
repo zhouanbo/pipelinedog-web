@@ -4,26 +4,30 @@ import yaml from 'js-yaml'
 import Actions from './actions'
 import Parser from './parser'
 
+const getStartState = () => {
+  return {
+    steps: [{
+      id:'1-1', 
+      name: 'Default Step',
+      code: '#Enter code here\n',
+      command: "", 
+      out: {},
+      comment: ""
+    }],
+    enterMain: 0,
+    tab: 0,
+    flist: "/home/usr/b1.bam\n/home/usr/b2.bam\n/home/usr/b3.bam",
+    gvar: "#Suggested global variables\nIN_DIR: \nOUT_DIR:",
+    editing: -2,
+    export: "",
+    save: ""
+  }
+}
+
 class Store {
   
   constructor() {
-    this.startState = {
-      steps: [{
-        id:'1-1', 
-        name: 'Default Step',
-        code: '#Enter code here\n',
-        command: "", 
-        out: {},
-        comment: ""
-      }],
-      enterMain: 0,
-      tab: 0,
-      flist: "/home/usr/b1.bam\n/home/usr/b2.bam\n/home/usr/b3.bam",
-      gvar: "#Suggested global variables\nIN_DIR: \nOUT_DIR:",
-      editing: -2,
-      export: "",
-      save: ""
-    }
+    
     this.on('afterEach', () => {
       try {
         localStorage.setItem('state', JSON.stringify(this.state))
@@ -50,7 +54,7 @@ class Store {
     if (localState = localStorage.getItem('state')) {
       this.state = JSON.parse(localState)
     } else {
-      this.state = this.startState
+      this.state = getStartState()
     }
   }
   onCreateStep() {
@@ -89,8 +93,7 @@ class Store {
   }
   onProjectCreate() {
     localStorage.clear()
-    this.state = {}
-    this.setState(this.startState)
+    this.setState(getStartState())
     console.log("state reset")
   }
   onProjectSave() {

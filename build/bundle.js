@@ -71986,29 +71986,32 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var getStartState = function getStartState() {
+  return {
+    steps: [{
+      id: '1-1',
+      name: 'Default Step',
+      code: '#Enter code here\n',
+      command: "",
+      out: {},
+      comment: ""
+    }],
+    enterMain: 0,
+    tab: 0,
+    flist: "/home/usr/b1.bam\n/home/usr/b2.bam\n/home/usr/b3.bam",
+    gvar: "#Suggested global variables\nIN_DIR: \nOUT_DIR:",
+    editing: -2,
+    export: "",
+    save: ""
+  };
+};
+
 var Store = function () {
   function Store() {
     var _this = this;
 
     _classCallCheck(this, Store);
 
-    this.startState = {
-      steps: [{
-        id: '1-1',
-        name: 'Default Step',
-        code: '#Enter code here\n',
-        command: "",
-        out: {},
-        comment: ""
-      }],
-      enterMain: 0,
-      tab: 0,
-      flist: "/home/usr/b1.bam\n/home/usr/b2.bam\n/home/usr/b3.bam",
-      gvar: "#Suggested global variables\nIN_DIR: \nOUT_DIR:",
-      editing: -2,
-      export: "",
-      save: ""
-    };
     this.on('afterEach', function () {
       try {
         localStorage.setItem('state', JSON.stringify(_this.state));
@@ -72035,7 +72038,7 @@ var Store = function () {
     if (localState = localStorage.getItem('state')) {
       this.state = JSON.parse(localState);
     } else {
-      this.state = this.startState;
+      this.state = getStartState();
     }
   }
 
@@ -72087,8 +72090,7 @@ var Store = function () {
     key: 'onProjectCreate',
     value: function onProjectCreate() {
       localStorage.clear();
-      this.state = {};
-      this.setState(this.startState);
+      this.setState(getStartState());
       console.log("state reset");
     }
   }, {
