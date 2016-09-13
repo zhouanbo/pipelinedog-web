@@ -117,6 +117,7 @@ class Main extends React.Component {
               >
                 <PdEditorToolBar 
                   name={this.getEditorName(this.props.editing)}
+                  text={this.getEditorText(this.props.editing)}
                   dispatchStepUpload={this.dispatchStepUpload}
                 />
                 <div id="editor" style={{overflow: "scroll"}}>

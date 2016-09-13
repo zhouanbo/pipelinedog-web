@@ -1,4 +1,6 @@
 import React from 'react'
+import queryString from 'query-string'
+
 import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle} from 'material-ui/Toolbar'
 import IconMenu from 'material-ui/IconMenu'
 import IconButton from 'material-ui/IconButton'
@@ -55,6 +57,14 @@ export default class PdEditorToolBar extends React.Component {
             icon={<FontIcon className="material-icons">file_upload</FontIcon>}
             style={{marginLeft: 0}} 
             onTouchTap={()=>{this.setState({uploadOpen: true})}}
+          />
+          <RaisedButton 
+            label="Download" 
+            labelPosition="before"
+            primary={true}
+            icon={<FontIcon className="material-icons">file_download</FontIcon>}
+            style={{marginLeft: 0}} 
+            onTouchTap={()=>{window.open(`https://pipelinedog.herokuapp.com/?${queryString.stringify({content: this.props.text, name: this.props.name.replace(/ /g, '_')+".yml"})}`, "_blank")}}
           />
         </ToolbarGroup>
       </Toolbar>

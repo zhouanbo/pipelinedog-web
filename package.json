@@ -35,6 +35,7 @@
     "flat": "^2.0.1",
     "js-yaml": "^3.6.1",
     "material-ui": "^0.15.3",
+    "query-string": "^4.2.3",
     "react": "^15.3.0",
     "react-ace": "^3.5.0",
     "react-dom": "^15.3.0",

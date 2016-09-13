@@ -1,4 +1,6 @@
 import React from 'react'
+import queryString from 'query-string'
+
 import AppBar from 'material-ui/AppBar'
 import Drawer from 'material-ui/Drawer'
 import IconMenu from 'material-ui/IconMenu'
@@ -56,6 +58,11 @@ export default class PdAppBar extends React.Component {
         <Dialog
           actions={[
             <FlatButton
+              label="Download"
+              primary={true}
+              onTouchTap={()=>{window.open(`https://pipelinedog.herokuapp.com/?${queryString.stringify({content: this.props.save, name: "pipeline.yml"})}`, "_blank")}}
+            />,
+            <FlatButton
               label="Close"
               primary={true}
               onTouchTap={()=>{this.setState({saveOpen: false})}}
@@ -78,6 +85,11 @@ export default class PdAppBar extends React.Component {
 
         <Dialog
           actions={[
+            <FlatButton
+              label="Download"
+              primary={true}
+              onTouchTap={()=>{window.open(`https://pipelinedog.herokuapp.com/?${queryString.stringify({content: this.props['export'], name: "pipeline.sh"})}`, "_blank");}}
+            />,
             <FlatButton
               label="Close"
               primary={true}
