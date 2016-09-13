@@ -70214,7 +70214,8 @@ var Main = function (_React$Component) {
                 _react2.default.createElement(_pdEditorToolBar2.default, {
                   name: this.getEditorName(this.props.editing),
                   text: this.getEditorText(this.props.editing),
-                  dispatchStepUpload: this.dispatchStepUpload
+                  dispatchStepUpload: this.dispatchStepUpload,
+                  tab: this.props.tab
                 }),
                 _react2.default.createElement(
                   'div',
@@ -70853,6 +70854,7 @@ var PdEditorToolBar = function (_React$Component) {
           _Toolbar.ToolbarGroup,
           { lastChild: true },
           _react2.default.createElement(_RaisedButton2.default, {
+            disabled: this.props.tab !== 0,
             label: 'Import',
             labelPosition: 'before',
             primary: true,
@@ -70867,6 +70869,7 @@ var PdEditorToolBar = function (_React$Component) {
             }
           }),
           _react2.default.createElement(_RaisedButton2.default, {
+            disabled: this.props.tab !== 0,
             label: 'Download',
             labelPosition: 'before',
             primary: true,

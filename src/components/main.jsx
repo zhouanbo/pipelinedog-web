@@ -119,6 +119,7 @@ class Main extends React.Component {
                   name={this.getEditorName(this.props.editing)}
                   text={this.getEditorText(this.props.editing)}
                   dispatchStepUpload={this.dispatchStepUpload}
+                  tab={this.props.tab}
                 />
                 <div id="editor" style={{overflow: "scroll"}}>
                   <PdEditor

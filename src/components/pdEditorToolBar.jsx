@@ -51,6 +51,7 @@ export default class PdEditorToolBar extends React.Component {
         </ToolbarGroup>
         <ToolbarGroup lastChild={true}>
           <RaisedButton 
+            disabled={this.props.tab!==0}
             label="Import" 
             labelPosition="before"
             primary={true}
@@ -59,6 +60,7 @@ export default class PdEditorToolBar extends React.Component {
             onTouchTap={()=>{this.setState({uploadOpen: true})}}
           />
           <RaisedButton 
+            disabled={this.props.tab!==0}
             label="Download" 
             labelPosition="before"
             primary={true}
