@@ -97,7 +97,7 @@ class Main extends React.Component {
 
         <div id="content" style={{flex: "1 1 auto", display: "flex", alignItems: "stretch"}}>
           
-          <Paper style={{flex: "0 0 25%", overflow: "scroll"}} zDepth={0}>
+          <Paper style={{flex: "0 0 25%", overflowY: "scroll"}} zDepth={0}>
             <PdStepList
               steps={this.props.steps}
               dispatchStepChange={this.dispatchStepChange}
@@ -121,7 +121,7 @@ class Main extends React.Component {
                   dispatchStepUpload={this.dispatchStepUpload}
                   tab={this.props.tab}
                 />
-                <div id="editor" style={{overflow: "scroll"}}>
+                <div id="editor" style={{overflowY: "scroll"}}>
                   <PdEditor
                     text={this.getEditorText(this.props.editing)}
                     onChange={this.dispatchEditorChange} 
