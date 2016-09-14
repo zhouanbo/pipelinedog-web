@@ -70184,7 +70184,7 @@ var Main = function (_React$Component) {
           { id: 'content', style: { flex: "1 1 auto", display: "flex", alignItems: "stretch" } },
           _react2.default.createElement(
             _Paper2.default,
-            { style: { flex: "0 0 25%", overflowY: "scroll" }, zDepth: 0 },
+            { style: { flex: "0 0 25%", overflowY: "scroll", overflowX: "hidden" }, zDepth: 0 },
             _react2.default.createElement(_pdStepList2.default, {
               steps: this.props.steps,
               dispatchStepChange: this.dispatchStepChange,
@@ -70219,7 +70219,7 @@ var Main = function (_React$Component) {
                 }),
                 _react2.default.createElement(
                   'div',
-                  { id: 'editor', style: { overflowY: "scroll" } },
+                  { id: 'editor', style: { overflowY: "scroll", overflowX: "hidden" } },
                   _react2.default.createElement(_pdEditor2.default, {
                     text: this.getEditorText(this.props.editing),
                     onChange: this.dispatchEditorChange
