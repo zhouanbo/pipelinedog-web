@@ -121,12 +121,10 @@ class Main extends React.Component {
                   dispatchStepUpload={this.dispatchStepUpload}
                   tab={this.props.tab}
                 />
-                <div id="editor" style={{overflowY: "scroll", overflowX: "hidden"}}>
-                  <PdEditor
-                    text={this.getEditorText(this.props.editing)}
-                    onChange={this.dispatchEditorChange} 
-                  />
-                </div>
+                <PdEditor
+                  text={this.getEditorText(this.props.editing)}
+                  onChange={this.dispatchEditorChange} 
+                />
               </Tab>
              
               <Tab 
@@ -176,7 +174,7 @@ class Main extends React.Component {
         </Paper>
         }
         
-        <Paper id="footer" style={{height: 50, background: "#F5F5F5", zIndex: 10}} zDepth={2}>
+        <Paper id="footer" style={{width: "100%", height: 50, background: "#F5F5F5", zIndex: 10}} zDepth={2}>
           <Subheader>
             2016 PipelineDog
           </Subheader>

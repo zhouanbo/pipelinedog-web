@@ -19,11 +19,13 @@ export default class PdEditor extends React.Component {
     }
     setEditorSize();
     window.addEventListener("resize", setEditorSize);
+
+    this.refs.ace.editor.getSession().setUseWrapMode(true)
   }
 
   render() {
     return (
-      <div style={{position: "relative", zIndex: 0}}>
+      <div id="editor" onClick={()=>{this.refs.ace.editor.focus()}} style={{overflowY: "scroll", overflowX: "hidden", position: "relative", zIndex: 0}}>
         <AceEditor
           ref="ace"
           mode="yaml"

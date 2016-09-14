@@ -70217,14 +70217,10 @@ var Main = function (_React$Component) {
                   dispatchStepUpload: this.dispatchStepUpload,
                   tab: this.props.tab
                 }),
-                _react2.default.createElement(
-                  'div',
-                  { id: 'editor', style: { overflowY: "scroll", overflowX: "hidden" } },
-                  _react2.default.createElement(_pdEditor2.default, {
-                    text: this.getEditorText(this.props.editing),
-                    onChange: this.dispatchEditorChange
-                  })
-                )
+                _react2.default.createElement(_pdEditor2.default, {
+                  text: this.getEditorText(this.props.editing),
+                  onChange: this.dispatchEditorChange
+                })
               ),
               _react2.default.createElement(
                 _Tabs.Tab,
@@ -70289,7 +70285,7 @@ var Main = function (_React$Component) {
         ),
         _react2.default.createElement(
           _Paper2.default,
-          { id: 'footer', style: { height: 50, background: "#F5F5F5", zIndex: 10 }, zDepth: 2 },
+          { id: 'footer', style: { width: "100%", height: 50, background: "#F5F5F5", zIndex: 10 }, zDepth: 2 },
           _react2.default.createElement(
             _Subheader2.default,
             null,
@@ -70686,13 +70682,19 @@ var PdEditor = function (_React$Component) {
       };
       setEditorSize();
       window.addEventListener("resize", setEditorSize);
+
+      this.refs.ace.editor.getSession().setUseWrapMode(true);
     }
   }, {
     key: 'render',
     value: function render() {
+      var _this2 = this;
+
       return _react2.default.createElement(
         'div',
-        { style: { position: "relative", zIndex: 0 } },
+        { id: 'editor', onClick: function onClick() {
+            _this2.refs.ace.editor.focus();
+          }, style: { overflowY: "scroll", overflowX: "hidden", position: "relative", zIndex: 0 } },
         _react2.default.createElement(_reactAce2.default, {
           ref: 'ace',
           mode: 'yaml',
