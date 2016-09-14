@@ -70686,6 +70686,11 @@ var PdEditor = function (_React$Component) {
       this.refs.ace.editor.getSession().setUseWrapMode(true);
     }
   }, {
+    key: 'componentDidUpdate',
+    value: function componentDidUpdate() {
+      this.refs.ace.editor.focus();
+    }
+  }, {
     key: 'render',
     value: function render() {
       var _this2 = this;
@@ -70939,6 +70944,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+var SelectableList = (0, _List.MakeSelectable)(_List.List);
+
 var PdStepList = function (_React$Component) {
   _inherits(PdStepList, _React$Component);
 
@@ -70948,6 +70955,7 @@ var PdStepList = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(PdStepList).call(this, props));
 
     _this.state = {
+      editing: -2,
       alertOpen: false,
       alertStep: {},
       alertIndex: 0
@@ -70961,8 +70969,10 @@ var PdStepList = function (_React$Component) {
       var _this2 = this;
 
       return _react2.default.createElement(
-        _List.List,
-        null,
+        SelectableList,
+        { value: this.state.editing, onChange: function onChange(event, index) {
+            _this2.setState({ editing: index });
+          } },
         _react2.default.createElement(
           _Subheader2.default,
           null,
@@ -70995,7 +71005,10 @@ var PdStepList = function (_React$Component) {
           '"?'
         ),
         _react2.default.createElement(_List.ListItem, {
-          onTouchTap: this.props.dispatchStepChange.bind(this, -2),
+          value: -2,
+          onTouchTap: function onTouchTap() {
+            _this2.props.dispatchStepChange.call(_this2, -2);
+          },
           leftIcon: _react2.default.createElement(
             _IconButton2.default,
             {
@@ -71008,7 +71021,10 @@ var PdStepList = function (_React$Component) {
           secondaryText: 'Pipeline input'
         }),
         _react2.default.createElement(_List.ListItem, {
-          onTouchTap: this.props.dispatchStepChange.bind(this, -1),
+          value: -1,
+          onTouchTap: function onTouchTap() {
+            _this2.props.dispatchStepChange.call(_this2, -1);
+          },
           leftIcon: _react2.default.createElement(
             _IconButton2.default,
             {
@@ -71048,8 +71064,11 @@ var PdStepList = function (_React$Component) {
         ),
         this.props.steps.map(function (step, index) {
           return _react2.default.createElement(_List.ListItem, {
+            value: index,
             key: index,
-            onTouchTap: _this2.props.dispatchStepChange.bind(_this2, index),
+            onTouchTap: function onTouchTap() {
+              _this2.props.dispatchStepChange.call(_this2, index);
+            },
             onMouseOver: function onMouseOver() {
               document.getElementsByClassName("delete-icon-" + index)[0].style.display = "inline";
             },
@@ -71861,7 +71880,7 @@ var Parser = function () {
             }
           }
         });
-        command.push(run + "&");
+        command.push(run);
       };
 
       for (var i = 0; i < loopNum; i++) {

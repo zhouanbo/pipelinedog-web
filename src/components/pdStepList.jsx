@@ -1,16 +1,19 @@
 import React from 'react'
-import {List, ListItem} from 'material-ui/List';
+import {List, ListItem, MakeSelectable} from 'material-ui/List';
 import IconButton from 'material-ui/IconButton'
 import Divider from 'material-ui/Divider';
 import Subheader from 'material-ui/Subheader';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 
+let SelectableList = MakeSelectable(List);
+
 export default class PdStepList extends React.Component {
 
   constructor(props) {
     super(props)
     this.state = {
+      editing: -2,
       alertOpen: false,
       alertStep: {},
       alertIndex: 0
@@ -19,7 +22,7 @@ export default class PdStepList extends React.Component {
 
   render() {
     return (
-      <List>
+      <SelectableList value={this.state.editing} onChange={(event, index)=>{this.setState({editing: index})}}>
         <Subheader>Tabs</Subheader>
 
         <Dialog
@@ -43,7 +46,8 @@ export default class PdStepList extends React.Component {
         </Dialog>
 
         <ListItem
-          onTouchTap={this.props.dispatchStepChange.bind(this, -2)}
+          value={-2}
+          onTouchTap={()=>{this.props.dispatchStepChange.call(this, -2)}}
           leftIcon={
             <IconButton 
               iconClassName="material-icons" 
@@ -56,7 +60,8 @@ export default class PdStepList extends React.Component {
           secondaryText="Pipeline input"
         />
         <ListItem
-          onTouchTap={this.props.dispatchStepChange.bind(this, -1)}
+          value={-1}
+          onTouchTap={()=>{this.props.dispatchStepChange.call(this, -1)}}
           leftIcon={
             <IconButton 
               iconClassName="material-icons" 
@@ -91,8 +96,9 @@ export default class PdStepList extends React.Component {
         {this.props.steps.map((step, index) => {
           return (
             <ListItem
+              value={index}
               key={index}
-              onTouchTap={this.props.dispatchStepChange.bind(this, index)}
+              onTouchTap={()=>{this.props.dispatchStepChange.call(this, index)}}
               onMouseOver={()=>{document.getElementsByClassName("delete-icon-"+index)[0].style.display="inline"}}
               onMouseLeave={()=>{document.getElementsByClassName("delete-icon-"+index)[0].style.display="none"}}
               leftIcon={
@@ -123,7 +129,7 @@ export default class PdStepList extends React.Component {
             />
           )
         })}    
-      </List>
+      </SelectableList>
     )
   }
 }

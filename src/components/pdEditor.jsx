@@ -23,6 +23,10 @@ export default class PdEditor extends React.Component {
     this.refs.ace.editor.getSession().setUseWrapMode(true)
   }
 
+  componentDidUpdate() {
+    this.refs.ace.editor.focus()
+  }
+
   render() {
     return (
       <div id="editor" onClick={()=>{this.refs.ace.editor.focus()}} style={{overflowY: "scroll", overflowX: "hidden", position: "relative", zIndex: 0}}>
