@@ -37,6 +37,7 @@ export default class PdEditor extends React.Component {
           onChange={this.props.onChange}
           showPrintMargin={false} 
           showGutter={true}
+          tabSize={2}
           editorProps={{$blockScrolling: Infinity}}
         />
       </div>

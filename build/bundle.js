@@ -70706,6 +70706,7 @@ var PdEditor = function (_React$Component) {
           onChange: this.props.onChange,
           showPrintMargin: false,
           showGutter: true,
+          tabSize: 2,
           editorProps: { $blockScrolling: Infinity }
         })
       );
