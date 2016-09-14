@@ -429,7 +429,7 @@ export default class Parser {
           }
         }
       })
-      command.push(run+"&")
+      command.push(run)
     }
     command = command.join('\n')
     
