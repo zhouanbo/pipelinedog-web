@@ -71485,7 +71485,7 @@ var Parser = function () {
   }, {
     key: 'combineSteps',
     value: function combineSteps(gvar, steps) {
-      var rText = gvar ? gvar + "\n" : "";
+      var rText = gvar ? gvar + "\n\n" : "";
       steps.map(function (step) {
         rText += step.code + '\n';
       });

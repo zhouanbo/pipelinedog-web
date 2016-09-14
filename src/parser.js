@@ -94,7 +94,7 @@ export default class Parser {
   }
 
   combineSteps(gvar, steps) {
-    let rText = gvar?gvar+"\n":""
+    let rText = gvar?gvar+"\n\n":""
     steps.map(step => {
       rText += `${step.code}\n`
     })
