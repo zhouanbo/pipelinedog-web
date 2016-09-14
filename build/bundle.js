@@ -71675,6 +71675,8 @@ var Parser = function () {
 
       var flatLines = (_ref = []).concat.apply(_ref, _toConsumableArray(lines));
       var loopNum = flatLines.length;
+      var eachLoop = 1;
+
       Object.keys(stepObj).map(function (key) {
         //find LEASH expressions
         if (key.indexOf('~') === 0) {
@@ -71696,13 +71698,13 @@ var Parser = function () {
           var lineArr = [];
           if (lineStr.indexOf(':') > -1) {
             lineArr = lineStr.split(':');
+            eachLoop = Number(lineArr[1]) === 0 ? flatLines.length : Number(lineArr[1]);
           } else {
             lineArr[0] = lineStr;
-            lineArr[1] = 1;
           }
           var selectedLineNum = _this2.parseRange(lineArr[0], flatLines).length;
           var actualLineNum = selectedLineNum < flatLines.length ? selectedLineNum : flatLines.length;
-          var newNum = Math.floor(actualLineNum / lineArr[1]);
+          var newNum = Math.floor(actualLineNum / eachLoop);
           loopNum = newNum < loopNum ? newNum : loopNum;
         }
       });
@@ -71744,7 +71746,7 @@ var Parser = function () {
         var lineArr = [];
         if (lineStr.indexOf(':') > -1) {
           lineArr = lineStr.split(':');
-          eachLoop = lineArr[1] === 0 ? flatLines.length : lineArr[1];
+          eachLoop = Number(lineArr[1]) === 0 ? flatLines.length : Number(lineArr[1]);
         } else {
           lineArr[0] = lineStr;
         }

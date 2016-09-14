@@ -270,6 +270,8 @@ export default class Parser {
   countLoop(stepObj, lines) {
     let flatLines = [].concat(...lines)
     let loopNum = flatLines.length
+    let eachLoop = 1
+
     Object.keys(stepObj).map(key => {
       //find LEASH expressions
       if (key.indexOf('~') === 0) {
@@ -283,13 +285,13 @@ export default class Parser {
         let lineArr = []
         if (lineStr.indexOf(':') > -1) {
           lineArr = lineStr.split(':')
+          eachLoop = Number(lineArr[1]) === 0 ? flatLines.length : Number(lineArr[1])
         } else {
           lineArr[0] = lineStr
-          lineArr[1] = 1
         }
         let selectedLineNum = this.parseRange(lineArr[0], flatLines).length
         let actualLineNum = selectedLineNum < flatLines.length ? selectedLineNum : flatLines.length
-        let newNum = Math.floor(actualLineNum / lineArr[1])
+        let newNum = Math.floor(actualLineNum / eachLoop)
         loopNum = newNum < loopNum ? newNum : loopNum
 
       }
@@ -317,7 +319,7 @@ export default class Parser {
       let lineArr = []
       if (lineStr.indexOf(':') > -1) {
         lineArr = lineStr.split(':')
-        eachLoop = lineArr[1] === 0 ? flatLines.length : lineArr[1]
+        eachLoop = Number(lineArr[1]) === 0 ? flatLines.length : Number(lineArr[1])
       } else {
         lineArr[0] = lineStr
       }
