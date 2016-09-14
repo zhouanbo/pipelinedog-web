@@ -71768,10 +71768,10 @@ var Parser = function () {
             //predefined vars
             var pvars = {
               "$ENTRY": line,
+              "$FILENAME_NOEXT": _path2.default.basename(line).substr(0, line.lastIndexOf('.')),
               "$FILENAME": _path2.default.basename(line),
               "$DIRNAME": _path2.default.dirname(line),
               "$PARENT_DIR": _path2.default.resolve(_path2.default.dirname(line), "../"),
-              "$FILENAME_NOEXT": _path2.default.basename(line).substr(0, line.lastIndexOf('.')),
               "$SEP": _path2.default.sep
             };
             Object.keys(pvars).map(function (key) {

@@ -154,7 +154,7 @@ export default class Parser {
     //get vars
     Object.keys(rObj).map((key, index) => {
       if (index === Object.keys(rObj).length-1) {
-        Object.keys(rObj[key]).map((stepKey) => {
+        Object.keys(rObj[key]).map(stepKey => {
           varObj[stepKey] = rObj[key][stepKey]
         })      
         let flatStepObj = flatten(rObj[key], {safe: true})
@@ -335,10 +335,10 @@ export default class Parser {
           //predefined vars
           let pvars = {
             "$ENTRY": line,
+            "$FILENAME_NOEXT": path.basename(line).substr(0, line.lastIndexOf('.')),
             "$FILENAME": path.basename(line),
             "$DIRNAME": path.dirname(line),
             "$PARENT_DIR": path.resolve(path.dirname(line), "../"),
-            "$FILENAME_NOEXT": path.basename(line).substr(0, line.lastIndexOf('.')),
             "$SEP": path.sep
           }
           Object.keys(pvars).map(key => {
