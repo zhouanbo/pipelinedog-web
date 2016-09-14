@@ -71651,7 +71651,7 @@ var Parser = function () {
           steps.map(function (step) {
             Object.keys(step.out).map(function (outKey) {
               var outStr = outKey === 'default' ? "" : outKey;
-              if (inFile === step.id + ".out" + outStr) {
+              if (inFile === '$' + step.id + ".out" + outStr) {
                 (function () {
                   var subLine = [];
                   step.out[outKey].split('\n').map(function (line) {

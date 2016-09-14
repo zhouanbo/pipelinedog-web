@@ -251,7 +251,7 @@ export default class Parser {
         steps.map((step) => { 
           Object.keys(step.out).map(outKey => {
             let outStr = outKey === 'default' ? "" : outKey
-            if (inFile === step.id+".out"+outStr) {
+            if (inFile === '$'+step.id+".out"+outStr) {
               let subLine = []
               step.out[outKey].split('\n').map(line => {
                 subLine.push(line)
