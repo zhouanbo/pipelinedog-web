@@ -70450,8 +70450,8 @@ var PdAppBar = function (_React$Component) {
           _react2.default.createElement(_TextField2.default, {
             name: 'save',
             value: this.props.save,
-            rows: 20,
-            rowsMax: 20,
+            rows: 15,
+            rowsMax: 15,
             style: { margin: "0px 25px", width: "90%" },
             multiLine: true
           })
@@ -70486,8 +70486,8 @@ var PdAppBar = function (_React$Component) {
           _react2.default.createElement(_TextField2.default, {
             name: 'export',
             value: this.props['export'],
-            rows: 20,
-            rowsMax: 20,
+            rows: 15,
+            rowsMax: 15,
             style: { margin: "0px 25px", width: "90%" },
             multiLine: true
           })
