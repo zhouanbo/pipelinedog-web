@@ -140,13 +140,13 @@ class Store {
       try {
         this.setState({steps: new Parser().parseAllSteps(this.state.gvar, this.state.flist, this.state.steps)})
       } catch(e) {
-        this.setState({error: {show: true, type: e.type.toString(), message: e.message.toString()}})
+        this.setState({error: {show: true, type: e.type, message: e.message}})
       }
     } else if (editing === -1) {
       try {
         this.setState({steps: new Parser().parseAllSteps(this.state.gvar, this.state.flist, this.state.steps)})
       } catch (e) {
-        this.setState({error: {show: true, type: e.type.toString(), message: e.message.toString()}})
+        this.setState({error: {show: true, type: e.type, message: e.message}})
       }
     } else {
       let steps = this.state.steps
@@ -155,7 +155,7 @@ class Store {
         let newStep = new Parser().parseStep(text, this.state.gvar, this.state.flist, this.state.steps)
         if (newStep) steps[editing] = newStep
       } catch (e) {
-        this.setState({error: {show: true, type: e.type.toString(), message: e.message.toString()}})
+        this.setState({error: {show: true, type: e.type, message: e.message}})
       }
 
       this.setState({steps})
@@ -182,7 +182,7 @@ class Store {
       if (newSteps) this.setState({steps: newSteps})
       this.setState({export: new Parser().combineCommands(this.state.steps)})
     } catch (e) {
-        this.setState({error: {show: true, type: e.type.toString(), message: e.message.toString()}})
+        this.setState({export: "", error: {show: true, type: e.type.toString(), message: e.message.toString()}})
     }
     
   }

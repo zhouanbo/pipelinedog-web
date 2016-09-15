@@ -70614,7 +70614,7 @@ var PdAppBar = function (_React$Component) {
               disabled: !this.props.enterMain,
               primaryText: 'Export Pipeline',
               onTouchTap: function onTouchTap() {
-                _this2.props.dispatchExportPipeline();_this2.setState({ exportOpen: true });
+                _this2.props.dispatchExportPipeline();if (_this2.props['export']) _this2.setState({ exportOpen: true });
               }
             })
           )
@@ -70650,7 +70650,7 @@ var PdAppBar = function (_React$Component) {
           _react2.default.createElement(
             _MenuItem2.default,
             { onTouchTap: function onTouchTap() {
-                _this2.handleToggle();_this2.props.dispatchExportPipeline();_this2.setState({ exportOpen: true });
+                _this2.handleToggle();_this2.props.dispatchExportPipeline();if (_this2.props['export']) _this2.setState({ exportOpen: true });
               } },
             'Export Pipeline'
           ),
@@ -72254,13 +72254,13 @@ var Store = function () {
         try {
           this.setState({ steps: new _parser2.default().parseAllSteps(this.state.gvar, this.state.flist, this.state.steps) });
         } catch (e) {
-          this.setState({ error: { show: true, type: e.type.toString(), message: e.message.toString() } });
+          this.setState({ error: { show: true, type: e.type, message: e.message } });
         }
       } else if (editing === -1) {
         try {
           this.setState({ steps: new _parser2.default().parseAllSteps(this.state.gvar, this.state.flist, this.state.steps) });
         } catch (e) {
-          this.setState({ error: { show: true, type: e.type.toString(), message: e.message.toString() } });
+          this.setState({ error: { show: true, type: e.type, message: e.message } });
         }
       } else {
         var steps = this.state.steps;
@@ -72269,7 +72269,7 @@ var Store = function () {
           var newStep = new _parser2.default().parseStep(text, this.state.gvar, this.state.flist, this.state.steps);
           if (newStep) steps[editing] = newStep;
         } catch (e) {
-          this.setState({ error: { show: true, type: e.type.toString(), message: e.message.toString() } });
+          this.setState({ error: { show: true, type: e.type, message: e.message } });
         }
 
         this.setState({ steps: steps });
@@ -72302,7 +72302,7 @@ var Store = function () {
         if (newSteps) this.setState({ steps: newSteps });
         this.setState({ export: new _parser2.default().combineCommands(this.state.steps) });
       } catch (e) {
-        this.setState({ error: { show: true, type: e.type.toString(), message: e.message.toString() } });
+        this.setState({ export: "", error: { show: true, type: e.type.toString(), message: e.message.toString() } });
       }
     }
   }]);
