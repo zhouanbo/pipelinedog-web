@@ -182,7 +182,7 @@ class Store {
       if (newSteps) this.setState({steps: newSteps})
       this.setState({export: new Parser().combineCommands(this.state.steps)})
     } catch (e) {
-        this.setState({export: "", error: {show: true, type: e.type.toString(), message: e.message.toString()}})
+      this.setState({export: "", error: {show: true, type: e.type.toString(), message: e.message.toString()}})
     }
     
   }

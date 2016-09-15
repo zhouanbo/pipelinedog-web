@@ -70487,7 +70487,7 @@ var PdAppBar = function (_React$Component) {
                 _this2.setState({ saveOpen: false });
               }
             })],
-            modal: true,
+            modal: false,
             open: this.state.saveOpen,
             onRequestClose: function onRequestClose() {
               _this2.setState({ saveOpen: false });
@@ -70523,7 +70523,7 @@ var PdAppBar = function (_React$Component) {
                 _this2.setState({ exportOpen: false });
               }
             })],
-            modal: true,
+            modal: false,
             open: this.state.exportOpen,
             onRequestClose: function onRequestClose() {
               _this2.setState({ exportOpen: false });
@@ -70614,7 +70614,7 @@ var PdAppBar = function (_React$Component) {
               disabled: !this.props.enterMain,
               primaryText: 'Export Pipeline',
               onTouchTap: function onTouchTap() {
-                _this2.props.dispatchExportPipeline();if (_this2.props['export']) _this2.setState({ exportOpen: true });
+                _this2.props.dispatchExportPipeline();_this2.setState({ exportOpen: true });
               }
             })
           )
@@ -70650,7 +70650,7 @@ var PdAppBar = function (_React$Component) {
           _react2.default.createElement(
             _MenuItem2.default,
             { onTouchTap: function onTouchTap() {
-                _this2.handleToggle();_this2.props.dispatchExportPipeline();if (_this2.props['export']) _this2.setState({ exportOpen: true });
+                _this2.handleToggle();_this2.props.dispatchExportPipeline();_this2.setState({ exportOpen: true });
               } },
             'Export Pipeline'
           ),
