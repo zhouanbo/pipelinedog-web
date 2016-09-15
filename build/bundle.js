@@ -72141,7 +72141,6 @@ var Store = function () {
       onExportClose: _actions2.default.exportClose
     });
     var localState = JSON.parse(localStorage.getItem('state'));
-    console.log("version: " + localState.version);
     if (localState && localState.version === getStartState().version) {
       this.state = localState;
     } else {
