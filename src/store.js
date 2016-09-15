@@ -18,7 +18,7 @@ const getStartState = () => {
     enterMain: 0,
     tab: 0,
     flist: "/home/usr/b1.bam\n/home/usr/b2.bam\n/home/usr/b3.bam",
-    gvar: "#Suggested global variables\nIN_DIR: \nOUT_DIR:",
+    gvar: "#Suggested global variables\nIN_DIR: \nOUT_DIR: ",
     editing: -2,
     export: "",
     exportOpen: false,
@@ -103,7 +103,6 @@ class Store {
   onProjectCreate() {
     localStorage.clear()
     this.setState(getStartState())
-    console.log("state reset")
   }
   onProjectSave() {
     this.setState({save: new Parser().combineSteps(this.state.gvar, this.state.steps)})

@@ -72100,7 +72100,7 @@ var getStartState = function getStartState() {
     enterMain: 0,
     tab: 0,
     flist: "/home/usr/b1.bam\n/home/usr/b2.bam\n/home/usr/b3.bam",
-    gvar: "#Suggested global variables\nIN_DIR: \nOUT_DIR:",
+    gvar: "#Suggested global variables\nIN_DIR: \nOUT_DIR: ",
     editing: -2,
     export: "",
     exportOpen: false,
@@ -72201,7 +72201,6 @@ var Store = function () {
     value: function onProjectCreate() {
       localStorage.clear();
       this.setState(getStartState());
-      console.log("state reset");
     }
   }, {
     key: 'onProjectSave',
