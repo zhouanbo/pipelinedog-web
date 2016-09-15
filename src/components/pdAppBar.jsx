@@ -122,7 +122,7 @@ export default class PdAppBar extends React.Component {
           open={this.state.aboutOpen}
           onRequestClose={()=>{this.setState({aboutOpen: false})}}
         >
-          <Subheader>2016 PipelineDog</Subheader>
+          <Subheader>PipelineDog v{this.props.version}</Subheader>
             <div style={{margin: "0px 25px"}}>
               <p>Anbo Zhou</p>
               <p>Yeting Zhang</p>

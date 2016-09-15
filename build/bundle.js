@@ -70194,6 +70194,7 @@ var Main = function (_React$Component) {
           'div',
           { id: 'header', style: { flex: "0 0 auto", zIndex: 99 } },
           _react2.default.createElement(_pdAppBar2.default, {
+            version: this.props.version,
             enterMain: this.props.enterMain,
             dispatchProjectCreate: this.dispatchProjectCreate,
             dispatchProjectSave: this.dispatchProjectSave,
@@ -70564,7 +70565,8 @@ var PdAppBar = function (_React$Component) {
           _react2.default.createElement(
             _Subheader2.default,
             null,
-            '2016 PipelineDog'
+            'PipelineDog v',
+            this.props.version
           ),
           _react2.default.createElement(
             'div',

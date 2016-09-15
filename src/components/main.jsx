@@ -95,6 +95,7 @@ class Main extends React.Component {
 
         <div id="header" style={{flex: "0 0 auto", zIndex: 99}}>
           <PdAppBar 
+            version={this.props.version}
             enterMain={this.props.enterMain}
             dispatchProjectCreate={this.dispatchProjectCreate}
             dispatchProjectSave={this.dispatchProjectSave}
