@@ -72084,6 +72084,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var getStartState = function getStartState() {
   return {
+    version: "0.1.0",
     steps: [{
       id: '',
       name: 'Default Step',
@@ -72133,9 +72134,10 @@ var Store = function () {
       onEditorParse: _actions2.default.editorParse,
       onSetError: _actions2.default.setError
     });
-    var localState = {};
-    if (localState = localStorage.getItem('state')) {
-      this.state = JSON.parse(localState);
+    var localState = JSON.parse(localStorage.getItem('state'));
+    if (localState && localState.version === getStartState().version) {
+      console.log("equal");
+      this.state = localState;
     } else {
       this.state = getStartState();
     }

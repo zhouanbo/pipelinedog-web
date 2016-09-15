@@ -6,6 +6,7 @@ import Parser from './parser'
 
 const getStartState = () => {
   return {
+    version: "0.1.0",
     steps: [{
       id:'', 
       name: 'Default Step',
@@ -53,9 +54,10 @@ class Store {
       onEditorParse: Actions.editorParse,
       onSetError: Actions.setError
     })
-    let localState = {}
-    if (localState = localStorage.getItem('state')) {
-      this.state = JSON.parse(localState)
+    let localState = JSON.parse(localStorage.getItem('state'))
+    if (localState && localState.version === getStartState().version) {
+      console.log("equal")
+      this.state = localState
     } else {
       this.state = getStartState()
     }
