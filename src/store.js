@@ -20,7 +20,8 @@ const getStartState = () => {
     gvar: "#Suggested global variables\nIN_DIR: \nOUT_DIR:",
     editing: -2,
     export: "",
-    save: ""
+    save: "",
+    error: {show: false, message: ""}
   }
 }
 
@@ -49,7 +50,8 @@ class Store {
       onExportPipeline: Actions.exportPipeline,
       onTabChange: Actions.tabChange,
       onStepUpload: Actions.stepUpload,
-      onEditorParse: Actions.editorParse
+      onEditorParse: Actions.editorParse,
+      onSetError: Actions.setError
     })
     let localState = {}
     if (localState = localStorage.getItem('state')) {
@@ -58,6 +60,10 @@ class Store {
       this.state = getStartState()
     }
   }
+
+  onSetError(error) {
+    this.setState({error})
+  }
   onCreateStep() {
     let steps = this.state.steps
     steps.push({
@@ -65,7 +71,6 @@ class Store {
       name: "",
       code: "", //code
       command: "", //the command to finally run
-      //valid: true, //if the JSON is valid
       out: {}, //the output array
       comment: ""
     })
@@ -135,13 +140,13 @@ class Store {
       try {
         this.setState({steps: new Parser().parseAllSteps(this.state.gvar, this.state.flist, this.state.steps)})
       } catch(e) {
-        console.log(e)
+        this.setState({error: {show: true, message: e.toString()}})
       }
     } else if (editing === -1) {
       try {
         this.setState({steps: new Parser().parseAllSteps(this.state.gvar, this.state.flist, this.state.steps)})
       } catch (e) {
-        console.log(e)
+        this.setState({error: {show: true, message: e.toString()}})
       }
     } else {
       let steps = this.state.steps
@@ -150,7 +155,7 @@ class Store {
         let newStep = new Parser().parseStep(text, this.state.gvar, this.state.flist, this.state.steps)
         if (newStep) steps[editing] = newStep
       } catch (e) {
-        console.log(e)
+        this.setState({error: {show: true, message: e.toString()}})
       }
 
       this.setState({steps})

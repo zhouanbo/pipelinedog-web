@@ -6,6 +6,8 @@ import FontIcon from 'material-ui/FontIcon'
 import {Tabs, Tab} from 'material-ui/Tabs';
 import Paper from 'material-ui/Paper';
 import Subheader from 'material-ui/Subheader';
+import Dialog from 'material-ui/Dialog'
+import FlatButton from 'material-ui/FlatButton'
 
 import PdWelcome from './pdWelcome.jsx'
 import PdAppBar from './pdAppBar.jsx'
@@ -79,6 +81,9 @@ class Main extends React.Component {
   }
   dispatchTabChange(value) {
     Actions.tabChange(value)
+  }
+  dispatchSetError(error) {
+    Actions.setError(error)
   }
 
   render() {
@@ -186,6 +191,22 @@ class Main extends React.Component {
           />
         </Paper>
         }
+
+        <Dialog
+          actions={[
+            <FlatButton
+              label="OK"
+              primary={true}
+              onTouchTap={this.dispatchSetError.bind(this, {show: false, message: ""})}
+            />
+          ]}
+          modal={false}
+          open={this.props.error['show']}
+          onRequestClose={this.dispatchSetError.bind(this, {show: false, message: ""})}
+        >
+          <Subheader style={{color: "red"}}>Error Message</Subheader>
+          <p style={{padding: "0px 25px"}}>{this.props.error['message']}</p>
+        </Dialog>
         
         <Paper id="footer" style={{width: "100%", height: 50, background: "#F5F5F5", zIndex: 10}} zDepth={2}>
           <Subheader>

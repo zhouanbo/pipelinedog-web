@@ -69933,7 +69933,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var Actions = function Actions() {
   _classCallCheck(this, Actions);
 
-  this.generateActions('uploadFile', 'createStep', 'deleteStep', 'sortStep', 'stepUpload', 'editorChange', 'enterMain', 'projectUpload', 'listUpload', 'stepChange', 'projectSave', 'projectCreate', 'editorChange', 'exportPipeline', 'tabChange', 'editorParse');
+  this.generateActions('uploadFile', 'createStep', 'deleteStep', 'sortStep', 'stepUpload', 'editorChange', 'enterMain', 'projectUpload', 'listUpload', 'stepChange', 'projectSave', 'projectCreate', 'editorChange', 'exportPipeline', 'tabChange', 'editorParse', 'setError');
 };
 
 exports.default = _alt2.default.createActions(Actions);
@@ -70036,6 +70036,14 @@ var _Paper2 = _interopRequireDefault(_Paper);
 var _Subheader = require('material-ui/Subheader');
 
 var _Subheader2 = _interopRequireDefault(_Subheader);
+
+var _Dialog = require('material-ui/Dialog');
+
+var _Dialog2 = _interopRequireDefault(_Dialog);
+
+var _FlatButton = require('material-ui/FlatButton');
+
+var _FlatButton2 = _interopRequireDefault(_FlatButton);
 
 var _pdWelcome = require('./pdWelcome.jsx');
 
@@ -70165,6 +70173,11 @@ var Main = function (_React$Component) {
     key: 'dispatchTabChange',
     value: function dispatchTabChange(value) {
       _actions2.default.tabChange(value);
+    }
+  }, {
+    key: 'dispatchSetError',
+    value: function dispatchSetError(error) {
+      _actions2.default.setError(error);
     }
   }, {
     key: 'render',
@@ -70299,6 +70312,29 @@ var Main = function (_React$Component) {
           })
         ),
         _react2.default.createElement(
+          _Dialog2.default,
+          {
+            actions: [_react2.default.createElement(_FlatButton2.default, {
+              label: 'OK',
+              primary: true,
+              onTouchTap: this.dispatchSetError.bind(this, { show: false, message: "" })
+            })],
+            modal: false,
+            open: this.props.error['show'],
+            onRequestClose: this.dispatchSetError.bind(this, { show: false, message: "" })
+          },
+          _react2.default.createElement(
+            _Subheader2.default,
+            { style: { color: "red" } },
+            'Error Message'
+          ),
+          _react2.default.createElement(
+            'p',
+            { style: { padding: "0px 25px" } },
+            this.props.error['message']
+          )
+        ),
+        _react2.default.createElement(
           _Paper2.default,
           { id: 'footer', style: { width: "100%", height: 50, background: "#F5F5F5", zIndex: 10 }, zDepth: 2 },
           _react2.default.createElement(
@@ -70316,7 +70352,7 @@ var Main = function (_React$Component) {
 
 exports.default = Main;
 
-},{"../actions":518,"./pdAppBar.jsx":522,"./pdEditor.jsx":523,"./pdEditorToolBar.jsx":524,"./pdStepList.jsx":525,"./pdWelcome.jsx":526,"js-yaml":79,"material-ui/FontIcon":246,"material-ui/Paper":261,"material-ui/Subheader":275,"material-ui/Tabs":282,"react":501}],522:[function(require,module,exports){
+},{"../actions":518,"./pdAppBar.jsx":522,"./pdEditor.jsx":523,"./pdEditorToolBar.jsx":524,"./pdStepList.jsx":525,"./pdWelcome.jsx":526,"js-yaml":79,"material-ui/Dialog":235,"material-ui/FlatButton":244,"material-ui/FontIcon":246,"material-ui/Paper":261,"material-ui/Subheader":275,"material-ui/Tabs":282,"react":501}],522:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -71449,12 +71485,7 @@ var Parser = function () {
       var parseText = gvar + "\n" + text;
       //read raw step obj
       var rawObj = {};
-      try {
-        rawObj = _jsYaml2.default.safeLoad(parseText);
-      } catch (e) {
-        console.log(e);
-        return;
-      }
+      rawObj = _jsYaml2.default.safeLoad(parseText);
       //replace vars
       var rvObj = this.replaceVars(rawObj);
       //get only the keys inside step
@@ -72061,7 +72092,8 @@ var getStartState = function getStartState() {
     gvar: "#Suggested global variables\nIN_DIR: \nOUT_DIR:",
     editing: -2,
     export: "",
-    save: ""
+    save: "",
+    error: { show: false, message: "" }
   };
 };
 
@@ -72092,7 +72124,8 @@ var Store = function () {
       onExportPipeline: _actions2.default.exportPipeline,
       onTabChange: _actions2.default.tabChange,
       onStepUpload: _actions2.default.stepUpload,
-      onEditorParse: _actions2.default.editorParse
+      onEditorParse: _actions2.default.editorParse,
+      onSetError: _actions2.default.setError
     });
     var localState = {};
     if (localState = localStorage.getItem('state')) {
@@ -72103,6 +72136,11 @@ var Store = function () {
   }
 
   _createClass(Store, [{
+    key: 'onSetError',
+    value: function onSetError(error) {
+      this.setState({ error: error });
+    }
+  }, {
     key: 'onCreateStep',
     value: function onCreateStep() {
       var steps = this.state.steps;
@@ -72111,7 +72149,6 @@ var Store = function () {
         name: "",
         code: "", //code
         command: "", //the command to finally run
-        //valid: true, //if the JSON is valid
         out: {}, //the output array
         comment: ""
       });
@@ -72211,13 +72248,13 @@ var Store = function () {
         try {
           this.setState({ steps: new _parser2.default().parseAllSteps(this.state.gvar, this.state.flist, this.state.steps) });
         } catch (e) {
-          console.log(e);
+          this.setState({ error: { show: true, message: e.toString() } });
         }
       } else if (editing === -1) {
         try {
           this.setState({ steps: new _parser2.default().parseAllSteps(this.state.gvar, this.state.flist, this.state.steps) });
         } catch (e) {
-          console.log(e);
+          this.setState({ error: { show: true, message: e.toString() } });
         }
       } else {
         var steps = this.state.steps;
@@ -72226,7 +72263,7 @@ var Store = function () {
           var newStep = new _parser2.default().parseStep(text, this.state.gvar, this.state.flist, this.state.steps);
           if (newStep) steps[editing] = newStep;
         } catch (e) {
-          console.log(e);
+          this.setState({ error: { show: true, message: e.toString() } });
         }
 
         this.setState({ steps: steps });

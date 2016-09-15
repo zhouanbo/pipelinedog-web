@@ -14,12 +14,7 @@ export default class Parser {
     let parseText = gvar + "\n" + text
     //read raw step obj
     let rawObj = {}
-    try {
-      rawObj = yaml.safeLoad(parseText)
-    } catch (e) {
-      console.log(e)
-      return
-    }
+    rawObj = yaml.safeLoad(parseText)
     //replace vars
     let rvObj = this.replaceVars(rawObj)
     //get only the keys inside step

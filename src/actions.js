@@ -18,7 +18,8 @@ class Actions {
       'editorChange',
       'exportPipeline',
       'tabChange',
-      'editorParse'
+      'editorParse',
+      'setError'
       )
   }
 }
