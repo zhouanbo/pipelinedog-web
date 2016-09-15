@@ -69933,7 +69933,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var Actions = function Actions() {
   _classCallCheck(this, Actions);
 
-  this.generateActions('uploadFile', 'createStep', 'deleteStep', 'sortStep', 'stepUpload', 'editorChange', 'enterMain', 'projectUpload', 'listUpload', 'stepChange', 'projectSave', 'projectCreate', 'editorChange', 'exportPipeline', 'tabChange');
+  this.generateActions('uploadFile', 'createStep', 'deleteStep', 'sortStep', 'stepUpload', 'editorChange', 'enterMain', 'projectUpload', 'listUpload', 'stepChange', 'projectSave', 'projectCreate', 'editorChange', 'exportPipeline', 'tabChange', 'editorParse');
 };
 
 exports.default = _alt2.default.createActions(Actions);
@@ -70147,6 +70147,11 @@ var Main = function (_React$Component) {
       _actions2.default.deleteStep(index);
     }
   }, {
+    key: 'dispatchEditorParse',
+    value: function dispatchEditorParse(text) {
+      _actions2.default.editorParse(text);
+    }
+  }, {
     key: 'dispatchEditorChange',
     value: function dispatchEditorChange(newText) {
       _actions2.default.editorChange(newText);
@@ -70215,6 +70220,7 @@ var Main = function (_React$Component) {
                   name: this.getEditorName(this.props.editing),
                   text: this.getEditorText(this.props.editing),
                   dispatchStepUpload: this.dispatchStepUpload,
+                  dispatchEditorParse: this.dispatchEditorParse,
                   tab: this.props.tab
                 }),
                 _react2.default.createElement(_pdEditor2.default, {
@@ -70236,7 +70242,11 @@ var Main = function (_React$Component) {
                   style: this.props.editing < 0 ? { display: "none" } : {}
                 },
                 _react2.default.createElement(_pdEditorToolBar2.default, {
-                  name: this.getEditorName(this.props.editing)
+                  name: this.getEditorName(this.props.editing),
+                  text: this.getEditorText(this.props.editing),
+                  dispatchStepUpload: this.dispatchStepUpload,
+                  dispatchEditorParse: this.dispatchEditorParse,
+                  tab: this.props.tab
                 }),
                 _react2.default.createElement(
                   _Paper2.default,
@@ -70261,7 +70271,11 @@ var Main = function (_React$Component) {
                   style: this.props.editing < 0 ? { display: "none" } : {}
                 },
                 _react2.default.createElement(_pdEditorToolBar2.default, {
-                  name: this.getEditorName(this.props.editing)
+                  name: this.getEditorName(this.props.editing),
+                  text: this.getEditorText(this.props.editing),
+                  dispatchStepUpload: this.dispatchStepUpload,
+                  dispatchEditorParse: this.dispatchEditorParse,
+                  tab: this.props.tab
                 }),
                 _react2.default.createElement(
                   _Paper2.default,
@@ -70872,7 +70886,20 @@ var PdEditorToolBar = function (_React$Component) {
           { lastChild: true },
           _react2.default.createElement(_RaisedButton2.default, {
             disabled: this.props.tab !== 0,
-            label: 'Import',
+            label: 'Parse',
+            labelPosition: 'before',
+            primary: true,
+            icon: _react2.default.createElement(
+              _FontIcon2.default,
+              { className: 'material-icons' },
+              'code'
+            ),
+            style: { marginLeft: 0 },
+            onTouchTap: this.props.dispatchEditorParse.bind(this, this.props.text)
+          }),
+          _react2.default.createElement(_RaisedButton2.default, {
+            disabled: this.props.tab !== 0,
+            label: 'Load',
             labelPosition: 'before',
             primary: true,
             icon: _react2.default.createElement(
@@ -70887,7 +70914,7 @@ var PdEditorToolBar = function (_React$Component) {
           }),
           _react2.default.createElement(_RaisedButton2.default, {
             disabled: this.props.tab !== 0,
-            label: 'Download',
+            label: 'Save',
             labelPosition: 'before',
             primary: true,
             icon: _react2.default.createElement(
@@ -70964,7 +70991,6 @@ var PdStepList = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(PdStepList).call(this, props));
 
     _this.state = {
-      editing: -2,
       alertOpen: false,
       alertStep: {},
       alertIndex: 0
@@ -70979,9 +71005,7 @@ var PdStepList = function (_React$Component) {
 
       return _react2.default.createElement(
         SelectableList,
-        { value: this.state.editing, onChange: function onChange(event, index) {
-            _this2.setState({ editing: index });
-          } },
+        { value: this.props.editing, onChange: function onChange(event, index) {} },
         _react2.default.createElement(
           _Subheader2.default,
           null,
@@ -71437,8 +71461,8 @@ var Parser = function () {
       var stepObj = rvObj[Object.keys(rvObj)[0]];
       //check stepOjb status
       if (!stepObj || !stepObj['in'] || !stepObj['run']) return;
-      console.log("stepObj:");
-      console.log(stepObj);
+      //console.log("stepObj:")
+      //console.log(stepObj)
       //set step ID
       var haveID = false;
       steps.map(function (step) {
@@ -72067,7 +72091,8 @@ var Store = function () {
       onProjectSave: _actions2.default.projectSave,
       onExportPipeline: _actions2.default.exportPipeline,
       onTabChange: _actions2.default.tabChange,
-      onStepUpload: _actions2.default.stepUpload
+      onStepUpload: _actions2.default.stepUpload,
+      onEditorParse: _actions2.default.editorParse
     });
     var localState = {};
     if (localState = localStorage.getItem('state')) {
@@ -72162,7 +72187,7 @@ var Store = function () {
 
       var reader = new FileReader();
       reader.onloadend = function (e) {
-        _this3.onEditorChange(reader.result);
+        _this3.onEditorParse(reader.result);
       };
       reader.readAsText(files[0]);
     }
@@ -72174,39 +72199,50 @@ var Store = function () {
       var reader = new FileReader();
       reader.onloadend = function (e) {
         _this4.setState({ flist: reader.result });
-        _this4.onEditorChange(reader.result);
+        _this4.onEditorParse(reader.result);
       };
       reader.readAsText(files[0]);
+    }
+  }, {
+    key: 'onEditorParse',
+    value: function onEditorParse(text) {
+      var editing = this.state.editing;
+      if (editing === -2) {
+        try {
+          this.setState({ steps: new _parser2.default().parseAllSteps(this.state.gvar, this.state.flist, this.state.steps) });
+        } catch (e) {
+          console.log(e);
+        }
+      } else if (editing === -1) {
+        try {
+          this.setState({ steps: new _parser2.default().parseAllSteps(this.state.gvar, this.state.flist, this.state.steps) });
+        } catch (e) {
+          console.log(e);
+        }
+      } else {
+        var steps = this.state.steps;
+        //call parser
+        try {
+          var newStep = new _parser2.default().parseStep(text, this.state.gvar, this.state.flist, this.state.steps);
+          if (newStep) steps[editing] = newStep;
+        } catch (e) {
+          console.log(e);
+        }
+
+        this.setState({ steps: steps });
+      }
     }
   }, {
     key: 'onEditorChange',
     value: function onEditorChange(newText) {
       var editing = this.state.editing;
       if (editing === -2) {
-        try {
-          this.setState({ flist: newText, steps: new _parser2.default().parseAllSteps(this.state.gvar, newText, this.state.steps) });
-        } catch (e) {
-          this.setState({ flist: newText });
-          console.log(e);
-        }
+        this.setState({ flist: newText });
       } else if (editing === -1) {
-        try {
-          this.setState({ gvar: newText, steps: new _parser2.default().parseAllSteps(newText, this.state.flist, this.state.steps) });
-        } catch (e) {
-          this.setState({ gvar: newText });
-          console.log(e);
-        }
+        this.setState({ gvar: newText });
       } else {
         var steps = this.state.steps;
         steps[editing].code = newText;
-        //call parser
-        try {
-          var newStep = new _parser2.default().parseStep(newText, this.state.gvar, this.state.flist, this.state.steps);
-          if (newStep) steps[editing] = newStep;
-        } catch (e) {
-          console.log(e);
-        }
-
         this.setState({ steps: steps });
       }
     }
@@ -72219,6 +72255,9 @@ var Store = function () {
     key: 'onExportPipeline',
     value: function onExportPipeline() {
       try {
+        console.log("exporting");
+        var newSteps = new _parser2.default().parseAllSteps(this.state.gvar, this.state.flist, this.state.steps);
+        if (newSteps) this.setState({ steps: newSteps });
         this.setState({ export: new _parser2.default().combineCommands(this.state.steps) });
       } catch (e) {
         console.log(e);

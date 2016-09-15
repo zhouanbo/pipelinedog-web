@@ -26,8 +26,8 @@ export default class Parser {
     let stepObj = rvObj[Object.keys(rvObj)[0]]
     //check stepOjb status
     if (!stepObj || !stepObj['in'] || !stepObj['run']) return
-    console.log("stepObj:")
-    console.log(stepObj)
+    //console.log("stepObj:")
+    //console.log(stepObj)
     //set step ID
     let haveID = false
     steps.map(step => {

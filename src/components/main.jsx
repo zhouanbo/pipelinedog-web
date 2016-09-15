@@ -68,6 +68,9 @@ class Main extends React.Component {
   dispatchDeleteStep(index) {
     Actions.deleteStep(index)
   }
+  dispatchEditorParse(text) {
+    Actions.editorParse(text)
+  }
   dispatchEditorChange(newText) {
     Actions.editorChange(newText)
   }
@@ -119,6 +122,7 @@ class Main extends React.Component {
                   name={this.getEditorName(this.props.editing)}
                   text={this.getEditorText(this.props.editing)}
                   dispatchStepUpload={this.dispatchStepUpload}
+                  dispatchEditorParse={this.dispatchEditorParse}
                   tab={this.props.tab}
                 />
                 <PdEditor
@@ -136,6 +140,10 @@ class Main extends React.Component {
               >
                 <PdEditorToolBar 
                   name={this.getEditorName(this.props.editing)}
+                  text={this.getEditorText(this.props.editing)}
+                  dispatchStepUpload={this.dispatchStepUpload}
+                  dispatchEditorParse={this.dispatchEditorParse}
+                  tab={this.props.tab}
                 />
                 <Paper zDepth={0} style={{padding: 8}}>
                   <pre className="codeblock" style={{margin: 0}}>
@@ -152,6 +160,10 @@ class Main extends React.Component {
               >
                 <PdEditorToolBar 
                   name={this.getEditorName(this.props.editing)}
+                  text={this.getEditorText(this.props.editing)}
+                  dispatchStepUpload={this.dispatchStepUpload}
+                  dispatchEditorParse={this.dispatchEditorParse}
+                  tab={this.props.tab}
                 />
                 <Paper zDepth={0} style={{padding: 8}}>
                   <pre className="codeblock" style={{margin: 0}}>

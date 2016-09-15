@@ -48,7 +48,8 @@ class Store {
       onProjectSave: Actions.projectSave,
       onExportPipeline: Actions.exportPipeline,
       onTabChange: Actions.tabChange,
-      onStepUpload: Actions.stepUpload
+      onStepUpload: Actions.stepUpload,
+      onEditorParse: Actions.editorParse
     })
     let localState = {}
     if (localState = localStorage.getItem('state')) {
@@ -116,7 +117,7 @@ class Store {
   onStepUpload(files) {
     const reader = new FileReader()
     reader.onloadend = (e) => {
-      this.onEditorChange(reader.result)
+      this.onEditorParse(reader.result)
     }
     reader.readAsText(files[0])
   }
@@ -124,32 +125,29 @@ class Store {
     const reader = new FileReader()
     reader.onloadend = (e) => {
       this.setState({flist: reader.result})
-      this.onEditorChange(reader.result)
+      this.onEditorParse(reader.result)
     }
     reader.readAsText(files[0])
   }
-  onEditorChange(newText) {
+  onEditorParse(text) {
     let editing = this.state.editing
     if (editing === -2) {
       try {
-        this.setState({flist: newText, steps: new Parser().parseAllSteps(this.state.gvar, newText, this.state.steps)})
+        this.setState({steps: new Parser().parseAllSteps(this.state.gvar, this.state.flist, this.state.steps)})
       } catch(e) {
-        this.setState({flist: newText})
         console.log(e)
       }
     } else if (editing === -1) {
       try {
-        this.setState({gvar: newText, steps: new Parser().parseAllSteps(newText, this.state.flist, this.state.steps)})
+        this.setState({steps: new Parser().parseAllSteps(this.state.gvar, this.state.flist, this.state.steps)})
       } catch (e) {
-        this.setState({gvar: newText})
         console.log(e)
       }
     } else {
       let steps = this.state.steps
-      steps[editing].code = newText     
       //call parser
       try {
-        let newStep = new Parser().parseStep(newText, this.state.gvar, this.state.flist, this.state.steps)
+        let newStep = new Parser().parseStep(text, this.state.gvar, this.state.flist, this.state.steps)
         if (newStep) steps[editing] = newStep
       } catch (e) {
         console.log(e)
@@ -158,15 +156,31 @@ class Store {
       this.setState({steps})
     }
   }
+  onEditorChange(newText) {
+    let editing = this.state.editing
+    if (editing === -2) {
+      this.setState({flist: newText})
+    } else if (editing === -1) {
+      this.setState({gvar: newText})
+    } else {
+      let steps = this.state.steps
+      steps[editing].code = newText    
+      this.setState({steps})
+    }
+  }
   onStepChange(index) {
     this.setState({editing: index, tab: 0})
   }
   onExportPipeline() {
     try {
+      console.log("exporting")
+      let newSteps = new Parser().parseAllSteps(this.state.gvar, this.state.flist, this.state.steps)
+      if (newSteps) this.setState({steps: newSteps})
       this.setState({export: new Parser().combineCommands(this.state.steps)})
     } catch (e) {
       console.log(e)
     }
+    
   }
 
 }

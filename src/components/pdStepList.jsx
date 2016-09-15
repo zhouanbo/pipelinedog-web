@@ -13,7 +13,6 @@ export default class PdStepList extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      editing: -2,
       alertOpen: false,
       alertStep: {},
       alertIndex: 0
@@ -22,7 +21,7 @@ export default class PdStepList extends React.Component {
 
   render() {
     return (
-      <SelectableList value={this.state.editing} onChange={(event, index)=>{this.setState({editing: index})}}>
+      <SelectableList value={this.props.editing} onChange={(event, index)=>{}}>
         <Subheader>Tabs</Subheader>
 
         <Dialog

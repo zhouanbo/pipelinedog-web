@@ -17,7 +17,8 @@ class Actions {
       'projectCreate',
       'editorChange',
       'exportPipeline',
-      'tabChange'
+      'tabChange',
+      'editorParse'
       )
   }
 }

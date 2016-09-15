@@ -52,7 +52,16 @@ export default class PdEditorToolBar extends React.Component {
         <ToolbarGroup lastChild={true}>
           <RaisedButton 
             disabled={this.props.tab!==0}
-            label="Import" 
+            label="Parse" 
+            labelPosition="before"
+            primary={true}
+            icon={<FontIcon className="material-icons">code</FontIcon>}
+            style={{marginLeft: 0}} 
+            onTouchTap={this.props.dispatchEditorParse.bind(this, this.props.text)}
+          />
+          <RaisedButton 
+            disabled={this.props.tab!==0}
+            label="Load" 
             labelPosition="before"
             primary={true}
             icon={<FontIcon className="material-icons">file_upload</FontIcon>}
@@ -61,7 +70,7 @@ export default class PdEditorToolBar extends React.Component {
           />
           <RaisedButton 
             disabled={this.props.tab!==0}
-            label="Download" 
+            label="Save" 
             labelPosition="before"
             primary={true}
             icon={<FontIcon className="material-icons">file_download</FontIcon>}
