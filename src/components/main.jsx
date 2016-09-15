@@ -197,15 +197,15 @@ class Main extends React.Component {
             <FlatButton
               label="OK"
               primary={true}
-              onTouchTap={this.dispatchSetError.bind(this, {show: false, message: ""})}
+              onTouchTap={this.dispatchSetError.bind(this, {show: false, type: "", message: ""})}
             />
           ]}
           modal={false}
-          open={this.props.error['show']}
-          onRequestClose={this.dispatchSetError.bind(this, {show: false, message: ""})}
+          open={this.props.error.show}
+          onRequestClose={this.dispatchSetError.bind(this, {show: false, type: "", message: ""})}
         >
-          <Subheader style={{color: "red"}}>Error Message</Subheader>
-          <p style={{padding: "0px 25px"}}>{this.props.error['message']}</p>
+          <Subheader style={{color: "red"}}>{this.props.error.type}</Subheader>
+          <p style={{padding: "0px 25px"}}>{this.props.error.message}</p>
         </Dialog>
         
         <Paper id="footer" style={{width: "100%", height: 50, background: "#F5F5F5", zIndex: 10}} zDepth={2}>

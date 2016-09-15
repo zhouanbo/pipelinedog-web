@@ -70317,21 +70317,21 @@ var Main = function (_React$Component) {
             actions: [_react2.default.createElement(_FlatButton2.default, {
               label: 'OK',
               primary: true,
-              onTouchTap: this.dispatchSetError.bind(this, { show: false, message: "" })
+              onTouchTap: this.dispatchSetError.bind(this, { show: false, type: "", message: "" })
             })],
             modal: false,
-            open: this.props.error['show'],
-            onRequestClose: this.dispatchSetError.bind(this, { show: false, message: "" })
+            open: this.props.error.show,
+            onRequestClose: this.dispatchSetError.bind(this, { show: false, type: "", message: "" })
           },
           _react2.default.createElement(
             _Subheader2.default,
             { style: { color: "red" } },
-            'Error Message'
+            this.props.error.type
           ),
           _react2.default.createElement(
             'p',
             { style: { padding: "0px 25px" } },
-            this.props.error['message']
+            this.props.error.message
           )
         ),
         _react2.default.createElement(
@@ -71485,13 +71485,17 @@ var Parser = function () {
       var parseText = gvar + "\n" + text;
       //read raw step obj
       var rawObj = {};
-      rawObj = _jsYaml2.default.safeLoad(parseText);
+      try {
+        rawObj = _jsYaml2.default.safeLoad(parseText);
+      } catch (e) {
+        throw { type: "Malformated YAML", message: e };
+      }
       //replace vars
       var rvObj = this.replaceVars(rawObj);
       //get only the keys inside step
       var stepObj = rvObj[Object.keys(rvObj)[0]];
       //check stepOjb status
-      if (!stepObj || !stepObj['in'] || !stepObj['run']) return;
+      if (!stepObj || !stepObj['name'] || !stepObj['in'] || !stepObj['run']) throw { type: "Missing Keys", message: "You are missing one of the mandatory keys: name, in, or run." };
       //console.log("stepObj:")
       //console.log(stepObj)
       //set step ID
@@ -71499,10 +71503,14 @@ var Parser = function () {
       steps.map(function (step) {
         if (step.id === stepObj.id) haveID = true;
       });
-      if (!haveID) stepObj.id = Object.keys(rvObj)[0];
+      if (!haveID) {
+        stepObj.id = Object.keys(rvObj)[0];
+      } else {
+        throw { type: "Duplicate ID", message: "You already have a same step ID defined before." };
+      }
       //process input lines
       var lines = this.processInArr(stepObj, flist, steps);
-      console.log("inLines:\n" + lines);
+      //console.log("inLines:\n"+lines)
       //count loops for this step
       var loopNum = this.countLoop(stepObj, lines);
       //console.log("loopNum:\n"+loopNum)
@@ -71554,18 +71562,16 @@ var Parser = function () {
     value: function parseAllSteps(gvar, flist, steps) {
       var _this = this;
 
-      var pass = true;
       var newSteps = steps;
       newSteps.forEach(function (step, index) {
-        var newStep = _this.parseStep(step.code, gvar, flist, steps);
-        if (newStep) {
+        try {
+          var newStep = _this.parseStep(step.code, gvar, flist, steps);
           newSteps[index] = newStep;
-        } else {
-          pass = false;
-          return 0;
+        } catch (e) {
+          throw { type: 'Step: ' + (step.name ? step.name.toString() : "Undefined") + ' Failed', message: "One or more of your steps failed for " + e.type + ", please check. Message: " + e.message };
         }
       });
-      return pass ? newSteps : steps;
+      return newSteps;
     }
   }, {
     key: 'combineSteps',
@@ -72093,7 +72099,7 @@ var getStartState = function getStartState() {
     editing: -2,
     export: "",
     save: "",
-    error: { show: false, message: "" }
+    error: { show: false, type: "", message: "" }
   };
 };
 
@@ -72248,13 +72254,13 @@ var Store = function () {
         try {
           this.setState({ steps: new _parser2.default().parseAllSteps(this.state.gvar, this.state.flist, this.state.steps) });
         } catch (e) {
-          this.setState({ error: { show: true, message: e.toString() } });
+          this.setState({ error: { show: true, type: e.type.toString(), message: e.message.toString() } });
         }
       } else if (editing === -1) {
         try {
           this.setState({ steps: new _parser2.default().parseAllSteps(this.state.gvar, this.state.flist, this.state.steps) });
         } catch (e) {
-          this.setState({ error: { show: true, message: e.toString() } });
+          this.setState({ error: { show: true, type: e.type.toString(), message: e.message.toString() } });
         }
       } else {
         var steps = this.state.steps;
@@ -72263,7 +72269,7 @@ var Store = function () {
           var newStep = new _parser2.default().parseStep(text, this.state.gvar, this.state.flist, this.state.steps);
           if (newStep) steps[editing] = newStep;
         } catch (e) {
-          this.setState({ error: { show: true, message: e.toString() } });
+          this.setState({ error: { show: true, type: e.type.toString(), message: e.message.toString() } });
         }
 
         this.setState({ steps: steps });
@@ -72292,12 +72298,11 @@ var Store = function () {
     key: 'onExportPipeline',
     value: function onExportPipeline() {
       try {
-        console.log("exporting");
         var newSteps = new _parser2.default().parseAllSteps(this.state.gvar, this.state.flist, this.state.steps);
         if (newSteps) this.setState({ steps: newSteps });
         this.setState({ export: new _parser2.default().combineCommands(this.state.steps) });
       } catch (e) {
-        console.log(e);
+        this.setState({ error: { show: true, type: e.type.toString(), message: e.message.toString() } });
       }
     }
   }]);

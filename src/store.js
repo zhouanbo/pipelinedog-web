@@ -21,7 +21,7 @@ const getStartState = () => {
     editing: -2,
     export: "",
     save: "",
-    error: {show: false, message: ""}
+    error: {show: false, type: "", message: ""}
   }
 }
 
@@ -140,13 +140,13 @@ class Store {
       try {
         this.setState({steps: new Parser().parseAllSteps(this.state.gvar, this.state.flist, this.state.steps)})
       } catch(e) {
-        this.setState({error: {show: true, message: e.toString()}})
+        this.setState({error: {show: true, type: e.type.toString(), message: e.message.toString()}})
       }
     } else if (editing === -1) {
       try {
         this.setState({steps: new Parser().parseAllSteps(this.state.gvar, this.state.flist, this.state.steps)})
       } catch (e) {
-        this.setState({error: {show: true, message: e.toString()}})
+        this.setState({error: {show: true, type: e.type.toString(), message: e.message.toString()}})
       }
     } else {
       let steps = this.state.steps
@@ -155,7 +155,7 @@ class Store {
         let newStep = new Parser().parseStep(text, this.state.gvar, this.state.flist, this.state.steps)
         if (newStep) steps[editing] = newStep
       } catch (e) {
-        this.setState({error: {show: true, message: e.toString()}})
+        this.setState({error: {show: true, type: e.type.toString(), message: e.message.toString()}})
       }
 
       this.setState({steps})
@@ -178,12 +178,11 @@ class Store {
   }
   onExportPipeline() {
     try {
-      console.log("exporting")
       let newSteps = new Parser().parseAllSteps(this.state.gvar, this.state.flist, this.state.steps)
       if (newSteps) this.setState({steps: newSteps})
       this.setState({export: new Parser().combineCommands(this.state.steps)})
     } catch (e) {
-      console.log(e)
+        this.setState({error: {show: true, type: e.type.toString(), message: e.message.toString()}})
     }
     
   }

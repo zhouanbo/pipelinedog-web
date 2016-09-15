@@ -14,13 +14,17 @@ export default class Parser {
     let parseText = gvar + "\n" + text
     //read raw step obj
     let rawObj = {}
-    rawObj = yaml.safeLoad(parseText)
+    try {
+      rawObj = yaml.safeLoad(parseText)
+    } catch(e) {
+      throw {type: "Malformated YAML", message: e}
+    }
     //replace vars
     let rvObj = this.replaceVars(rawObj)
     //get only the keys inside step
     let stepObj = rvObj[Object.keys(rvObj)[0]]
     //check stepOjb status
-    if (!stepObj || !stepObj['in'] || !stepObj['run']) return
+    if (!stepObj || !stepObj['name'] || !stepObj['in'] || !stepObj['run']) throw {type: "Missing Keys", message: "You are missing one of the mandatory keys: name, in, or run."}
     //console.log("stepObj:")
     //console.log(stepObj)
     //set step ID
@@ -28,10 +32,14 @@ export default class Parser {
     steps.map(step => {
       if (step.id === stepObj.id) haveID = true
     })
-    if (!haveID) stepObj.id = Object.keys(rvObj)[0]
+    if (!haveID) {
+      stepObj.id = Object.keys(rvObj)[0]
+    } else {
+      throw {type: "Duplicate ID", message: "You already have a same step ID defined before."}
+    }
     //process input lines
     let lines = this.processInArr(stepObj, flist, steps)
-    console.log("inLines:\n"+lines)
+    //console.log("inLines:\n"+lines)
     //count loops for this step
     let loopNum = this.countLoop(stepObj, lines)
     //console.log("loopNum:\n"+loopNum)
@@ -74,18 +82,16 @@ export default class Parser {
   }
 
   parseAllSteps(gvar, flist, steps) {
-    let pass = true
     let newSteps = steps
     newSteps.forEach((step, index) => {
-      let newStep = this.parseStep(step.code, gvar, flist, steps)
-      if (newStep) {
+      try {
+        let newStep = this.parseStep(step.code, gvar, flist, steps)
         newSteps[index] = newStep
-      } else {
-        pass = false
-        return 0
+      } catch(e) {
+        throw {type: `Step: ${step.name?step.name.toString():"Undefined"} Failed`, message: "One or more of your steps failed for "+e.type+", please check. Message: "+e.message}
       }
     })
-    return pass ? newSteps : steps
+    return newSteps
   }
 
   combineSteps(gvar, steps) {
