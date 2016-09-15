@@ -19,7 +19,6 @@ export default class PdAppBar extends React.Component {
       open: false, 
       alertOpen: false,
       saveOpen: false,
-      exportOpen: false,
       aboutOpen: false
     }
     this.handleToggle = this.handleToggle.bind(this)
@@ -93,12 +92,12 @@ export default class PdAppBar extends React.Component {
             <FlatButton
               label="Close"
               primary={true}
-              onTouchTap={()=>{this.setState({exportOpen: false})}}
+              onTouchTap={this.props.dispatchExportClose}
             />
           ]}
           modal={false}
-          open={this.state.exportOpen}
-          onRequestClose={()=>{this.setState({exportOpen: false})}}
+          open={this.props.exportOpen}
+          onRequestClose={this.props.dispatchExportClose}
         >
           <Subheader>Exporting Commands:</Subheader>
           <TextField

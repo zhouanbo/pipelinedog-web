@@ -82,6 +82,9 @@ class Main extends React.Component {
   dispatchTabChange(value) {
     Actions.tabChange(value)
   }
+  dispatchExportClose() {
+    Actions.exportClose()
+  }
   dispatchSetError(error) {
     Actions.setError(error)
   }
@@ -96,6 +99,8 @@ class Main extends React.Component {
             dispatchProjectCreate={this.dispatchProjectCreate}
             dispatchProjectSave={this.dispatchProjectSave}
             dispatchExportPipeline={this.dispatchExportPipeline}
+            exportOpen={this.props.exportOpen}
+            dispatchExportClose={this.dispatchExportClose}
             export={this.props['export']}
             save={this.props.save}
           />

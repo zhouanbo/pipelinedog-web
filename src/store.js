@@ -6,7 +6,7 @@ import Parser from './parser'
 
 const getStartState = () => {
   return {
-    version: "0.1.0",
+    version: "0.1.1",
     steps: [{
       id:'', 
       name: 'Default Step',
@@ -21,6 +21,7 @@ const getStartState = () => {
     gvar: "#Suggested global variables\nIN_DIR: \nOUT_DIR:",
     editing: -2,
     export: "",
+    exportOpen: false,
     save: "",
     error: {show: false, type: "", message: ""}
   }
@@ -52,11 +53,12 @@ class Store {
       onTabChange: Actions.tabChange,
       onStepUpload: Actions.stepUpload,
       onEditorParse: Actions.editorParse,
-      onSetError: Actions.setError
+      onSetError: Actions.setError,
+      onExportClose: Actions.exportClose
     })
     let localState = JSON.parse(localStorage.getItem('state'))
+    console.log("version: "+localState.version)
     if (localState && localState.version === getStartState().version) {
-      console.log("equal")
       this.state = localState
     } else {
       this.state = getStartState()
@@ -186,11 +188,13 @@ class Store {
     try {
       let newSteps = new Parser().parseAllSteps(this.state.gvar, this.state.flist, this.state.steps)
       if (newSteps) this.setState({steps: newSteps})
-      this.setState({export: new Parser().combineCommands(this.state.steps)})
+      this.setState({exportOpen: true, export: new Parser().combineCommands(this.state.steps)})
     } catch (e) {
       this.setState({export: "", error: {show: true, type: e.type.toString(), message: e.message.toString()}})
-    }
-    
+    } 
+  }
+  onExportClose() {
+    this.setState({exportOpen: false})
   }
 
 }

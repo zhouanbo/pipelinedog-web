@@ -69933,7 +69933,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var Actions = function Actions() {
   _classCallCheck(this, Actions);
 
-  this.generateActions('uploadFile', 'createStep', 'deleteStep', 'sortStep', 'stepUpload', 'editorChange', 'enterMain', 'projectUpload', 'listUpload', 'stepChange', 'projectSave', 'projectCreate', 'editorChange', 'exportPipeline', 'tabChange', 'editorParse', 'setError');
+  this.generateActions('uploadFile', 'createStep', 'deleteStep', 'sortStep', 'stepUpload', 'editorChange', 'enterMain', 'projectUpload', 'listUpload', 'stepChange', 'projectSave', 'projectCreate', 'editorChange', 'exportPipeline', 'tabChange', 'editorParse', 'setError', 'exportClose');
 };
 
 exports.default = _alt2.default.createActions(Actions);
@@ -70175,6 +70175,11 @@ var Main = function (_React$Component) {
       _actions2.default.tabChange(value);
     }
   }, {
+    key: 'dispatchExportClose',
+    value: function dispatchExportClose() {
+      _actions2.default.exportClose();
+    }
+  }, {
     key: 'dispatchSetError',
     value: function dispatchSetError(error) {
       _actions2.default.setError(error);
@@ -70193,6 +70198,8 @@ var Main = function (_React$Component) {
             dispatchProjectCreate: this.dispatchProjectCreate,
             dispatchProjectSave: this.dispatchProjectSave,
             dispatchExportPipeline: this.dispatchExportPipeline,
+            exportOpen: this.props.exportOpen,
+            dispatchExportClose: this.dispatchExportClose,
             'export': this.props['export'],
             save: this.props.save
           })
@@ -70425,7 +70432,6 @@ var PdAppBar = function (_React$Component) {
       open: false,
       alertOpen: false,
       saveOpen: false,
-      exportOpen: false,
       aboutOpen: false
     };
     _this.handleToggle = _this.handleToggle.bind(_this);
@@ -70519,15 +70525,11 @@ var PdAppBar = function (_React$Component) {
             }), _react2.default.createElement(_FlatButton2.default, {
               label: 'Close',
               primary: true,
-              onTouchTap: function onTouchTap() {
-                _this2.setState({ exportOpen: false });
-              }
+              onTouchTap: this.props.dispatchExportClose
             })],
             modal: false,
-            open: this.state.exportOpen,
-            onRequestClose: function onRequestClose() {
-              _this2.setState({ exportOpen: false });
-            }
+            open: this.props.exportOpen,
+            onRequestClose: this.props.dispatchExportClose
           },
           _react2.default.createElement(
             _Subheader2.default,
@@ -72084,7 +72086,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var getStartState = function getStartState() {
   return {
-    version: "0.1.0",
+    version: "0.1.1",
     steps: [{
       id: '',
       name: 'Default Step',
@@ -72099,6 +72101,7 @@ var getStartState = function getStartState() {
     gvar: "#Suggested global variables\nIN_DIR: \nOUT_DIR:",
     editing: -2,
     export: "",
+    exportOpen: false,
     save: "",
     error: { show: false, type: "", message: "" }
   };
@@ -72132,11 +72135,12 @@ var Store = function () {
       onTabChange: _actions2.default.tabChange,
       onStepUpload: _actions2.default.stepUpload,
       onEditorParse: _actions2.default.editorParse,
-      onSetError: _actions2.default.setError
+      onSetError: _actions2.default.setError,
+      onExportClose: _actions2.default.exportClose
     });
     var localState = JSON.parse(localStorage.getItem('state'));
+    console.log("version: " + localState.version);
     if (localState && localState.version === getStartState().version) {
-      console.log("equal");
       this.state = localState;
     } else {
       this.state = getStartState();
@@ -72308,10 +72312,15 @@ var Store = function () {
       try {
         var newSteps = new _parser2.default().parseAllSteps(this.state.gvar, this.state.flist, this.state.steps);
         if (newSteps) this.setState({ steps: newSteps });
-        this.setState({ export: new _parser2.default().combineCommands(this.state.steps) });
+        this.setState({ exportOpen: true, export: new _parser2.default().combineCommands(this.state.steps) });
       } catch (e) {
         this.setState({ export: "", error: { show: true, type: e.type.toString(), message: e.message.toString() } });
       }
+    }
+  }, {
+    key: 'onExportClose',
+    value: function onExportClose() {
+      this.setState({ exportOpen: false });
     }
   }]);
 

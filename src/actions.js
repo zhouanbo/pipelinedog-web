@@ -19,7 +19,8 @@ class Actions {
       'exportPipeline',
       'tabChange',
       'editorParse',
-      'setError'
+      'setError',
+      'exportClose'
       )
   }
 }
