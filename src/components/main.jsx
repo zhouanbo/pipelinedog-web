@@ -84,7 +84,7 @@ class Main extends React.Component {
 
         <div id="header" style={{flex: "0 0 auto", zIndex: 99}}>
           <PdAppBar 
-            enterMain={this.props.enterMain} 
+            enterMain={this.props.enterMain}
             dispatchProjectCreate={this.dispatchProjectCreate}
             dispatchProjectSave={this.dispatchProjectSave}
             dispatchExportPipeline={this.dispatchExportPipeline}
@@ -122,6 +122,7 @@ class Main extends React.Component {
                   tab={this.props.tab}
                 />
                 <PdEditor
+                  ref="editorWrap"
                   text={this.getEditorText(this.props.editing)}
                   onChange={this.dispatchEditorChange} 
                 />

@@ -337,7 +337,7 @@ export default class Parser {
           //predefined vars
           let pvars = {
             "$ENTRY": line,
-            "$FILENAME_NOEXT": path.basename(line).substr(0, line.lastIndexOf('.')),
+            "$FILENAME_NOEXT": path.basename(line).substr(0, path.basename(line).lastIndexOf('.')),
             "$FILENAME": path.basename(line),
             "$DIRNAME": path.dirname(line),
             "$PARENT_DIR": path.resolve(path.dirname(line), "../"),

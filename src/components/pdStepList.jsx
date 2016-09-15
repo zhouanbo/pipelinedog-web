@@ -85,7 +85,7 @@ export default class PdStepList extends React.Component {
           note_add
         </IconButton>
         <IconButton
-          onTouchTap={this.props.dispatchSortStep}
+          onTouchTap={(event, index)=>{this.props.dispatchSortStep(); this.setState({editing: -2})}}
           iconClassName="material-icons" 
           style={{marginTop: -50, float: "right"}}
           tooltip="Sort"

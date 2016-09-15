@@ -70218,6 +70218,7 @@ var Main = function (_React$Component) {
                   tab: this.props.tab
                 }),
                 _react2.default.createElement(_pdEditor2.default, {
+                  ref: 'editorWrap',
                   text: this.getEditorText(this.props.editing),
                   onChange: this.dispatchEditorChange
                 })
@@ -70691,6 +70692,13 @@ var PdEditor = function (_React$Component) {
       this.refs.ace.editor.focus();
     }
   }, {
+    key: 'clearUndo',
+    value: function clearUndo() {
+      var undo_manager = this.refs.ace.editor.getSession().getUndoManager();
+      undo_manager.reset();
+      this.refs.ace.editor.getSession().setUndoManager(undo_manager);
+    }
+  }, {
     key: 'render',
     value: function render() {
       var _this2 = this;
@@ -70712,7 +70720,8 @@ var PdEditor = function (_React$Component) {
           showPrintMargin: false,
           showGutter: true,
           tabSize: 2,
-          editorProps: { $blockScrolling: Infinity }
+          editorProps: { $blockScrolling: Infinity },
+          onFocus: this.clearUndo.bind(this)
         })
       );
     }
@@ -71055,7 +71064,9 @@ var PdStepList = function (_React$Component) {
         _react2.default.createElement(
           _IconButton2.default,
           {
-            onTouchTap: this.props.dispatchSortStep,
+            onTouchTap: function onTouchTap(event, index) {
+              _this2.props.dispatchSortStep();_this2.setState({ editing: -2 });
+            },
             iconClassName: 'material-icons',
             style: { marginTop: -50, float: "right" },
             tooltip: 'Sort'
@@ -71789,7 +71800,7 @@ var Parser = function () {
             //predefined vars
             var pvars = {
               "$ENTRY": line,
-              "$FILENAME_NOEXT": _path2.default.basename(line).substr(0, line.lastIndexOf('.')),
+              "$FILENAME_NOEXT": _path2.default.basename(line).substr(0, _path2.default.basename(line).lastIndexOf('.')),
               "$FILENAME": _path2.default.basename(line),
               "$DIRNAME": _path2.default.dirname(line),
               "$PARENT_DIR": _path2.default.resolve(_path2.default.dirname(line), "../"),

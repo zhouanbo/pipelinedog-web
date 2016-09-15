@@ -27,6 +27,12 @@ export default class PdEditor extends React.Component {
     this.refs.ace.editor.focus()
   }
 
+  clearUndo() {
+    let undo_manager = this.refs.ace.editor.getSession().getUndoManager()
+    undo_manager.reset()
+    this.refs.ace.editor.getSession().setUndoManager(undo_manager)
+  }
+
   render() {
     return (
       <div id="editor" onClick={()=>{this.refs.ace.editor.focus()}} style={{overflowY: "scroll", overflowX: "hidden", position: "relative", zIndex: 0}}>
@@ -43,6 +49,7 @@ export default class PdEditor extends React.Component {
           showGutter={true}
           tabSize={2}
           editorProps={{$blockScrolling: Infinity}}
+          onFocus={this.clearUndo.bind(this)}
         />
       </div>
     )
