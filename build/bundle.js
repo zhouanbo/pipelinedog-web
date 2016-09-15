@@ -72254,13 +72254,17 @@ var Store = function () {
         try {
           this.setState({ steps: new _parser2.default().parseAllSteps(this.state.gvar, this.state.flist, this.state.steps) });
         } catch (e) {
-          this.setState({ error: { show: true, type: e.type, message: e.message } });
+          var eType = e.type ? e.type.toString() : "Error Message";
+          var eMessage = e.message ? e.message.toString() : "Unkown Error.";
+          this.setState({ error: { show: true, type: eType, message: eMessage } });
         }
       } else if (editing === -1) {
         try {
           this.setState({ steps: new _parser2.default().parseAllSteps(this.state.gvar, this.state.flist, this.state.steps) });
         } catch (e) {
-          this.setState({ error: { show: true, type: e.type, message: e.message } });
+          var _eType = e.type ? e.type.toString() : "Error Message";
+          var _eMessage = e.message ? e.message.toString() : "Unkown Error.";
+          this.setState({ error: { show: true, type: _eType, message: _eMessage } });
         }
       } else {
         var steps = this.state.steps;
@@ -72269,7 +72273,9 @@ var Store = function () {
           var newStep = new _parser2.default().parseStep(text, this.state.gvar, this.state.flist, this.state.steps);
           if (newStep) steps[editing] = newStep;
         } catch (e) {
-          this.setState({ error: { show: true, type: e.type, message: e.message } });
+          var _eType2 = e.type ? e.type.toString() : "Error Message";
+          var _eMessage2 = e.message ? e.message.toString() : "Unkown Error.";
+          this.setState({ error: { show: true, type: _eType2, message: _eMessage2 } });
         }
 
         this.setState({ steps: steps });

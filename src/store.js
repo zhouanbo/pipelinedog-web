@@ -140,14 +140,17 @@ class Store {
       try {
         this.setState({steps: new Parser().parseAllSteps(this.state.gvar, this.state.flist, this.state.steps)})
       } catch(e) {
-        this.setState({error: {show: true, type: e.type, message: e.message}})
+        let eType = e.type?e.type.toString():"Error Message"
+        let eMessage = e.message?e.message.toString():"Unkown Error."
+        this.setState({error: {show: true, type: eType, message: eMessage}})
       }
     } else if (editing === -1) {
       try {
         this.setState({steps: new Parser().parseAllSteps(this.state.gvar, this.state.flist, this.state.steps)})
       } catch (e) {
-        this.setState({error: {show: true, type: e.type, message: e.message}})
-      }
+        let eType = e.type?e.type.toString():"Error Message"
+        let eMessage = e.message?e.message.toString():"Unkown Error."
+        this.setState({error: {show: true, type: eType, message: eMessage}})      }
     } else {
       let steps = this.state.steps
       //call parser
@@ -155,8 +158,9 @@ class Store {
         let newStep = new Parser().parseStep(text, this.state.gvar, this.state.flist, this.state.steps)
         if (newStep) steps[editing] = newStep
       } catch (e) {
-        this.setState({error: {show: true, type: e.type, message: e.message}})
-      }
+        let eType = e.type?e.type.toString():"Error Message"
+        let eMessage = e.message?e.message.toString():"Unkown Error."
+        this.setState({error: {show: true, type: eType, message: eMessage}})      }
 
       this.setState({steps})
     }
