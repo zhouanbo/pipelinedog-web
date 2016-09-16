@@ -72051,7 +72051,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var getStartState = function getStartState() {
   return {
-    version: "0.1.1",
+    version: "0.2.0",
     steps: [{
       id: '',
       name: 'Default Step',

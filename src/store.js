@@ -6,7 +6,7 @@ import Parser from './parser'
 
 const getStartState = () => {
   return {
-    version: "0.1.1",
+    version: "0.2.0",
     steps: [{
       id:'', 
       name: 'Default Step',
