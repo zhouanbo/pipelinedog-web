@@ -47,7 +47,7 @@ export default class PdEditorToolBar extends React.Component {
         </Dialog>
 
         <ToolbarGroup firstChild={true}>
-          <h4 style={{marginLeft: 16, color: "#757575"}}>{!this.props.name?"Unnamed Step":this.props.name}</h4>
+          <h4 style={{marginLeft: 16, color: "#757575"}}>{this.props.name}</h4>
         </ToolbarGroup>
         <ToolbarGroup lastChild={true}>
           <RaisedButton 

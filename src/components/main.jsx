@@ -22,21 +22,21 @@ class Main extends React.Component {
   }
 
   getEditorText(index) {
-    if (index === -2) {
-      return this.props.flist
+    if (index <= -2) {
+      return this.props.flists[index*-1-2].content ? this.props.flists[index*-1-2].content : ""
     } else if (index === -1) {
       return this.props.gvar
     } else {
-      return 'code' in this.props.steps[index] ? this.props.steps[index].code : ""
+      return this.props.steps[index].code ? this.props.steps[index].code : ""
     }
   }
   getEditorName(index) {
-    if (index === -2) {
-      return "List File"
+    if (index <= -2) {
+      return this.props.flists[index*-1-2].name ? this.props.flists[index*-1-2].name : ""
     } else if (index === -1) {
       return "Global Variables"
     } else {
-      return this.props.steps[index].name
+      return this.props.steps[index].name ? this.props.steps[index].name : "Unnamed Step"
     }
   }
 
@@ -63,6 +63,9 @@ class Main extends React.Component {
   }
   dispatchCreateStep() {
     Actions.createStep()
+  }
+  dispatchCreateList(name) {
+    Actions.createList(name)
   }
   dispatchSortStep() {
     Actions.sortStep()
@@ -114,9 +117,12 @@ class Main extends React.Component {
           <Paper style={{flex: "0 0 25%", overflowY: "scroll", overflowX: "hidden"}} zDepth={0}>
             <PdStepList
               steps={this.props.steps}
+              flists={this.props.flists}
               dispatchStepChange={this.dispatchStepChange}
               dispatchCreateStep={this.dispatchCreateStep}
+              dispatchCreateList={this.dispatchCreateList}
               dispatchDeleteStep={this.dispatchDeleteStep}
+              dispatchDeleteList={this.dispatchDeleteList}
               dispatchSortStep={this.dispatchSortStep}
               editing={this.props.editing}
             />

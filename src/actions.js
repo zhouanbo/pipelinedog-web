@@ -5,6 +5,7 @@ class Actions {
     this.generateActions(
       'uploadFile',
       'createStep',
+      'createList',
       'deleteStep',
       'sortStep',
       'stepUpload',

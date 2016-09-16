@@ -69933,7 +69933,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var Actions = function Actions() {
   _classCallCheck(this, Actions);
 
-  this.generateActions('uploadFile', 'createStep', 'deleteStep', 'sortStep', 'stepUpload', 'editorChange', 'enterMain', 'projectUpload', 'listUpload', 'stepChange', 'projectSave', 'projectCreate', 'editorChange', 'exportPipeline', 'tabChange', 'editorParse', 'setError', 'exportClose');
+  this.generateActions('uploadFile', 'createStep', 'createList', 'deleteStep', 'sortStep', 'stepUpload', 'editorChange', 'enterMain', 'projectUpload', 'listUpload', 'stepChange', 'projectSave', 'projectCreate', 'editorChange', 'exportPipeline', 'tabChange', 'editorParse', 'setError', 'exportClose');
 };
 
 exports.default = _alt2.default.createActions(Actions);
@@ -70085,23 +70085,23 @@ var Main = function (_React$Component) {
   _createClass(Main, [{
     key: 'getEditorText',
     value: function getEditorText(index) {
-      if (index === -2) {
-        return this.props.flist;
+      if (index <= -2) {
+        return this.props.flists[index * -1 - 2].content ? this.props.flists[index * -1 - 2].content : "";
       } else if (index === -1) {
         return this.props.gvar;
       } else {
-        return 'code' in this.props.steps[index] ? this.props.steps[index].code : "";
+        return this.props.steps[index].code ? this.props.steps[index].code : "";
       }
     }
   }, {
     key: 'getEditorName',
     value: function getEditorName(index) {
-      if (index === -2) {
-        return "List File";
+      if (index <= -2) {
+        return this.props.flists[index * -1 - 2].name ? this.props.flists[index * -1 - 2].name : "";
       } else if (index === -1) {
         return "Global Variables";
       } else {
-        return this.props.steps[index].name;
+        return this.props.steps[index].name ? this.props.steps[index].name : "Unnamed Step";
       }
     }
   }, {
@@ -70143,6 +70143,11 @@ var Main = function (_React$Component) {
     key: 'dispatchCreateStep',
     value: function dispatchCreateStep() {
       _actions2.default.createStep();
+    }
+  }, {
+    key: 'dispatchCreateList',
+    value: function dispatchCreateList(name) {
+      _actions2.default.createList(name);
     }
   }, {
     key: 'dispatchSortStep',
@@ -70213,9 +70218,12 @@ var Main = function (_React$Component) {
             { style: { flex: "0 0 25%", overflowY: "scroll", overflowX: "hidden" }, zDepth: 0 },
             _react2.default.createElement(_pdStepList2.default, {
               steps: this.props.steps,
+              flists: this.props.flists,
               dispatchStepChange: this.dispatchStepChange,
               dispatchCreateStep: this.dispatchCreateStep,
+              dispatchCreateList: this.dispatchCreateList,
               dispatchDeleteStep: this.dispatchDeleteStep,
+              dispatchDeleteList: this.dispatchDeleteList,
               dispatchSortStep: this.dispatchSortStep,
               editing: this.props.editing
             })
@@ -70918,7 +70926,7 @@ var PdEditorToolBar = function (_React$Component) {
           _react2.default.createElement(
             'h4',
             { style: { marginLeft: 16, color: "#757575" } },
-            !this.props.name ? "Unnamed Step" : this.props.name
+            this.props.name
           )
         ),
         _react2.default.createElement(
@@ -71012,6 +71020,10 @@ var _FlatButton = require('material-ui/FlatButton');
 
 var _FlatButton2 = _interopRequireDefault(_FlatButton);
 
+var _TextField = require('material-ui/TextField');
+
+var _TextField2 = _interopRequireDefault(_TextField);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -71033,7 +71045,9 @@ var PdStepList = function (_React$Component) {
     _this.state = {
       alertOpen: false,
       alertStep: {},
-      alertIndex: 0
+      alertIndex: 0,
+      nameOpen: false,
+      name: ""
     };
     return _this;
   }
@@ -71046,11 +71060,6 @@ var PdStepList = function (_React$Component) {
       return _react2.default.createElement(
         SelectableList,
         { value: this.props.editing, onChange: function onChange(event, index) {} },
-        _react2.default.createElement(
-          _Subheader2.default,
-          null,
-          'Tabs'
-        ),
         _react2.default.createElement(
           _Dialog2.default,
           {
@@ -71073,26 +71082,35 @@ var PdStepList = function (_React$Component) {
               _this2.setState({ alertOpen: false });
             }
           },
-          'Are you sure to delete step "',
-          this.state.alertStep.name === "" ? "Unnamed Step" : this.state.alertStep.name,
+          'Are you sure to delete "',
+          this.state.alertStep.name === "" ? "Unnamed Tab" : this.state.alertStep.name,
           '"?'
         ),
-        _react2.default.createElement(_List.ListItem, {
-          value: -2,
-          onTouchTap: function onTouchTap() {
-            _this2.props.dispatchStepChange.call(_this2, -2);
+        _react2.default.createElement(
+          _Dialog2.default,
+          {
+            actions: [_react2.default.createElement(_FlatButton2.default, {
+              label: 'OK',
+              primary: true,
+              onTouchTap: function onTouchTap() {
+                _this2.props.dispatchCreateList(_this2.state.name);_this2.setState({ nameOpen: false });
+              }
+            })],
+            modal: false,
+            open: this.state.nameOpen,
+            onRequestClose: function onRequestClose() {
+              _this2.setState({ nameOpen: false });
+            }
           },
-          leftIcon: _react2.default.createElement(
-            _IconButton2.default,
-            {
-              iconClassName: 'material-icons',
-              style: { marginTop: 5 }
-            },
-            'input'
+          _react2.default.createElement(
+            _Subheader2.default,
+            null,
+            'Create File List'
           ),
-          primaryText: 'List File',
-          secondaryText: 'Pipeline input'
-        }),
+          _react2.default.createElement(_TextField2.default, { style: { margin: "0px 25px" }, value: this.state.name, hintText: 'File List Name', onChange: function onChange(event) {
+              _this2.setState({ name: event.target.value });
+            } })
+        ),
         _react2.default.createElement(_List.ListItem, {
           value: -1,
           onTouchTap: function onTouchTap() {
@@ -71108,6 +71126,67 @@ var PdStepList = function (_React$Component) {
           ),
           primaryText: 'Global Variables',
           secondaryText: 'Pipeline specific variables'
+        }),
+        _react2.default.createElement(_Divider2.default, { inset: true }),
+        _react2.default.createElement(
+          _Subheader2.default,
+          null,
+          'List Files'
+        ),
+        _react2.default.createElement(
+          _IconButton2.default,
+          {
+            onTouchTap: function onTouchTap() {
+              _this2.setState({ nameOpen: true, name: "" });
+            },
+            iconClassName: 'material-icons',
+            style: { marginTop: -50, float: "right" },
+            tooltip: 'Add'
+          },
+          'note_add'
+        ),
+        this.props.flists.map(function (flist, index) {
+          var idx = index * -1 - 2;
+          return _react2.default.createElement(_List.ListItem, {
+            value: idx,
+            key: idx,
+            onTouchTap: function onTouchTap() {
+              _this2.props.dispatchStepChange.call(_this2, idx);
+            },
+            onMouseOver: function onMouseOver() {
+              document.getElementsByClassName("delete-icon-" + idx)[0].style.display = "inline";
+            },
+            onMouseLeave: function onMouseLeave() {
+              document.getElementsByClassName("delete-icon-" + idx)[0].style.display = "none";
+            },
+            leftIcon: _react2.default.createElement(
+              _IconButton2.default,
+              {
+                iconClassName: 'material-icons',
+                style: { marginTop: 5 }
+              },
+              'input'
+            ),
+            rightIcon: _react2.default.createElement(
+              _IconButton2.default,
+              {
+                className: "delete-icon-" + idx,
+                iconClassName: 'material-icons',
+                style: { marginTop: 5, marginRight: 21, display: "none" },
+                onTouchTap: function onTouchTap() {
+                  _this2.setState({
+                    alertOpen: true,
+                    alertStep: flist,
+                    alertIndex: idx
+                  });
+                },
+                tooltip: 'Delete'
+              },
+              'delete'
+            ),
+            primaryText: !flist.name ? "Unnamed List" : flist.name,
+            secondaryText: !flist.name ? "ID: NA" : 'ID: $' + flist.name.replace(/ /g, '_')
+          });
         }),
         _react2.default.createElement(_Divider2.default, { inset: true }),
         _react2.default.createElement(
@@ -71188,7 +71267,7 @@ var PdStepList = function (_React$Component) {
 
 exports.default = PdStepList;
 
-},{"material-ui/Dialog":235,"material-ui/Divider":237,"material-ui/FlatButton":244,"material-ui/IconButton":248,"material-ui/List":255,"material-ui/Subheader":275,"react":501}],526:[function(require,module,exports){
+},{"material-ui/Dialog":235,"material-ui/Divider":237,"material-ui/FlatButton":244,"material-ui/IconButton":248,"material-ui/List":255,"material-ui/Subheader":275,"material-ui/TextField":288,"react":501}],526:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -71236,43 +71315,17 @@ var PdWelcome = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(PdWelcome).call(this, props));
 
     _this.state = {
-      stepIndex: 0,
-      listDropText: "Drop your list file or click to select.",
       projectDropText: "Drop your project file or click to select."
     };
-    _this.handleNext = _this.handleNext.bind(_this);
-    _this.handlePrev = _this.handlePrev.bind(_this);
-    _this.handleListDrop = _this.handleListDrop.bind(_this);
+    _this.handleStart = _this.handleStart.bind(_this);
     _this.handleProjectDrop = _this.handleProjectDrop.bind(_this);
-    _this.getStepContent = _this.getContent.bind(_this);
     return _this;
   }
 
   _createClass(PdWelcome, [{
-    key: 'handleNext',
-    value: function handleNext() {
-      var stepIndex = this.state.stepIndex;
-
-      this.setState({
-        stepIndex: stepIndex + 1
-      });
-      if (stepIndex >= 2) {
-        this.props.dispatchEnterMain();
-      }
-    }
-  }, {
-    key: 'handlePrev',
-    value: function handlePrev() {
-      var stepIndex = this.state.stepIndex;
-
-      if (stepIndex > 0) {
-        this.setState({ stepIndex: stepIndex - 1 });
-      }
-    }
-  }, {
-    key: 'handleListDrop',
-    value: function handleListDrop(files) {
-      this.setState({ listDropText: "Uploaded Sucessfully: " + files[0].name });
+    key: 'handleStart',
+    value: function handleStart() {
+      this.props.dispatchEnterMain();
     }
   }, {
     key: 'handleProjectDrop',
@@ -71284,135 +71337,50 @@ var PdWelcome = function (_React$Component) {
     value: function getContent(stepIndex) {
       var _this2 = this;
 
-      switch (stepIndex) {
-        case 0:
-          return _react2.default.createElement(
-            _Paper2.default,
-            { zDepth: 0 },
-            _react2.default.createElement(
-              'h2',
-              null,
-              'Welcome to PipelineDog!'
-            ),
-            _react2.default.createElement(
-              'h4',
-              null,
-              'You can continue as a new project or upload a project file.'
-            ),
-            _react2.default.createElement(
-              _reactDropzone2.default,
-              {
-                multiple: false,
-                onDrop: function onDrop(files) {
-                  _this2.props.dispatchProjectUpload(files);_this2.handleProjectDrop(files);
-                }
-              },
-              _react2.default.createElement(
-                'div',
-                { style: { padding: 16, textAlign: "center" } },
-                this.state.projectDropText
-              )
-            )
-          );
-        case 1:
-          return _react2.default.createElement(
-            _Paper2.default,
-            { zDepth: 0 },
-            _react2.default.createElement(
-              'h2',
-              null,
-              'Upload a List File'
-            ),
-            _react2.default.createElement(
-              'h4',
-              null,
-              'You can upload a list file or type it later on.'
-            ),
-            _react2.default.createElement(
-              _reactDropzone2.default,
-              {
-                multiple: false,
-                onDrop: function onDrop(files) {
-                  _this2.props.dispatchListUpload(files);_this2.handleListDrop(files);
-                }
-              },
-              _react2.default.createElement(
-                'div',
-                { style: { padding: 16, textAlign: "center" } },
-                this.state.listDropText
-              )
-            )
-          );
-        case 2:
-          return _react2.default.createElement(
-            _Paper2.default,
-            { zDepth: 0 },
-            _react2.default.createElement(
-              'h2',
-              null,
-              'Let\'s Go!'
-            ),
-            _react2.default.createElement(
-              'h4',
-              null,
-              'It seems you are all set, let\'s\' get started.'
-            )
-          );
-        default:
-          return 'This is a wrong index!';
-      }
+      return _react2.default.createElement(
+        _Paper2.default,
+        { zDepth: 0 },
+        _react2.default.createElement(
+          'h2',
+          null,
+          'Welcome to PipelineDog!'
+        ),
+        _react2.default.createElement(
+          'h4',
+          null,
+          'You can continue as a new project or upload a project file.',
+          _react2.default.createElement('br', null),
+          'The documentation and other information can be found at: ',
+          _react2.default.createElement(
+            'a',
+            { href: 'http://pipeline.dog', target: '_blank' },
+            'http://pipeline.dog'
+          )
+        ),
+        _react2.default.createElement(
+          _reactDropzone2.default,
+          {
+            multiple: false,
+            onDrop: function onDrop(files) {
+              _this2.props.dispatchProjectUpload(files);_this2.handleProjectDrop(files);
+            }
+          },
+          _react2.default.createElement(
+            'div',
+            { style: { padding: 16, textAlign: "center" } },
+            this.state.projectDropText
+          )
+        )
+      );
     }
   }, {
     key: 'render',
     value: function render() {
-      var _this3 = this;
-
-      var _state = this.state;
-      var finished = _state.finished;
-      var stepIndex = _state.stepIndex;
-
       var contentStyle = { margin: '0 16px' };
 
       return _react2.default.createElement(
         'div',
         { style: { width: '100%', maxWidth: 700, margin: 'auto' } },
-        _react2.default.createElement(
-          _Stepper.Stepper,
-          { linear: false, activeStep: stepIndex },
-          _react2.default.createElement(
-            _Stepper.Step,
-            null,
-            _react2.default.createElement(
-              _Stepper.StepButton,
-              { onClick: function onClick() {
-                  return _this3.setState({ stepIndex: 0 });
-                } },
-              'Upload a project file'
-            )
-          ),
-          _react2.default.createElement(
-            _Stepper.Step,
-            null,
-            _react2.default.createElement(
-              _Stepper.StepButton,
-              { onClick: function onClick() {
-                  return _this3.setState({ stepIndex: 1 });
-                } },
-              'Upload a list file'
-            )
-          ),
-          _react2.default.createElement(
-            _Stepper.Step,
-            null,
-            _react2.default.createElement(
-              _Stepper.StepButton,
-              { onClick: function onClick() {
-                  return _this3.setState({ stepIndex: 2 });
-                } },
-              'Ready to start'
-            )
-          )
-        ),
         _react2.default.createElement(
           'div',
           { style: contentStyle },
@@ -71422,21 +71390,15 @@ var PdWelcome = function (_React$Component) {
             _react2.default.createElement(
               'div',
               null,
-              this.getContent(stepIndex)
+              this.getContent()
             ),
             _react2.default.createElement(
               'div',
               { style: { marginTop: 36 } },
-              _react2.default.createElement(_FlatButton2.default, {
-                label: 'Back',
-                disabled: stepIndex === 0,
-                onTouchTap: this.handlePrev,
-                style: { marginRight: 12 }
-              }),
               _react2.default.createElement(_RaisedButton2.default, {
-                label: stepIndex === 2 ? 'Start' : 'Next',
+                label: 'Start',
                 primary: true,
-                onTouchTap: this.handleNext
+                onTouchTap: this.handleStart
               })
             )
           )
@@ -71484,7 +71446,7 @@ var Parser = function () {
 
   _createClass(Parser, [{
     key: 'parseStep',
-    value: function parseStep(text, gvar, flist, steps) {
+    value: function parseStep(text, gvar, flists, steps) {
       //concat global vars with the step code
       var parseText = gvar + "\n" + text;
       //read raw step obj
@@ -71513,7 +71475,7 @@ var Parser = function () {
         throw { type: "Duplicate ID", message: "You already have a same step ID defined before." };
       }
       //process input lines
-      var lines = this.processInArr(stepObj, flist, steps);
+      var lines = this.processInArr(stepObj, flists, steps);
       //console.log("inLines:\n"+lines)
       //count loops for this step
       var loopNum = this.countLoop(stepObj, lines);
@@ -71563,13 +71525,13 @@ var Parser = function () {
     }
   }, {
     key: 'parseAllSteps',
-    value: function parseAllSteps(gvar, flist, steps) {
+    value: function parseAllSteps(gvar, flists, steps) {
       var _this = this;
 
       var newSteps = steps;
       newSteps.forEach(function (step, index) {
         try {
-          var newStep = _this.parseStep(step.code, gvar, flist, steps);
+          var newStep = _this.parseStep(step.code, gvar, flists, steps);
           newSteps[index] = newStep;
         } catch (e) {
           throw { type: 'Step: ' + (step.name ? step.name.toString() : "Undefined") + ' Failed', message: "One or more of your steps failed for " + e.type + ", please check. Message: " + e.message };
@@ -71717,7 +71679,7 @@ var Parser = function () {
     }
   }, {
     key: 'processInArr',
-    value: function processInArr(stepObj, flist, steps) {
+    value: function processInArr(stepObj, flists, steps) {
       //process in array
       var inArr = [];
       if (stepObj['in']) {
@@ -71734,30 +71696,31 @@ var Parser = function () {
       //concat in content
       var lines = [];
       inArr.map(function (inFile) {
-        if (inFile === "$LIST_FILE") {
-          (function () {
-            var subLine = [];
-            flist.split('\n').map(function (line) {
-              if (line !== "") subLine.push(line);
-            });
-            lines.push(subLine);
-          })();
-        } else {
-          steps.map(function (step) {
-            Object.keys(step.out).map(function (outKey) {
-              var outStr = outKey === 'default' ? "" : outKey;
-              if (inFile === '$' + step.id + ".out" + outStr) {
-                (function () {
-                  var subLine = [];
-                  step.out[outKey].split('\n').map(function (line) {
-                    subLine.push(line);
-                  });
-                  lines.push(subLine);
-                })();
-              }
-            });
+        flists.map(function (flist) {
+          if (inFile === '$' + flist.name.replace(/ /g, '_')) {
+            (function () {
+              var subLine = [];
+              flist.content.split('\n').map(function (line) {
+                if (line !== "") subLine.push(line);
+              });
+              lines.push(subLine);
+            })();
+          }
+        });
+        steps.map(function (step) {
+          Object.keys(step.out).map(function (outKey) {
+            var outStr = outKey === 'default' ? "" : outKey;
+            if (inFile === '$' + step.id + ".out" + outStr) {
+              (function () {
+                var subLine = [];
+                step.out[outKey].split('\n').map(function (line) {
+                  subLine.push(line);
+                });
+                lines.push(subLine);
+              })();
+            }
           });
-        }
+        });
       });
 
       return lines;
@@ -72099,7 +72062,10 @@ var getStartState = function getStartState() {
     }],
     enterMain: 0,
     tab: 0,
-    flist: "/home/usr/b1.bam\n/home/usr/b2.bam\n/home/usr/b3.bam",
+    flists: [{
+      name: "Default List",
+      content: "/home/usr/b1.bam\n/home/usr/b2.bam\n/home/usr/b3.bam"
+    }],
     gvar: "#Suggested global variables\nIN_DIR: \nOUT_DIR: ",
     editing: -2,
     export: "",
@@ -72138,7 +72104,8 @@ var Store = function () {
       onStepUpload: _actions2.default.stepUpload,
       onEditorParse: _actions2.default.editorParse,
       onSetError: _actions2.default.setError,
-      onExportClose: _actions2.default.exportClose
+      onExportClose: _actions2.default.exportClose,
+      onCreateList: _actions2.default.createList
     });
     var localState = JSON.parse(localStorage.getItem('state'));
     if (localState && localState.version === getStartState().version) {
@@ -72168,23 +72135,43 @@ var Store = function () {
       this.setState({ steps: steps });
     }
   }, {
+    key: 'onCreateList',
+    value: function onCreateList(name) {
+      var flists = this.state.flists;
+      flists.push({
+        name: name,
+        content: ""
+      });
+      this.setState({ flists: flists });
+      console.log(flists);
+    }
+  }, {
     key: 'onSortStep',
     value: function onSortStep() {
       this.state.steps.sort(function (a, b) {
         return Number(a.id.replace('-', '')) - Number(b.id.replace('-', ''));
       });
-      this.setState({ editing: -2, tab: 0 });
+      this.setState({ editing: -1, tab: 0 });
     }
   }, {
     key: 'onDeleteStep',
     value: function onDeleteStep(index) {
-      var steps = this.state.steps;
       var editing = this.state.editing;
-      steps.splice(index, 1);
-      if (editing === index) {
-        editing = -2;
+      if (index <= -2) {
+        var flists = this.state.flists;
+        flists.splice(index * -1 - 2, 1);
+        if (editing === index) {
+          editing = -1;
+        }
+        this.setState({ flists: flists, editing: editing });
+      } else {
+        var steps = this.state.steps;
+        steps.splice(index, 1);
+        if (editing === index) {
+          editing = -1;
+        }
+        this.setState({ steps: steps, editing: editing });
       }
-      this.setState({ steps: steps, editing: editing });
     }
   }, {
     key: 'onEnterMain',
@@ -72221,7 +72208,7 @@ var Store = function () {
 
         _this2.setState({ gvar: gvar, steps: steps });
         try {
-          var newSteps = new _parser2.default().parseAllSteps(gvar, _this2.state.flist, steps);
+          var newSteps = new _parser2.default().parseAllSteps(gvar, _this2.state.flists, steps);
           if (newSteps) _this2.setState({ steps: newSteps });
         } catch (e) {
           console.log(e);
@@ -72236,6 +72223,7 @@ var Store = function () {
 
       var reader = new FileReader();
       reader.onloadend = function (e) {
+        _this3.onEditorChange(reader.result);
         _this3.onEditorParse(reader.result);
       };
       reader.readAsText(files[0]);
@@ -72247,7 +72235,7 @@ var Store = function () {
 
       var reader = new FileReader();
       reader.onloadend = function (e) {
-        _this4.setState({ flist: reader.result });
+        _this4.setState({ flists: [{ name: "Default List", content: reader.result }] });
         _this4.onEditorParse(reader.result);
       };
       reader.readAsText(files[0]);
@@ -72256,32 +72244,24 @@ var Store = function () {
     key: 'onEditorParse',
     value: function onEditorParse(text) {
       var editing = this.state.editing;
-      if (editing === -2) {
+      if (editing <= -1) {
         try {
-          this.setState({ steps: new _parser2.default().parseAllSteps(this.state.gvar, this.state.flist, this.state.steps) });
+          this.setState({ steps: new _parser2.default().parseAllSteps(this.state.gvar, this.state.flists, this.state.steps) });
         } catch (e) {
           var eType = e.type ? e.type.toString() : "Error Message";
           var eMessage = e.message ? e.message.toString() : "Unkown Error.";
           this.setState({ error: { show: true, type: eType, message: eMessage } });
         }
-      } else if (editing === -1) {
-        try {
-          this.setState({ steps: new _parser2.default().parseAllSteps(this.state.gvar, this.state.flist, this.state.steps) });
-        } catch (e) {
-          var _eType = e.type ? e.type.toString() : "Error Message";
-          var _eMessage = e.message ? e.message.toString() : "Unkown Error.";
-          this.setState({ error: { show: true, type: _eType, message: _eMessage } });
-        }
       } else {
         var steps = this.state.steps;
         //call parser
         try {
-          var newStep = new _parser2.default().parseStep(text, this.state.gvar, this.state.flist, this.state.steps);
+          var newStep = new _parser2.default().parseStep(text, this.state.gvar, this.state.flists, this.state.steps);
           if (newStep) steps[editing] = newStep;
         } catch (e) {
-          var _eType2 = e.type ? e.type.toString() : "Error Message";
-          var _eMessage2 = e.message ? e.message.toString() : "Unkown Error.";
-          this.setState({ error: { show: true, type: _eType2, message: _eMessage2 } });
+          var _eType = e.type ? e.type.toString() : "Error Message";
+          var _eMessage = e.message ? e.message.toString() : "Unkown Error.";
+          this.setState({ error: { show: true, type: _eType, message: _eMessage } });
         }
 
         this.setState({ steps: steps });
@@ -72291,8 +72271,10 @@ var Store = function () {
     key: 'onEditorChange',
     value: function onEditorChange(newText) {
       var editing = this.state.editing;
-      if (editing === -2) {
-        this.setState({ flist: newText });
+      if (editing <= -2) {
+        var flists = this.state.flists;
+        flists[editing * -1 - 2].content = newText;
+        this.setState({ flists: flists });
       } else if (editing === -1) {
         this.setState({ gvar: newText });
       } else {
@@ -72310,7 +72292,7 @@ var Store = function () {
     key: 'onExportPipeline',
     value: function onExportPipeline() {
       try {
-        var newSteps = new _parser2.default().parseAllSteps(this.state.gvar, this.state.flist, this.state.steps);
+        var newSteps = new _parser2.default().parseAllSteps(this.state.gvar, this.state.flists, this.state.steps);
         if (newSteps) this.setState({ steps: newSteps });
         this.setState({ exportOpen: true, export: new _parser2.default().combineCommands(this.state.steps) });
       } catch (e) {

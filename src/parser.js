@@ -9,7 +9,7 @@ export default class Parser {
 
   }
 
-  parseStep(text, gvar, flist, steps) {
+  parseStep(text, gvar, flists, steps) {
     //concat global vars with the step code
     let parseText = gvar + "\n" + text
     //read raw step obj
@@ -38,7 +38,7 @@ export default class Parser {
       throw {type: "Duplicate ID", message: "You already have a same step ID defined before."}
     }
     //process input lines
-    let lines = this.processInArr(stepObj, flist, steps)
+    let lines = this.processInArr(stepObj, flists, steps)
     //console.log("inLines:\n"+lines)
     //count loops for this step
     let loopNum = this.countLoop(stepObj, lines)
@@ -81,11 +81,11 @@ export default class Parser {
     return result
   }
 
-  parseAllSteps(gvar, flist, steps) {
+  parseAllSteps(gvar, flists, steps) {
     let newSteps = steps
     newSteps.forEach((step, index) => {
       try {
-        let newStep = this.parseStep(step.code, gvar, flist, steps)
+        let newStep = this.parseStep(step.code, gvar, flists, steps)
         newSteps[index] = newStep
       } catch(e) {
         throw {type: `Step: ${step.name?step.name.toString():"Undefined"} Failed`, message: "One or more of your steps failed for "+e.type+", please check. Message: "+e.message}
@@ -225,7 +225,7 @@ export default class Parser {
     return rObj
   }
 
-  processInArr(stepObj, flist, steps) {
+  processInArr(stepObj, flists, steps) {
     //process in array
     let inArr = []
     if (stepObj['in']) {
@@ -242,27 +242,27 @@ export default class Parser {
     //concat in content
     let lines = []
     inArr.map((inFile) => {
-      if (inFile === "$LIST_FILE") {
-        let subLine = []
-        flist.split('\n').map(line => {
-          if (line !== "") subLine.push(line)
-        })
-        lines.push(subLine)
-      } else {
-        steps.map((step) => { 
-          Object.keys(step.out).map(outKey => {
-            let outStr = outKey === 'default' ? "" : outKey
-            if (inFile === '$'+step.id+".out"+outStr) {
-              let subLine = []
-              step.out[outKey].split('\n').map(line => {
-                subLine.push(line)
-              })
-              lines.push(subLine)
-            }
+      flists.map(flist => {
+        if(inFile === '$'+flist.name.replace(/ /g, '_')) {
+          let subLine = []
+          flist.content.split('\n').map(line => {
+            if (line !== "") subLine.push(line)
           })
-          
+          lines.push(subLine)
+        }
+      })
+      steps.map((step) => { 
+        Object.keys(step.out).map(outKey => {
+          let outStr = outKey === 'default' ? "" : outKey
+          if (inFile === '$'+step.id+".out"+outStr) {
+            let subLine = []
+            step.out[outKey].split('\n').map(line => {
+              subLine.push(line)
+            })
+            lines.push(subLine)
+          }
         })
-      }
+      })
     })
 
     return lines
