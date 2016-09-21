@@ -69984,14 +69984,27 @@ var _main = require('./components/main.jsx');
 
 var _main2 = _interopRequireDefault(_main);
 
+var _colors = require('material-ui/styles/colors');
+
+var _getMuiTheme = require('material-ui/styles/getMuiTheme');
+
+var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 (0, _reactTapEventPlugin2.default)();
 
+var muiTheme = (0, _getMuiTheme2.default)({
+  palette: {
+    primary1Color: _colors.brown400,
+    accent1Color: _colors.blueGrey700
+  }
+});
+
 var App = function App() {
   return _react2.default.createElement(
     _MuiThemeProvider2.default,
-    null,
+    { muiTheme: muiTheme },
     _react2.default.createElement(
       _altContainer2.default,
       { store: _store2.default },
@@ -70002,7 +70015,7 @@ var App = function App() {
 
 _reactDom2.default.render(_react2.default.createElement(App, null), document.getElementById('app'));
 
-},{"./components/main.jsx":521,"./store":528,"alt-container":1,"material-ui/styles/MuiThemeProvider":309,"react":501,"react-dom":345,"react-tap-event-plugin":353}],521:[function(require,module,exports){
+},{"./components/main.jsx":521,"./store":528,"alt-container":1,"material-ui/styles/MuiThemeProvider":309,"material-ui/styles/colors":311,"material-ui/styles/getMuiTheme":312,"react":501,"react-dom":345,"react-tap-event-plugin":353}],521:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
