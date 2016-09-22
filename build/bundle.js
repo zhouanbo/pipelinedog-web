@@ -71946,7 +71946,7 @@ var Parser = function () {
         if (outKey.indexOf('out') === 0) {
           (function () {
             var outStr = stepObj[outKey];
-            var rStr = "";
+            var rStr = outStr;
             var result = [];
 
             var _loop2 = function _loop2(_i) {
