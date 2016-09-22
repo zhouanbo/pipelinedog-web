@@ -7,7 +7,7 @@ import AltContainer from 'alt-container'
 import Store from './store'
 import Main from './components/main.jsx'
 
-import {brown400, blueGrey700} from 'material-ui/styles/colors'
+import {brown400, purple400} from 'material-ui/styles/colors'
 import getMuiTheme from 'material-ui/styles/getMuiTheme'
 
 injectTapEventPlugin()
@@ -15,7 +15,7 @@ injectTapEventPlugin()
 const muiTheme = getMuiTheme({
   palette: {
     primary1Color: brown400,
-    accent1Color: blueGrey700,
+    accent1Color: purple400,
   },
 })
 
