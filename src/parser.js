@@ -439,7 +439,7 @@ export default class Parser {
     Object.keys(stepObj).map(outKey => {
       if (outKey.indexOf('out') === 0) {
         let outStr = stepObj[outKey]
-        let rStr = ""
+        let rStr = outStr
         let result = []
         for (let i = 0; i < loopNum; i++) {
           //decide to parse LEASH or string
