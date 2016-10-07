@@ -8,6 +8,7 @@ import Paper from 'material-ui/Paper';
 import Subheader from 'material-ui/Subheader';
 import Dialog from 'material-ui/Dialog'
 import FlatButton from 'material-ui/FlatButton'
+import firebase from 'firebase'
 
 import PdWelcome from './pdWelcome.jsx'
 import PdAppBar from './pdAppBar.jsx'
@@ -19,6 +20,15 @@ class Main extends React.Component {
   
   constructor(props) {
     super(props)
+
+    const config = {
+      apiKey: "AIzaSyAv1vpgS7QiY5Uf1nBhWpW3VAg-JcUwvYI",
+      authDomain: "pipeline-dog.firebaseapp.com",
+      databaseURL: "https://pipeline-dog.firebaseio.com",
+      storageBucket: "pipeline-dog.appspot.com",
+      messagingSenderId: "980858736788"
+    }
+    firebase.initializeApp(config)
   }
 
   getEditorText(index) {
@@ -140,7 +150,10 @@ class Main extends React.Component {
                   text={this.getEditorText(this.props.editing)}
                   dispatchStepUpload={this.dispatchStepUpload}
                   dispatchEditorParse={this.dispatchEditorParse}
+                  dispatchEditorChange={this.dispatchEditorChange}
+                  dispatchEditorParse={this.dispatchEditorParse}
                   tab={this.props.tab}
+                  firebase={firebase}
                 />
                 <PdEditor
                   ref="editorWrap"

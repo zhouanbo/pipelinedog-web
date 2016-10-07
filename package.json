@@ -32,6 +32,7 @@
     "alt": "^0.18.5",
     "alt-container": "^1.0.2",
     "brace": "^0.8.0",
+    "firebase": "^3.4.1",
     "flat": "^2.0.1",
     "js-yaml": "^3.6.1",
     "material-ui": "^0.15.3",
