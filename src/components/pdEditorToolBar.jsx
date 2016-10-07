@@ -199,7 +199,7 @@ export default class PdEditorToolBar extends React.Component {
             onTouchTap={() => { window.open(`https://pipelinedog.herokuapp.com/?${queryString.stringify({ content: this.props.text, name: this.props.name.replace(/ /g, '_') + ".yml" })}`, "_blank") } }
             />
           <RaisedButton
-            disabled={this.props.tab !== 0}
+            disabled={this.props.tab !== 0 || this.props.editing < 0}
             label="Publish"
             labelPosition="before"
             primary={true}
@@ -208,7 +208,7 @@ export default class PdEditorToolBar extends React.Component {
             onTouchTap={()=>{this.setState({alertOpen: true})}}
             />
           <RaisedButton
-            disabled={this.props.tab !== 0}
+            disabled={this.props.tab !== 0 || this.props.editing < 0}
             label="Search"
             labelPosition="before"
             primary={true}

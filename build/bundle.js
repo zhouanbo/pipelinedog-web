@@ -71084,7 +71084,7 @@ var Main = function (_React$Component) {
                   dispatchStepUpload: this.dispatchStepUpload,
                   dispatchEditorParse: this.dispatchEditorParse,
                   dispatchEditorChange: this.dispatchEditorChange
-                }, _defineProperty(_React$createElement, 'dispatchEditorParse', this.dispatchEditorParse), _defineProperty(_React$createElement, 'tab', this.props.tab), _defineProperty(_React$createElement, 'firebase', _firebase2.default), _React$createElement)),
+                }, _defineProperty(_React$createElement, 'dispatchEditorParse', this.dispatchEditorParse), _defineProperty(_React$createElement, 'editing', this.props.editing), _defineProperty(_React$createElement, 'tab', this.props.tab), _defineProperty(_React$createElement, 'firebase', _firebase2.default), _React$createElement)),
                 _react2.default.createElement(_pdEditor2.default, {
                   ref: 'editorWrap',
                   text: this.getEditorText(this.props.editing),
@@ -71981,7 +71981,7 @@ var PdEditorToolBar = function (_React$Component) {
             }
           }),
           _react2.default.createElement(_RaisedButton2.default, {
-            disabled: this.props.tab !== 0,
+            disabled: this.props.tab !== 0 || this.props.editing < 0,
             label: 'Publish',
             labelPosition: 'before',
             primary: true,
@@ -71996,7 +71996,7 @@ var PdEditorToolBar = function (_React$Component) {
             }
           }),
           _react2.default.createElement(_RaisedButton2.default, {
-            disabled: this.props.tab !== 0,
+            disabled: this.props.tab !== 0 || this.props.editing < 0,
             label: 'Search',
             labelPosition: 'before',
             primary: true,

@@ -152,6 +152,7 @@ class Main extends React.Component {
                   dispatchEditorParse={this.dispatchEditorParse}
                   dispatchEditorChange={this.dispatchEditorChange}
                   dispatchEditorParse={this.dispatchEditorParse}
+                  editing={this.props.editing}
                   tab={this.props.tab}
                   firebase={firebase}
                 />
