@@ -77,6 +77,33 @@ export default class PdEditorToolBar extends React.Component {
             <FlatButton
               label="Close"
               primary={true}
+              onTouchTap={() => { this.setState({ alertOpen: false }) } }
+              />,
+            <FlatButton
+              label="OK"
+              primary={true}
+              onTouchTap={() => {
+                this.props.firebase.database().ref('pipelines').push({
+                  name: this.props.name,
+                  content: this.props.text,
+                  upvote: 0,
+                  createdAt: this.props.firebase.database.ServerValue.TIMESTAMP
+                }).then(() => { this.setState({ alertOpen: false, successOpen: true }) })
+              } }
+              />
+          ]}
+          modal={true}
+          open={this.state.alertOpen}
+          onRequestClose={() => { this.setState({ alertOpen: false }) } }
+          >
+          Are you sure to publish your step so everybody can search and use it?
+        </Dialog>
+
+        <Dialog
+          actions={[
+            <FlatButton
+              label="Close"
+              primary={true}
               onTouchTap={() => { this.setState({ searchOpen: false }) } }
               />
           ]}
@@ -101,7 +128,7 @@ export default class PdEditorToolBar extends React.Component {
             />
           <List>
             <Subheader>Result Pipelines</Subheader>
-            {Object.keys(this.state.pipelines).length !== 0 ? Object.keys(this.state.pipelines).map((id, idx) => {
+            {Object.keys(this.state.pipelines).length !== 0 ? Object.keys(this.state.pipelines).sort((a,b)=>{return this.state.pipelines[b].upvote-this.state.pipelines[a].upvote}).map((id, idx) => {
               return <ListItem
                 key={idx}
                 primaryText={this.state.pipelines[id].name}
@@ -114,7 +141,7 @@ export default class PdEditorToolBar extends React.Component {
                     primary={true}
                     >
                     <FlatButton
-                      style={{ marginTop: -5  }}
+                      style={{ marginTop: -5 }}
                       onTouchTap={() => {
                         this.props.dispatchEditorChange.call(this, this.state.pipelines[id].content)
                         this.props.dispatchEditorParse.call(this, this.state.pipelines[id].content)
@@ -178,14 +205,7 @@ export default class PdEditorToolBar extends React.Component {
             primary={true}
             icon={<FontIcon className="material-icons">language</FontIcon>}
             style={{ marginLeft: 0 }}
-            onTouchTap={() => {
-              this.props.firebase.database().ref('pipelines').push({
-                name: this.props.name,
-                content: this.props.text,
-                upvote: 0,
-                createdAt: this.props.firebase.database.ServerValue.TIMESTAMP
-              }).then(() => { this.setState({ successOpen: true }) })
-            } }
+            onTouchTap={()=>{this.setState({alertOpen: true})}}
             />
           <RaisedButton
             disabled={this.props.tab !== 0}

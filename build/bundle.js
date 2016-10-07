@@ -71798,6 +71798,37 @@ var PdEditorToolBar = function (_React$Component) {
               label: 'Close',
               primary: true,
               onTouchTap: function onTouchTap() {
+                _this2.setState({ alertOpen: false });
+              }
+            }), _react2.default.createElement(_FlatButton2.default, {
+              label: 'OK',
+              primary: true,
+              onTouchTap: function onTouchTap() {
+                _this2.props.firebase.database().ref('pipelines').push({
+                  name: _this2.props.name,
+                  content: _this2.props.text,
+                  upvote: 0,
+                  createdAt: _this2.props.firebase.database.ServerValue.TIMESTAMP
+                }).then(function () {
+                  _this2.setState({ alertOpen: false, successOpen: true });
+                });
+              }
+            })],
+            modal: true,
+            open: this.state.alertOpen,
+            onRequestClose: function onRequestClose() {
+              _this2.setState({ alertOpen: false });
+            }
+          },
+          'Are you sure to publish your step so everybody can search and use it?'
+        ),
+        _react2.default.createElement(
+          _Dialog2.default,
+          {
+            actions: [_react2.default.createElement(_FlatButton2.default, {
+              label: 'Close',
+              primary: true,
+              onTouchTap: function onTouchTap() {
                 _this2.setState({ searchOpen: false });
               }
             })],
@@ -71836,7 +71867,9 @@ var PdEditorToolBar = function (_React$Component) {
               null,
               'Result Pipelines'
             ),
-            Object.keys(this.state.pipelines).length !== 0 ? Object.keys(this.state.pipelines).map(function (id, idx) {
+            Object.keys(this.state.pipelines).length !== 0 ? Object.keys(this.state.pipelines).sort(function (a, b) {
+              return _this2.state.pipelines[b].upvote - _this2.state.pipelines[a].upvote;
+            }).map(function (id, idx) {
               return _react2.default.createElement(_List.ListItem, {
                 key: idx,
                 primaryText: _this2.state.pipelines[id].name,
@@ -71959,14 +71992,7 @@ var PdEditorToolBar = function (_React$Component) {
             ),
             style: { marginLeft: 0 },
             onTouchTap: function onTouchTap() {
-              _this2.props.firebase.database().ref('pipelines').push({
-                name: _this2.props.name,
-                content: _this2.props.text,
-                upvote: 0,
-                createdAt: _this2.props.firebase.database.ServerValue.TIMESTAMP
-              }).then(function () {
-                _this2.setState({ successOpen: true });
-              });
+              _this2.setState({ alertOpen: true });
             }
           }),
           _react2.default.createElement(_RaisedButton2.default, {
