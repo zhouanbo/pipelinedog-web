@@ -71937,81 +71937,72 @@ var PdEditorToolBar = function (_React$Component) {
         _react2.default.createElement(
           _Toolbar.ToolbarGroup,
           { lastChild: true },
-          _react2.default.createElement(_RaisedButton2.default, {
-            disabled: this.props.tab !== 0,
-            label: 'Parse',
-            labelPosition: 'before',
-            primary: true,
-            icon: _react2.default.createElement(
-              _FontIcon2.default,
-              { className: 'material-icons' },
-              'code'
-            ),
-            style: { marginLeft: 0 },
-            onTouchTap: this.props.dispatchEditorParse.bind(this, this.props.text)
-          }),
-          _react2.default.createElement(_RaisedButton2.default, {
-            disabled: this.props.tab !== 0,
-            label: 'Load',
-            labelPosition: 'before',
-            primary: true,
-            icon: _react2.default.createElement(
-              _FontIcon2.default,
-              { className: 'material-icons' },
-              'file_upload'
-            ),
-            style: { marginLeft: 0 },
-            onTouchTap: function onTouchTap() {
-              _this2.setState({ uploadOpen: true });
-            }
-          }),
-          _react2.default.createElement(_RaisedButton2.default, {
-            disabled: this.props.tab !== 0,
-            label: 'Save',
-            labelPosition: 'before',
-            primary: true,
-            icon: _react2.default.createElement(
-              _FontIcon2.default,
-              { className: 'material-icons' },
-              'file_download'
-            ),
-            style: { marginLeft: 0 },
-            onTouchTap: function onTouchTap() {
-              window.open('https://pipelinedog.herokuapp.com/?' + _queryString2.default.stringify({ content: _this2.props.text, name: _this2.props.name.replace(/ /g, '_') + ".yml" }), "_blank");
-            }
-          }),
-          _react2.default.createElement(_RaisedButton2.default, {
-            disabled: this.props.tab !== 0 || this.props.editing < 0,
-            label: 'Publish',
-            labelPosition: 'before',
-            primary: true,
-            icon: _react2.default.createElement(
-              _FontIcon2.default,
-              { className: 'material-icons' },
-              'language'
-            ),
-            style: { marginLeft: 0 },
-            onTouchTap: function onTouchTap() {
-              _this2.setState({ alertOpen: true });
-            }
-          }),
-          _react2.default.createElement(_RaisedButton2.default, {
-            disabled: this.props.tab !== 0 || this.props.editing < 0,
-            label: 'Search',
-            labelPosition: 'before',
-            primary: true,
-            icon: _react2.default.createElement(
-              _FontIcon2.default,
-              { className: 'material-icons' },
-              'search'
-            ),
-            style: { marginLeft: 0 },
-            onTouchTap: function onTouchTap() {
-              _this2.props.firebase.database().ref('pipelines').orderByChild('upvote').on('value', function (snapshot) {
-                _this2.setState({ database: snapshot.val() });
-              });_this2.setState({ searchOpen: true });
-            }
-          })
+          _react2.default.createElement(
+            _IconButton2.default,
+            {
+              disabled: this.props.tab !== 0,
+              tooltip: 'Parse',
+              tooltipPosition: 'top-center',
+              iconClassName: 'material-icons',
+              style: { marginLeft: 0, marginTop: 5 },
+              onTouchTap: this.props.dispatchEditorParse.bind(this, this.props.text) },
+            'code'
+          ),
+          _react2.default.createElement(
+            _IconButton2.default,
+            {
+              disabled: this.props.tab !== 0,
+              tooltip: 'Load',
+              tooltipPosition: 'top-center',
+              iconClassName: 'material-icons',
+              style: { marginLeft: 0, marginTop: 5 },
+              onTouchTap: function onTouchTap() {
+                _this2.setState({ uploadOpen: true });
+              } },
+            'file_upload'
+          ),
+          _react2.default.createElement(
+            _IconButton2.default,
+            {
+              disabled: this.props.tab !== 0,
+              tooltip: 'Save',
+              tooltipPosition: 'top-center',
+              iconClassName: 'material-icons',
+              style: { marginLeft: 0, marginTop: 5 },
+              onTouchTap: function onTouchTap() {
+                window.open('https://pipelinedog.herokuapp.com/?' + _queryString2.default.stringify({ content: _this2.props.text, name: _this2.props.name.replace(/ /g, '_') + ".yml" }), "_blank");
+              } },
+            'file_download'
+          ),
+          _react2.default.createElement(
+            _IconButton2.default,
+            {
+              disabled: this.props.tab !== 0 || this.props.editing < 0,
+              tooltip: 'Publish',
+              tooltipPosition: 'top-center',
+              iconClassName: 'material-icons',
+              style: { marginLeft: 0, marginTop: 5 },
+              onTouchTap: function onTouchTap() {
+                _this2.setState({ alertOpen: true });
+              } },
+            'language'
+          ),
+          _react2.default.createElement(
+            _IconButton2.default,
+            {
+              disabled: this.props.tab !== 0 || this.props.editing < 0,
+              tooltip: 'Search',
+              tooltipPosition: 'top-center',
+              iconClassName: 'material-icons',
+              style: { marginLeft: 0, marginTop: 5 },
+              onTouchTap: function onTouchTap() {
+                _this2.props.firebase.database().ref('pipelines').orderByChild('upvote').on('value', function (snapshot) {
+                  _this2.setState({ database: snapshot.val() });
+                });_this2.setState({ searchOpen: true });
+              }
+            },
+            'search'
+          )
         )
       );
     }

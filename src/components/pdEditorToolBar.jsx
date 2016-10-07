@@ -171,55 +171,56 @@ export default class PdEditorToolBar extends React.Component {
           <h4 style={{ marginLeft: 16, color: "#757575" }}>{this.props.name}</h4>
         </ToolbarGroup>
         <ToolbarGroup lastChild={true}>
-          <RaisedButton
+          <IconButton
             disabled={this.props.tab !== 0}
-            label="Parse"
-            labelPosition="before"
-            primary={true}
-            icon={<FontIcon className="material-icons">code</FontIcon>}
-            style={{ marginLeft: 0 }}
-            onTouchTap={this.props.dispatchEditorParse.bind(this, this.props.text) }
-            />
-          <RaisedButton
+            tooltip="Parse"
+            tooltipPosition="top-center"
+            iconClassName="material-icons"
+            style={{ marginLeft: 0, marginTop: 5 }}
+            onTouchTap={this.props.dispatchEditorParse.bind(this, this.props.text) }>
+            code
+            </IconButton>
+          <IconButton
             disabled={this.props.tab !== 0}
-            label="Load"
-            labelPosition="before"
-            primary={true}
-            icon={<FontIcon className="material-icons">file_upload</FontIcon>}
-            style={{ marginLeft: 0 }}
-            onTouchTap={() => { this.setState({ uploadOpen: true }) } }
-            />
-          <RaisedButton
+            tooltip="Load"
+            tooltipPosition="top-center"
+            iconClassName="material-icons"
+            style={{ marginLeft: 0, marginTop: 5 }}
+            onTouchTap={() => { this.setState({ uploadOpen: true }) } }>
+            file_upload
+            </IconButton>
+          <IconButton
             disabled={this.props.tab !== 0}
-            label="Save"
-            labelPosition="before"
-            primary={true}
-            icon={<FontIcon className="material-icons">file_download</FontIcon>}
-            style={{ marginLeft: 0 }}
-            onTouchTap={() => { window.open(`https://pipelinedog.herokuapp.com/?${queryString.stringify({ content: this.props.text, name: this.props.name.replace(/ /g, '_') + ".yml" })}`, "_blank") } }
-            />
-          <RaisedButton
+            tooltip="Save"
+            tooltipPosition="top-center"
+            iconClassName="material-icons"
+            style={{ marginLeft: 0, marginTop: 5 }}
+            onTouchTap={() => { window.open(`https://pipelinedog.herokuapp.com/?${queryString.stringify({ content: this.props.text, name: this.props.name.replace(/ /g, '_') + ".yml" })}`, "_blank") } }>
+            file_download
+            </IconButton>
+          <IconButton
             disabled={this.props.tab !== 0 || this.props.editing < 0}
-            label="Publish"
-            labelPosition="before"
-            primary={true}
-            icon={<FontIcon className="material-icons">language</FontIcon>}
-            style={{ marginLeft: 0 }}
-            onTouchTap={()=>{this.setState({alertOpen: true})}}
-            />
-          <RaisedButton
+            tooltip="Publish"
+            tooltipPosition="top-center"
+            iconClassName="material-icons"
+            style={{ marginLeft: 0, marginTop: 5 }}
+            onTouchTap={()=>{this.setState({alertOpen: true})}}>
+            language
+            </IconButton>
+          <IconButton
             disabled={this.props.tab !== 0 || this.props.editing < 0}
-            label="Search"
-            labelPosition="before"
-            primary={true}
-            icon={<FontIcon className="material-icons">search</FontIcon>}
-            style={{ marginLeft: 0 }}
+            tooltip="Search"
+            tooltipPosition="top-center"
+            iconClassName="material-icons"
+            style={{ marginLeft: 0, marginTop: 5}}
             onTouchTap={() => {
               this.props.firebase.database().ref('pipelines').orderByChild('upvote').on('value', (snapshot) => {
                 this.setState({ database: snapshot.val() })
               }); this.setState({ searchOpen: true })
             } }
-            />
+            >
+            search
+            </IconButton>
         </ToolbarGroup>
       </Toolbar>
     )
