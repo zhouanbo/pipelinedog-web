@@ -77,6 +77,9 @@ class Main extends React.Component {
   dispatchCreateList(name) {
     Actions.createList(name)
   }
+  dispatchModifyList(id, name) {
+    Actions.modifyList({id, name})
+  }
   dispatchSortStep() {
     Actions.sortStep()
   }
@@ -134,6 +137,7 @@ class Main extends React.Component {
               dispatchDeleteStep={this.dispatchDeleteStep}
               dispatchDeleteList={this.dispatchDeleteList}
               dispatchSortStep={this.dispatchSortStep}
+              dispatchModifyList={this.dispatchModifyList}
               editing={this.props.editing}
             />
           </Paper>

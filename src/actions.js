@@ -21,7 +21,8 @@ class Actions {
       'tabChange',
       'editorParse',
       'setError',
-      'exportClose'
+      'exportClose',
+      'modifyList'
       )
   }
 }

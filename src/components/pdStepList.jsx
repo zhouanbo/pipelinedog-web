@@ -5,6 +5,7 @@ import Divider from 'material-ui/Divider';
 import Subheader from 'material-ui/Subheader';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
+import Badge from 'material-ui/Badge'
 import TextField from 'material-ui/TextField';
 
 let SelectableList = MakeSelectable(List);
@@ -18,7 +19,10 @@ export default class PdStepList extends React.Component {
       alertStep: {},
       alertIndex: 0,
       nameOpen: false,
-      name: ""
+      modifyOpen: false,
+      id: "",
+      name: "",
+      modifyName: ''
     }
   }
 
@@ -62,6 +66,22 @@ export default class PdStepList extends React.Component {
           <TextField style={{margin: "0px 25px"}} value={this.state.name} hintText="File List Name" onChange={event=>{this.setState({name: event.target.value})}}/>
         </Dialog>
 
+        <Dialog
+          actions={[
+            <FlatButton
+              label="OK"
+              primary={true}
+              onTouchTap={()=>{this.props.dispatchModifyList(this.state.id, this.state.modifyName); this.setState({modifyOpen: false})}}
+            />
+          ]}
+          modal={false}
+          open={this.state.modifyOpen}
+          onRequestClose={()=>{this.setState({modifyOpen: false})}}
+        >
+          <Subheader>Modify List Name</Subheader>
+          <TextField style={{margin: "0px 25px"}} value={this.state.modifyName} hintText="New Name" onChange={event=>{this.setState({modifyName: event.target.value})}}/>
+        </Dialog>
+
         <ListItem
           value={-1}
           onTouchTap={()=>{this.props.dispatchStepChange.call(this, -1)}}
@@ -95,8 +115,8 @@ export default class PdStepList extends React.Component {
               value={idx}
               key={idx}
               onTouchTap={()=>{this.props.dispatchStepChange.call(this, idx)}}
-              onMouseOver={()=>{document.getElementsByClassName("delete-icon-"+idx)[0].style.display="inline"}}
-              onMouseLeave={()=>{document.getElementsByClassName("delete-icon-"+idx)[0].style.display="none"}}
+              onMouseOver={()=>{document.getElementsByClassName("delete-icon-"+idx)[0].style.display="inline";document.getElementsByClassName("modify-icon-"+idx)[0].style.display="inline"}}
+              onMouseLeave={()=>{document.getElementsByClassName("delete-icon-"+idx)[0].style.display="none";document.getElementsByClassName("modify-icon-"+idx)[0].style.display="none"}}
               leftIcon={
                 <IconButton 
                   iconClassName="material-icons" 
@@ -106,10 +126,23 @@ export default class PdStepList extends React.Component {
                 </IconButton>
               }
               rightIcon={
+                <div style={{marginTop: 5, marginRight: -120, width: 200}}>
+                <IconButton
+                  className={"modify-icon-"+idx}
+                  iconClassName="material-icons" 
+                  style={{display: "none"}}
+                  onTouchTap={()=>{this.setState({
+                    modifyOpen: true,
+                    id: idx,
+                  })}}
+                  tooltip="Edit Name"
+                >
+                  mode_edit
+                </IconButton>
                 <IconButton
                   className={"delete-icon-"+idx}
                   iconClassName="material-icons" 
-                  style={{marginTop: 5, marginRight: 21, display: "none"}}
+                  style={{marginLeft: -15, display: "none"}}
                   onTouchTap={()=>{this.setState({
                     alertOpen: true,
                     alertStep: flist,
@@ -119,6 +152,7 @@ export default class PdStepList extends React.Component {
                 >
                   delete
                 </IconButton>
+                </div>
               }
               primaryText={!flist.name?"Unnamed List":flist.name}
               secondaryText={!flist.name?"ID: NA":'ID: $'+flist.name.replace(/ /g, '_')}

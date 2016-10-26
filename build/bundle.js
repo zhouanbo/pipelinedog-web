@@ -70735,7 +70735,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var Actions = function Actions() {
   _classCallCheck(this, Actions);
 
-  this.generateActions('uploadFile', 'createStep', 'createList', 'deleteStep', 'sortStep', 'stepUpload', 'editorChange', 'enterMain', 'projectUpload', 'listUpload', 'stepChange', 'projectSave', 'projectCreate', 'editorChange', 'exportPipeline', 'tabChange', 'editorParse', 'setError', 'exportClose');
+  this.generateActions('uploadFile', 'createStep', 'createList', 'deleteStep', 'sortStep', 'stepUpload', 'editorChange', 'enterMain', 'projectUpload', 'listUpload', 'stepChange', 'projectSave', 'projectCreate', 'editorChange', 'exportPipeline', 'tabChange', 'editorParse', 'setError', 'exportClose', 'modifyList');
 };
 
 exports.default = _alt2.default.createActions(Actions);
@@ -70981,6 +70981,11 @@ var Main = function (_React$Component) {
       _actions2.default.createList(name);
     }
   }, {
+    key: 'dispatchModifyList',
+    value: function dispatchModifyList(id, name) {
+      _actions2.default.modifyList({ id: id, name: name });
+    }
+  }, {
     key: 'dispatchSortStep',
     value: function dispatchSortStep() {
       _actions2.default.sortStep();
@@ -71058,6 +71063,7 @@ var Main = function (_React$Component) {
               dispatchDeleteStep: this.dispatchDeleteStep,
               dispatchDeleteList: this.dispatchDeleteList,
               dispatchSortStep: this.dispatchSortStep,
+              dispatchModifyList: this.dispatchModifyList,
               editing: this.props.editing
             })
           ),
@@ -72048,6 +72054,10 @@ var _FlatButton = require('material-ui/FlatButton');
 
 var _FlatButton2 = _interopRequireDefault(_FlatButton);
 
+var _Badge = require('material-ui/Badge');
+
+var _Badge2 = _interopRequireDefault(_Badge);
+
 var _TextField = require('material-ui/TextField');
 
 var _TextField2 = _interopRequireDefault(_TextField);
@@ -72075,7 +72085,10 @@ var PdStepList = function (_React$Component) {
       alertStep: {},
       alertIndex: 0,
       nameOpen: false,
-      name: ""
+      modifyOpen: false,
+      id: "",
+      name: "",
+      modifyName: ''
     };
     return _this;
   }
@@ -72139,6 +72152,31 @@ var PdStepList = function (_React$Component) {
               _this2.setState({ name: event.target.value });
             } })
         ),
+        _react2.default.createElement(
+          _Dialog2.default,
+          {
+            actions: [_react2.default.createElement(_FlatButton2.default, {
+              label: 'OK',
+              primary: true,
+              onTouchTap: function onTouchTap() {
+                _this2.props.dispatchModifyList(_this2.state.id, _this2.state.modifyName);_this2.setState({ modifyOpen: false });
+              }
+            })],
+            modal: false,
+            open: this.state.modifyOpen,
+            onRequestClose: function onRequestClose() {
+              _this2.setState({ modifyOpen: false });
+            }
+          },
+          _react2.default.createElement(
+            _Subheader2.default,
+            null,
+            'Modify List Name'
+          ),
+          _react2.default.createElement(_TextField2.default, { style: { margin: "0px 25px" }, value: this.state.modifyName, hintText: 'New Name', onChange: function onChange(event) {
+              _this2.setState({ modifyName: event.target.value });
+            } })
+        ),
         _react2.default.createElement(_List.ListItem, {
           value: -1,
           onTouchTap: function onTouchTap() {
@@ -72182,10 +72220,10 @@ var PdStepList = function (_React$Component) {
               _this2.props.dispatchStepChange.call(_this2, idx);
             },
             onMouseOver: function onMouseOver() {
-              document.getElementsByClassName("delete-icon-" + idx)[0].style.display = "inline";
+              document.getElementsByClassName("delete-icon-" + idx)[0].style.display = "inline";document.getElementsByClassName("modify-icon-" + idx)[0].style.display = "inline";
             },
             onMouseLeave: function onMouseLeave() {
-              document.getElementsByClassName("delete-icon-" + idx)[0].style.display = "none";
+              document.getElementsByClassName("delete-icon-" + idx)[0].style.display = "none";document.getElementsByClassName("modify-icon-" + idx)[0].style.display = "none";
             },
             leftIcon: _react2.default.createElement(
               _IconButton2.default,
@@ -72196,21 +72234,41 @@ var PdStepList = function (_React$Component) {
               'input'
             ),
             rightIcon: _react2.default.createElement(
-              _IconButton2.default,
-              {
-                className: "delete-icon-" + idx,
-                iconClassName: 'material-icons',
-                style: { marginTop: 5, marginRight: 21, display: "none" },
-                onTouchTap: function onTouchTap() {
-                  _this2.setState({
-                    alertOpen: true,
-                    alertStep: flist,
-                    alertIndex: idx
-                  });
+              'div',
+              { style: { marginTop: 5, marginRight: -120, width: 200 } },
+              _react2.default.createElement(
+                _IconButton2.default,
+                {
+                  className: "modify-icon-" + idx,
+                  iconClassName: 'material-icons',
+                  style: { display: "none" },
+                  onTouchTap: function onTouchTap() {
+                    _this2.setState({
+                      modifyOpen: true,
+                      id: idx
+                    });
+                  },
+                  tooltip: 'Edit Name'
                 },
-                tooltip: 'Delete'
-              },
-              'delete'
+                'mode_edit'
+              ),
+              _react2.default.createElement(
+                _IconButton2.default,
+                {
+                  className: "delete-icon-" + idx,
+                  iconClassName: 'material-icons',
+                  style: { marginLeft: -15, display: "none" },
+                  onTouchTap: function onTouchTap() {
+                    _this2.setState({
+                      alertOpen: true,
+                      alertStep: flist,
+                      alertIndex: idx
+                    });
+                  },
+                  tooltip: 'Delete'
+                },
+                'delete'
+              )
             ),
             primaryText: !flist.name ? "Unnamed List" : flist.name,
             secondaryText: !flist.name ? "ID: NA" : 'ID: $' + flist.name.replace(/ /g, '_')
@@ -72295,7 +72353,7 @@ var PdStepList = function (_React$Component) {
 
 exports.default = PdStepList;
 
-},{"material-ui/Dialog":242,"material-ui/Divider":244,"material-ui/FlatButton":251,"material-ui/IconButton":255,"material-ui/List":262,"material-ui/Subheader":282,"material-ui/TextField":295,"react":508}],533:[function(require,module,exports){
+},{"material-ui/Badge":240,"material-ui/Dialog":242,"material-ui/Divider":244,"material-ui/FlatButton":251,"material-ui/IconButton":255,"material-ui/List":262,"material-ui/Subheader":282,"material-ui/TextField":295,"react":508}],533:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -72737,7 +72795,7 @@ var Parser = function () {
         });
         steps.map(function (step) {
           Object.keys(step.out).map(function (outKey) {
-            var outStr = outKey === 'default' ? "" : outKey;
+            var outStr = outKey === 'out' ? "" : outKey;
             if (inFile === '$' + step.id + ".out" + outStr) {
               (function () {
                 var subLine = [];
@@ -72986,7 +73044,7 @@ var Parser = function () {
               _loop2(_i);
             }
             if (outKey === 'out') {
-              outObj['default'] = result.join('\n');
+              outObj['out'] = result.join('\n');
             } else {
               outObj[outKey.substr(3, outKey.length)] = result.join('\n');
             }
@@ -73079,7 +73137,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var getStartState = function getStartState() {
   return {
-    version: "0.2.0",
+    version: "0.2.1",
     steps: [{
       id: '',
       name: 'Default Step',
@@ -73133,7 +73191,8 @@ var Store = function () {
       onEditorParse: _actions2.default.editorParse,
       onSetError: _actions2.default.setError,
       onExportClose: _actions2.default.exportClose,
-      onCreateList: _actions2.default.createList
+      onCreateList: _actions2.default.createList,
+      onModifyList: _actions2.default.modifyList
     });
     var localState = JSON.parse(localStorage.getItem('state'));
     if (localState && localState.version === getStartState().version) {
@@ -73171,7 +73230,13 @@ var Store = function () {
         content: ""
       });
       this.setState({ flists: flists });
-      console.log(flists);
+    }
+  }, {
+    key: 'onModifyList',
+    value: function onModifyList(param) {
+      var flists = this.state.flists;
+      flists[param.id * -1 - 2].name = param.name;
+      this.setState({ flists: flists });
     }
   }, {
     key: 'onSortStep',

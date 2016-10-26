@@ -6,7 +6,7 @@ import Parser from './parser'
 
 const getStartState = () => {
   return {
-    version: "0.2.0",
+    version: "0.2.1",
     steps: [{
       id:'', 
       name: 'Default Step',
@@ -58,7 +58,8 @@ class Store {
       onEditorParse: Actions.editorParse,
       onSetError: Actions.setError,
       onExportClose: Actions.exportClose,
-      onCreateList: Actions.createList
+      onCreateList: Actions.createList,
+      onModifyList: Actions.modifyList
     })
     let localState = JSON.parse(localStorage.getItem('state'))
     if (localState && localState.version === getStartState().version) {
@@ -90,7 +91,11 @@ class Store {
       content: ""
     })
     this.setState({flists})
-    console.log(flists)
+  }
+  onModifyList(param) {
+    let flists = this.state.flists
+    flists[param.id*-1-2].name = param.name
+    this.setState({flists})
   }
   onSortStep() {
     this.state.steps.sort((a,b)=>{

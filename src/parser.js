@@ -253,7 +253,7 @@ export default class Parser {
       })
       steps.map((step) => { 
         Object.keys(step.out).map(outKey => {
-          let outStr = outKey === 'default' ? "" : outKey
+          let outStr = outKey === 'out' ? "" : outKey
           if (inFile === '$'+step.id+".out"+outStr) {
             let subLine = []
             step.out[outKey].split('\n').map(line => {
@@ -459,7 +459,7 @@ export default class Parser {
           result.push(rStr)
         }
         if (outKey === 'out') {
-          outObj['default'] = result.join('\n')
+          outObj['out'] = result.join('\n')
         } else {
           outObj[outKey.substr(3, outKey.length)] = result.join('\n')
         }
