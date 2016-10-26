@@ -71868,11 +71868,6 @@ var PdEditorToolBar = function (_React$Component) {
           _react2.default.createElement(
             _List.List,
             null,
-            _react2.default.createElement(
-              _Subheader2.default,
-              null,
-              'Result Pipelines'
-            ),
             Object.keys(this.state.pipelines).length !== 0 ? Object.keys(this.state.pipelines).sort(function (a, b) {
               return _this2.state.pipelines[b].upvote - _this2.state.pipelines[a].upvote;
             }).map(function (id, idx) {

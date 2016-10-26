@@ -127,7 +127,6 @@ export default class PdEditorToolBar extends React.Component {
             hintText="Search Term"
             />
           <List>
-            <Subheader>Result Pipelines</Subheader>
             {Object.keys(this.state.pipelines).length !== 0 ? Object.keys(this.state.pipelines).sort((a,b)=>{return this.state.pipelines[b].upvote-this.state.pipelines[a].upvote}).map((id, idx) => {
               return <ListItem
                 key={idx}
