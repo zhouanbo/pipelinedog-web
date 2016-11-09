@@ -72529,7 +72529,7 @@ var Parser = function () {
     key: 'parseStep',
     value: function parseStep(text, gvar, flists, steps) {
       //concat global vars with the step code
-      var parseText = gvar + "\n" + text;
+      var parseText = gvar + "\n" + text.trim();
       //read raw step obj
       var rawObj = {};
       try {
@@ -72543,8 +72543,6 @@ var Parser = function () {
       var stepObj = rvObj[Object.keys(rvObj)[0]];
       //check stepOjb status
       if (!stepObj || !stepObj['name'] || !stepObj['in'] || !stepObj['run']) throw { type: "Missing Keys", message: "You are missing one of the mandatory keys: name, in, or run." };
-      //console.log("stepObj:")
-      //console.log(stepObj)
       //set step ID
       var haveID = false;
       steps.map(function (step) {
@@ -72557,10 +72555,8 @@ var Parser = function () {
       }
       //process input lines
       var lines = this.processInArr(stepObj, flists, steps);
-      //console.log("inLines:\n"+lines)
       //count loops for this step
       var loopNum = this.countLoop(stepObj, lines);
-      //console.log("loopNum:\n"+loopNum)
       //parse the LEASH expressions
 
       var _parseLEASH = this.parseLEASH(stepObj, lines, loopNum);
@@ -73132,11 +73128,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var getStartState = function getStartState() {
   return {
-    version: "0.2.1",
+    version: "0.2.2",
     steps: [{
       id: '',
-      name: 'Default Step',
-      code: '#Enter code here\n',
+      name: "Default Step",
+      code: '',
       command: "",
       out: {},
       comment: ""
@@ -73147,7 +73143,7 @@ var getStartState = function getStartState() {
       name: "Default List",
       content: "/home/usr/b1.bam\n/home/usr/b2.bam\n/home/usr/b3.bam"
     }],
-    gvar: "#Suggested global variables\nIN_DIR: \nOUT_DIR: ",
+    gvar: "IN_DIR: \nOUT_DIR: ",
     editing: -2,
     export: "",
     exportOpen: false,
@@ -73657,45 +73653,17 @@ var cachedClearTimeout;
 } ())
 function runTimeout(fun) {
     if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
         return setTimeout(fun, 0);
+    } else {
+        return cachedSetTimeout.call(null, fun, 0);
     }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
 }
 function runClearTimeout(marker) {
     if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
+        clearTimeout(marker);
+    } else {
+        cachedClearTimeout.call(null, marker);
     }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
 }
 var queue = [];
 var draining = false;

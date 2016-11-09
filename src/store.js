@@ -6,11 +6,11 @@ import Parser from './parser'
 
 const getStartState = () => {
   return {
-    version: "0.2.1",
+    version: "0.2.2",
     steps: [{
-      id:'', 
-      name: 'Default Step',
-      code: '#Enter code here\n',
+      id: '', 
+      name: "Default Step",
+      code: '',
       command: "", 
       out: {},
       comment: ""
@@ -21,7 +21,7 @@ const getStartState = () => {
       name: "Default List" ,
       content: "/home/usr/b1.bam\n/home/usr/b2.bam\n/home/usr/b3.bam"
     }],
-    gvar: "#Suggested global variables\nIN_DIR: \nOUT_DIR: ",
+    gvar: "IN_DIR: \nOUT_DIR: ",
     editing: -2,
     export: "",
     exportOpen: false,

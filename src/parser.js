@@ -11,7 +11,7 @@ export default class Parser {
 
   parseStep(text, gvar, flists, steps) {
     //concat global vars with the step code
-    let parseText = gvar + "\n" + text
+    let parseText = gvar + "\n" + text.trim()
     //read raw step obj
     let rawObj = {}
     try {
@@ -25,8 +25,6 @@ export default class Parser {
     let stepObj = rvObj[Object.keys(rvObj)[0]]
     //check stepOjb status
     if (!stepObj || !stepObj['name'] || !stepObj['in'] || !stepObj['run']) throw {type: "Missing Keys", message: "You are missing one of the mandatory keys: name, in, or run."}
-    //console.log("stepObj:")
-    //console.log(stepObj)
     //set step ID
     let haveID = false
     steps.map(step => {
@@ -39,10 +37,8 @@ export default class Parser {
     }
     //process input lines
     let lines = this.processInArr(stepObj, flists, steps)
-    //console.log("inLines:\n"+lines)
     //count loops for this step
     let loopNum = this.countLoop(stepObj, lines)
-    //console.log("loopNum:\n"+loopNum)
     //parse the LEASH expressions
     let { command, outObj } = this.parseLEASH(stepObj, lines, loopNum)
     console.log("command:\n"+command)
