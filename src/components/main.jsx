@@ -127,7 +127,7 @@ class Main extends React.Component {
 
         <div id="content" style={{flex: "1 1 auto", display: "flex", alignItems: "stretch"}}>
           
-          <Paper style={{flex: "0 0 25%", overflowY: "scroll", overflowX: "hidden"}} zDepth={0}>
+          
             <PdStepList
               steps={this.props.steps}
               flists={this.props.flists}
@@ -140,7 +140,6 @@ class Main extends React.Component {
               dispatchModifyList={this.dispatchModifyList}
               editing={this.props.editing}
             />
-          </Paper>
 
           <Paper style={{flex: "1 1 auto", zIndex: 9}} zDepth={1}>
             <Tabs value={this.props.tab} onChange={this.dispatchTabChange}>
@@ -238,7 +237,7 @@ class Main extends React.Component {
           <p style={{padding: "0px 25px"}}>{this.props.error.message}</p>
         </Dialog>
         
-        <Paper id="footer" style={{width: "100%", height: 50, background: "#F5F5F5", zIndex: 10}} zDepth={2}>
+        <Paper id="footer" style={{width: "100%", position:'absolute', bottom: 0, height: 50, background: "#F5F5F5", zIndex: 10}} zDepth={2}>
           <Subheader>
             2016 PipelineDog
           </Subheader>

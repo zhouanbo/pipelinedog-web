@@ -17,8 +17,8 @@ export default class PdEditor extends React.Component {
     const setEditorSize = () => {
       document.getElementById('editor').style.height=Number(document.getElementById('container').offsetHeight-64-56-72-50)+"px"
     }
-    setEditorSize();
-    window.addEventListener("resize", setEditorSize);
+    setEditorSize()
+    window.addEventListener("resize", setEditorSize)
 
     this.refs.ace.editor.getSession().setUseWrapMode(true)
   }
