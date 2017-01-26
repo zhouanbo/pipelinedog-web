@@ -6,7 +6,7 @@ import Parser from './parser'
 
 const getStartState = () => {
   return {
-    version: "0.2.2",
+    version: "0.2.3",
     steps: [{
       id: '',
       name: "Default Step",
@@ -21,7 +21,7 @@ const getStartState = () => {
       name: "Default List",
       content: "/home/usr/sample1.fq\n/home/usr/sample2.fq\n/home/usr/sample3.fq"
     }],
-    gvar: "IN_DIR: \nOUT_DIR: ",
+    gvar: "OUT_DIR: ",
     editing: -2,
     export: "",
     exportOpen: false,
