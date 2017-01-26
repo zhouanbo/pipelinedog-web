@@ -19,7 +19,7 @@ const getStartState = () => {
     tab: 0,
     flists: [{
       name: "Default List",
-      content: "/home/usr/b1.bam\n/home/usr/b2.bam\n/home/usr/b3.bam"
+      content: "/home/usr/sample1.fq\n/home/usr/sample2.fq\n/home/usr/sample3.fq"
     }],
     gvar: "IN_DIR: \nOUT_DIR: ",
     editing: -2,
