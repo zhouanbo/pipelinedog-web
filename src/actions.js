@@ -22,7 +22,8 @@ class Actions {
       'editorParse',
       'setError',
       'exportClose',
-      'modifyList'
+      'modifyList',
+      'enterExample'
       )
   }
 }

@@ -14,11 +14,16 @@ export default class PdWelcome extends React.Component {
       projectDropText: "Drop your project file or click to select."
     }
     this.handleStart = this.handleStart.bind(this)
+    this.handleExample = this.handleExample.bind(this)
     this.handleProjectDrop = this.handleProjectDrop.bind(this)
   }
 
   handleStart() {
     this.props.dispatchEnterMain()
+  }
+
+  handleExample() {
+    this.props.dispatchEnterExample()
   }
 
   handleProjectDrop(files) {
@@ -53,6 +58,12 @@ export default class PdWelcome extends React.Component {
                 label="Start"
                 primary={true}
                 onTouchTap={this.handleStart}
+              />
+              <RaisedButton
+                label="Load Example"
+                style={{marginLeft: 15}}
+                primary={true}
+                onTouchTap={this.handleExample}
               />
             </div>
           </div>

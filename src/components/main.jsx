@@ -53,6 +53,9 @@ class Main extends React.Component {
   dispatchEnterMain() {
     Actions.enterMain()
   }
+  dispatchEnterExample() {
+    Actions.enterExample()
+  }
   dispatchProjectUpload(file) {
     Actions.projectUpload(file)
   }
@@ -214,6 +217,7 @@ class Main extends React.Component {
 
         <Paper id="welcome" style={{flex: "1 1 auto", display: "flex", alignItems: "stretch"}}>
           <PdWelcome 
+            dispatchEnterExample={this.dispatchEnterExample}
             dispatchEnterMain={this.dispatchEnterMain}
             dispatchProjectUpload={this.dispatchProjectUpload}
             dispatchListUpload={this.dispatchListUpload}

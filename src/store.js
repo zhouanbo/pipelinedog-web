@@ -8,17 +8,17 @@ const getStartState = () => {
   return {
     version: "0.2.2",
     steps: [{
-      id: '', 
+      id: '',
       name: "Default Step",
       code: '',
-      command: "", 
+      command: "",
       out: {},
       comment: ""
     }],
     enterMain: 0,
     tab: 0,
     flists: [{
-      name: "Default List" ,
+      name: "Default List",
       content: "/home/usr/b1.bam\n/home/usr/b2.bam\n/home/usr/b3.bam"
     }],
     gvar: "IN_DIR: \nOUT_DIR: ",
@@ -26,18 +26,18 @@ const getStartState = () => {
     export: "",
     exportOpen: false,
     save: "",
-    error: {show: false, type: "", message: ""}
+    error: { show: false, type: "", message: "" }
   }
 }
 
 class Store {
-  
+
   constructor() {
-    
+
     this.on('afterEach', () => {
       try {
         localStorage.setItem('state', JSON.stringify(this.state))
-      } catch(e) {
+      } catch (e) {
         console.log(e)
       }
     })
@@ -59,7 +59,8 @@ class Store {
       onSetError: Actions.setError,
       onExportClose: Actions.exportClose,
       onCreateList: Actions.createList,
-      onModifyList: Actions.modifyList
+      onModifyList: Actions.modifyList,
+      onEnterExample: Actions.enterExample
     })
     let localState = JSON.parse(localStorage.getItem('state'))
     if (localState && localState.version === getStartState().version) {
@@ -70,7 +71,7 @@ class Store {
   }
 
   onSetError(error) {
-    this.setState({error})
+    this.setState({ error })
   }
   onCreateStep() {
     let steps = this.state.steps
@@ -82,7 +83,7 @@ class Store {
       out: {}, //the output array
       comment: ""
     })
-    this.setState({steps})
+    this.setState({ steps })
   }
   onCreateList(name) {
     let flists = this.state.flists
@@ -90,63 +91,75 @@ class Store {
       name: name,
       content: ""
     })
-    this.setState({flists})
+    this.setState({ flists })
   }
   onModifyList(param) {
     let flists = this.state.flists
-    flists[param.id*-1-2].name = param.name
-    this.setState({flists})
+    flists[param.id * -1 - 2].name = param.name
+    this.setState({ flists })
   }
   onSortStep() {
-    this.state.steps.sort((a,b)=>{
-      return Number(a.id.replace('-',''))-Number(b.id.replace('-',''))
+    this.state.steps.sort((a, b) => {
+      return Number(a.id.replace('-', '')) - Number(b.id.replace('-', ''))
     })
-    this.setState({editing: -1, tab: 0})
+    this.setState({ editing: -1, tab: 0 })
   }
-  onDeleteStep(index) {    
+  onDeleteStep(index) {
     let editing = this.state.editing
     if (index <= -2) {
       let flists = this.state.flists
-      flists.splice(index*-1-2, 1)
+      flists.splice(index * -1 - 2, 1)
       if (editing === index) {
         editing = -1
       }
-      this.setState({flists, editing})
+      this.setState({ flists, editing })
     } else {
       let steps = this.state.steps
       steps.splice(index, 1)
       if (editing === index) {
         editing = -1
       }
-      this.setState({steps, editing})
+      this.setState({ steps, editing })
     }
   }
   onEnterMain() {
-    this.setState({enterMain: 1})
+    this.setState({ enterMain: 1 })
+  }
+  onEnterExample() {
+    let blob = null
+    var xhr = new XMLHttpRequest()
+    xhr.open("GET", "http://pipeline.dog/gatk.yml")
+    xhr.responseType = "blob"
+    xhr.onload = () => {
+      blob = xhr.response
+      this.onProjectUpload([blob])
+      this.setState({ enterMain: 1 })
+    }
+    xhr.send()   
   }
   onTabChange(value) {
-    this.setState({tab: value})
+    this.setState({ tab: value })
   }
   onProjectCreate() {
     localStorage.clear()
     this.setState(getStartState())
   }
   onProjectSave() {
-    this.setState({save: new Parser().combineSteps(this.state.gvar, this.state.steps)})
+    this.setState({ save: new Parser().combineSteps(this.state.gvar, this.state.steps) })
   }
   onProjectUpload(files) {
     const reader = new FileReader()
     reader.onloadend = (e) => {
       let {gvar, steps} = new Parser().resolveSteps(reader.result)
-      this.setState({gvar, steps})
+      this.setState({ gvar, steps })
       try {
         let newSteps = new Parser().parseAllSteps(gvar, this.state.flists, steps)
-        if (newSteps) this.setState({steps: newSteps})
-      } catch(e) {
+        if (newSteps) this.setState({ steps: newSteps })
+      } catch (e) {
         console.log(e)
       }
     }
-    reader.readAsText(files[0])  
+    reader.readAsText(files[0])
   }
   onStepUpload(files) {
     const reader = new FileReader()
@@ -159,7 +172,7 @@ class Store {
   onListUpload(files) {
     const reader = new FileReader()
     reader.onloadend = (e) => {
-      this.setState({flists: [{name: "Default List", content: reader.result}]})
+      this.setState({ flists: [{ name: "Default List", content: reader.result }] })
       this.onEditorParse(reader.result)
     }
     reader.readAsText(files[0])
@@ -168,11 +181,11 @@ class Store {
     let editing = this.state.editing
     if (editing <= -1) {
       try {
-        this.setState({steps: new Parser().parseAllSteps(this.state.gvar, this.state.flists, this.state.steps)})
-      } catch(e) {
-        let eType = e.type?e.type.toString():"Error Message"
-        let eMessage = e.message?e.message.toString():"Unkown Error."
-        this.setState({error: {show: true, type: eType, message: eMessage}})
+        this.setState({ steps: new Parser().parseAllSteps(this.state.gvar, this.state.flists, this.state.steps) })
+      } catch (e) {
+        let eType = e.type ? e.type.toString() : "Error Message"
+        let eMessage = e.message ? e.message.toString() : "Unkown Error."
+        this.setState({ error: { show: true, type: eType, message: eMessage } })
       }
     } else {
       let steps = this.state.steps
@@ -181,41 +194,42 @@ class Store {
         let newStep = new Parser().parseStep(text, this.state.gvar, this.state.flists, this.state.steps)
         if (newStep) steps[editing] = newStep
       } catch (e) {
-        let eType = e.type?e.type.toString():"Error Message"
-        let eMessage = e.message?e.message.toString():"Unkown Error."
-        this.setState({error: {show: true, type: eType, message: eMessage}})      }
+        let eType = e.type ? e.type.toString() : "Error Message"
+        let eMessage = e.message ? e.message.toString() : "Unkown Error."
+        this.setState({ error: { show: true, type: eType, message: eMessage } })
+      }
 
-      this.setState({steps})
+      this.setState({ steps })
     }
   }
   onEditorChange(newText) {
     let editing = this.state.editing
     if (editing <= -2) {
       let flists = this.state.flists
-      flists[editing*-1-2].content = newText
-      this.setState({flists})
+      flists[editing * -1 - 2].content = newText
+      this.setState({ flists })
     } else if (editing === -1) {
-      this.setState({gvar: newText})
+      this.setState({ gvar: newText })
     } else {
       let steps = this.state.steps
-      steps[editing].code = newText    
-      this.setState({steps})
+      steps[editing].code = newText
+      this.setState({ steps })
     }
   }
   onStepChange(index) {
-    this.setState({editing: index, tab: 0})
+    this.setState({ editing: index, tab: 0 })
   }
   onExportPipeline() {
     try {
       let newSteps = new Parser().parseAllSteps(this.state.gvar, this.state.flists, this.state.steps)
-      if (newSteps) this.setState({steps: newSteps})
-      this.setState({exportOpen: true, export: new Parser().combineCommands(this.state.steps)})
+      if (newSteps) this.setState({ steps: newSteps })
+      this.setState({ exportOpen: true, export: new Parser().combineCommands(this.state.steps) })
     } catch (e) {
-      this.setState({export: "", error: {show: true, type: e.type.toString(), message: e.message.toString()}})
-    } 
+      this.setState({ export: "", error: { show: true, type: e.type.toString(), message: e.message.toString() } })
+    }
   }
   onExportClose() {
-    this.setState({exportOpen: false})
+    this.setState({ exportOpen: false })
   }
 
 }

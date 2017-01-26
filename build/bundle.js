@@ -71972,7 +71972,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var Actions = function Actions() {
   _classCallCheck(this, Actions);
 
-  this.generateActions('uploadFile', 'createStep', 'createList', 'deleteStep', 'sortStep', 'stepUpload', 'editorChange', 'enterMain', 'projectUpload', 'listUpload', 'stepChange', 'projectSave', 'projectCreate', 'editorChange', 'exportPipeline', 'tabChange', 'editorParse', 'setError', 'exportClose', 'modifyList');
+  this.generateActions('uploadFile', 'createStep', 'createList', 'deleteStep', 'sortStep', 'stepUpload', 'editorChange', 'enterMain', 'projectUpload', 'listUpload', 'stepChange', 'projectSave', 'projectCreate', 'editorChange', 'exportPipeline', 'tabChange', 'editorParse', 'setError', 'exportClose', 'modifyList', 'enterExample');
 };
 
 exports.default = _alt2.default.createActions(Actions);
@@ -72176,6 +72176,11 @@ var Main = function (_React$Component) {
     key: 'dispatchEnterMain',
     value: function dispatchEnterMain() {
       _actions2.default.enterMain();
+    }
+  }, {
+    key: 'dispatchEnterExample',
+    value: function dispatchEnterExample() {
+      _actions2.default.enterExample();
     }
   }, {
     key: 'dispatchProjectUpload',
@@ -72394,6 +72399,7 @@ var Main = function (_React$Component) {
           _Paper2.default,
           { id: 'welcome', style: { flex: "1 1 auto", display: "flex", alignItems: "stretch" } },
           _react2.default.createElement(_pdWelcome2.default, {
+            dispatchEnterExample: this.dispatchEnterExample,
             dispatchEnterMain: this.dispatchEnterMain,
             dispatchProjectUpload: this.dispatchProjectUpload,
             dispatchListUpload: this.dispatchListUpload
@@ -73654,6 +73660,7 @@ var PdWelcome = function (_React$Component) {
       projectDropText: "Drop your project file or click to select."
     };
     _this.handleStart = _this.handleStart.bind(_this);
+    _this.handleExample = _this.handleExample.bind(_this);
     _this.handleProjectDrop = _this.handleProjectDrop.bind(_this);
     return _this;
   }
@@ -73662,6 +73669,11 @@ var PdWelcome = function (_React$Component) {
     key: 'handleStart',
     value: function handleStart() {
       this.props.dispatchEnterMain();
+    }
+  }, {
+    key: 'handleExample',
+    value: function handleExample() {
+      this.props.dispatchEnterExample();
     }
   }, {
     key: 'handleProjectDrop',
@@ -73735,6 +73747,12 @@ var PdWelcome = function (_React$Component) {
                 label: 'Start',
                 primary: true,
                 onTouchTap: this.handleStart
+              }),
+              _react2.default.createElement(_RaisedButton2.default, {
+                label: 'Load Example',
+                style: { marginLeft: 15 },
+                primary: true,
+                onTouchTap: this.handleExample
               })
             )
           )
@@ -74438,7 +74456,8 @@ var Store = function () {
       onSetError: _actions2.default.setError,
       onExportClose: _actions2.default.exportClose,
       onCreateList: _actions2.default.createList,
-      onModifyList: _actions2.default.modifyList
+      onModifyList: _actions2.default.modifyList,
+      onEnterExample: _actions2.default.enterExample
     });
     var localState = JSON.parse(localStorage.getItem('state'));
     if (localState && localState.version === getStartState().version) {
@@ -74518,6 +74537,22 @@ var Store = function () {
       this.setState({ enterMain: 1 });
     }
   }, {
+    key: 'onEnterExample',
+    value: function onEnterExample() {
+      var _this2 = this;
+
+      var blob = null;
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", "http://pipeline.dog/gatk.yml");
+      xhr.responseType = "blob";
+      xhr.onload = function () {
+        blob = xhr.response;
+        _this2.onProjectUpload([blob]);
+        _this2.setState({ enterMain: 1 });
+      };
+      xhr.send();
+    }
+  }, {
     key: 'onTabChange',
     value: function onTabChange(value) {
       this.setState({ tab: value });
@@ -74536,7 +74571,7 @@ var Store = function () {
   }, {
     key: 'onProjectUpload',
     value: function onProjectUpload(files) {
-      var _this2 = this;
+      var _this3 = this;
 
       var reader = new FileReader();
       reader.onloadend = function (e) {
@@ -74545,10 +74580,10 @@ var Store = function () {
         var gvar = _resolveSteps.gvar;
         var steps = _resolveSteps.steps;
 
-        _this2.setState({ gvar: gvar, steps: steps });
+        _this3.setState({ gvar: gvar, steps: steps });
         try {
-          var newSteps = new _parser2.default().parseAllSteps(gvar, _this2.state.flists, steps);
-          if (newSteps) _this2.setState({ steps: newSteps });
+          var newSteps = new _parser2.default().parseAllSteps(gvar, _this3.state.flists, steps);
+          if (newSteps) _this3.setState({ steps: newSteps });
         } catch (e) {
           console.log(e);
         }
@@ -74558,24 +74593,24 @@ var Store = function () {
   }, {
     key: 'onStepUpload',
     value: function onStepUpload(files) {
-      var _this3 = this;
+      var _this4 = this;
 
       var reader = new FileReader();
       reader.onloadend = function (e) {
-        _this3.onEditorChange(reader.result);
-        _this3.onEditorParse(reader.result);
+        _this4.onEditorChange(reader.result);
+        _this4.onEditorParse(reader.result);
       };
       reader.readAsText(files[0]);
     }
   }, {
     key: 'onListUpload',
     value: function onListUpload(files) {
-      var _this4 = this;
+      var _this5 = this;
 
       var reader = new FileReader();
       reader.onloadend = function (e) {
-        _this4.setState({ flists: [{ name: "Default List", content: reader.result }] });
-        _this4.onEditorParse(reader.result);
+        _this5.setState({ flists: [{ name: "Default List", content: reader.result }] });
+        _this5.onEditorParse(reader.result);
       };
       reader.readAsText(files[0]);
     }
