@@ -74401,7 +74401,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var getStartState = function getStartState() {
   return {
-    version: "0.2.2",
+    version: "0.2.3",
     steps: [{
       id: '',
       name: "Default Step",
@@ -74414,9 +74414,9 @@ var getStartState = function getStartState() {
     tab: 0,
     flists: [{
       name: "Default List",
-      content: "/home/usr/b1.bam\n/home/usr/b2.bam\n/home/usr/b3.bam"
+      content: "/home/usr/sample1.fq\n/home/usr/sample2.fq\n/home/usr/sample3.fq"
     }],
-    gvar: "IN_DIR: \nOUT_DIR: ",
+    gvar: "OUT_DIR: ",
     editing: -2,
     export: "",
     exportOpen: false,
@@ -74943,45 +74943,17 @@ var cachedClearTimeout;
 } ())
 function runTimeout(fun) {
     if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
         return setTimeout(fun, 0);
+    } else {
+        return cachedSetTimeout.call(null, fun, 0);
     }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
 }
 function runClearTimeout(marker) {
     if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
+        clearTimeout(marker);
+    } else {
+        cachedClearTimeout.call(null, marker);
     }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
 }
 var queue = [];
 var draining = false;
