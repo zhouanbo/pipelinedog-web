@@ -135,26 +135,22 @@ export default class PdAppBar extends React.Component {
           title="PipelineDog"
           onLeftIconButtonTouchTap={this.handleToggle}
           iconElementRight={
-            <IconMenu
-              iconButtonElement={
-                <IconButton iconClassName="material-icons">
-                  more_vert
-                </IconButton>
-              }
-              targetOrigin={{horizontal: 'right', vertical: 'top'}}
-              anchorOrigin={{horizontal: 'right', vertical: 'top'}}
+            <div
+              style={{flexFlow: 'row', display: 'flex', flex: 1, marginTop: 7}}
             >
-              <MenuItem 
+              <FlatButton
+                style={{color: 'white'}}
                 disabled={!this.props.enterMain}
-                primaryText="Save Project" 
+                label="Save Project" 
                 onTouchTap={()=>{this.props.dispatchProjectSave();this.setState({saveOpen: true})}}
               />
-              <MenuItem 
+              <FlatButton 
+                style={{color: 'white', marginLeft: 5}}              
                 disabled={!this.props.enterMain}
-                primaryText="Export Pipeline" 
+                label="Export Pipeline" 
                 onTouchTap={()=>{this.props.dispatchExportPipeline();this.setState({exportOpen: true})}}
               />
-            </IconMenu>
+            </div>
           }
         />
         <Drawer
