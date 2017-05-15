@@ -255,7 +255,7 @@ class Main extends React.Component {
         
         <Paper id="footer" style={{width: "100%", position:'absolute', bottom: 0, height: 50, background: "#F5F5F5", zIndex: 10}} zDepth={2}>
           <Subheader>
-            2016 PipelineDog
+            2017 PipelineDog
           </Subheader>
         </Paper>
       </div>
