@@ -71972,7 +71972,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var Actions = function Actions() {
   _classCallCheck(this, Actions);
 
-  this.generateActions('uploadFile', 'createStep', 'createList', 'deleteStep', 'sortStep', 'stepUpload', 'editorChange', 'enterMain', 'projectUpload', 'listUpload', 'stepChange', 'projectSave', 'projectCreate', 'editorChange', 'exportPipeline', 'tabChange', 'editorParse', 'setError', 'exportClose', 'modifyList', 'enterExample');
+  this.generateActions('uploadFile', 'createStep', 'createList', 'deleteStep', 'sortStep', 'sortList', 'stepUpload', 'editorChange', 'enterMain', 'projectUpload', 'listUpload', 'stepChange', 'projectSave', 'projectCreate', 'editorChange', 'exportPipeline', 'tabChange', 'editorParse', 'setError', 'exportClose', 'modifyList', 'enterExample', 'stepAddUpload', 'listAddUpload');
 };
 
 exports.default = _alt2.default.createActions(Actions);
@@ -72233,6 +72233,21 @@ var Main = function (_React$Component) {
       _actions2.default.sortStep();
     }
   }, {
+    key: 'dispatchSortList',
+    value: function dispatchSortList() {
+      _actions2.default.sortList();
+    }
+  }, {
+    key: 'dispatchStepAddUpload',
+    value: function dispatchStepAddUpload(file) {
+      _actions2.default.stepAddUpload(file);
+    }
+  }, {
+    key: 'dispatchListAddUpload',
+    value: function dispatchListAddUpload(file) {
+      _actions2.default.listAddUpload(file);
+    }
+  }, {
     key: 'dispatchDeleteStep',
     value: function dispatchDeleteStep(index) {
       _actions2.default.deleteStep(index);
@@ -72301,7 +72316,10 @@ var Main = function (_React$Component) {
             dispatchCreateList: this.dispatchCreateList,
             dispatchDeleteStep: this.dispatchDeleteStep,
             dispatchDeleteList: this.dispatchDeleteList,
+            dispatchStepAddUpload: this.dispatchStepAddUpload,
+            dispatchListAddUpload: this.dispatchListAddUpload,
             dispatchSortStep: this.dispatchSortStep,
+            dispatchSortList: this.dispatchSortList,
             dispatchModifyList: this.dispatchModifyList,
             editing: this.props.editing
           }),
@@ -73296,6 +73314,10 @@ var _TextField = require('material-ui/TextField');
 
 var _TextField2 = _interopRequireDefault(_TextField);
 
+var _reactDropzone = require('react-dropzone');
+
+var _reactDropzone2 = _interopRequireDefault(_reactDropzone);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -73320,6 +73342,8 @@ var PdStepList = function (_React$Component) {
       alertIndex: 0,
       nameOpen: false,
       modifyOpen: false,
+      flistUploadOpen: false,
+      stepUploadOpen: false,
       id: "",
       name: "",
       modifyName: ''
@@ -73453,10 +73477,34 @@ var PdStepList = function (_React$Component) {
                 _this2.setState({ nameOpen: true, name: "" });
               },
               iconClassName: 'material-icons',
-              style: { marginTop: -50, float: "right" },
+              style: { marginTop: -50, marginRight: 70, float: "right" },
               tooltip: 'Add'
             },
             'note_add'
+          ),
+          _react2.default.createElement(
+            _IconButton2.default,
+            {
+              onTouchTap: function onTouchTap() {
+                _this2.setState({ flistUploadOpen: true });
+              },
+              iconClassName: 'material-icons',
+              style: { marginTop: -50, marginRight: 35, float: "right" },
+              tooltip: 'Upload'
+            },
+            'file_upload'
+          ),
+          _react2.default.createElement(
+            _IconButton2.default,
+            {
+              onTouchTap: function onTouchTap(event, index) {
+                _this2.props.dispatchSortList();_this2.setState({ editing: -2 });
+              },
+              iconClassName: 'material-icons',
+              style: { marginTop: -50, float: "right" },
+              tooltip: 'Sort'
+            },
+            'sort'
           ),
           this.props.flists.map(function (flist, index) {
             var idx = index * -1 - 2;
@@ -73532,10 +73580,22 @@ var PdStepList = function (_React$Component) {
             {
               onTouchTap: this.props.dispatchCreateStep,
               iconClassName: 'material-icons',
-              style: { marginTop: -50, marginRight: 35, float: "right" },
+              style: { marginTop: -50, marginRight: 70, float: "right" },
               tooltip: 'Add'
             },
             'note_add'
+          ),
+          _react2.default.createElement(
+            _IconButton2.default,
+            {
+              onTouchTap: function onTouchTap() {
+                _this2.setState({ stepUploadOpen: true });
+              },
+              iconClassName: 'material-icons',
+              style: { marginTop: -50, marginRight: 35, float: "right" },
+              tooltip: 'Upload'
+            },
+            'file_upload'
           ),
           _react2.default.createElement(
             _IconButton2.default,
@@ -73595,6 +73655,78 @@ var PdStepList = function (_React$Component) {
               secondaryText: "ID: " + (step.id ? step.id : "NA")
             });
           })
+        ),
+        _react2.default.createElement(
+          _Dialog2.default,
+          {
+            actions: [_react2.default.createElement(_FlatButton2.default, {
+              label: 'Close',
+              primary: true,
+              onTouchTap: function onTouchTap() {
+                _this2.setState({ flistUploadOpen: false });
+              }
+            })],
+            modal: true,
+            open: this.state.flistUploadOpen,
+            onRequestClose: function onRequestClose() {
+              _this2.setState({ flistUploadOpen: false });
+            }
+          },
+          _react2.default.createElement(
+            'h4',
+            null,
+            'Upload File'
+          ),
+          _react2.default.createElement(
+            _reactDropzone2.default,
+            {
+              multiple: false,
+              onDrop: function onDrop(files) {
+                _this2.props.dispatchListAddUpload(files);_this2.setState({ flistUploadOpen: false });
+              }
+            },
+            _react2.default.createElement(
+              'div',
+              { style: { padding: 16, textAlign: "center" } },
+              'Drop your file or click to select.'
+            )
+          )
+        ),
+        _react2.default.createElement(
+          _Dialog2.default,
+          {
+            actions: [_react2.default.createElement(_FlatButton2.default, {
+              label: 'Close',
+              primary: true,
+              onTouchTap: function onTouchTap() {
+                _this2.setState({ stepUploadOpen: false });
+              }
+            })],
+            modal: true,
+            open: this.state.stepUploadOpen,
+            onRequestClose: function onRequestClose() {
+              _this2.setState({ stepUploadOpen: false });
+            }
+          },
+          _react2.default.createElement(
+            'h4',
+            null,
+            'Upload File'
+          ),
+          _react2.default.createElement(
+            _reactDropzone2.default,
+            {
+              multiple: false,
+              onDrop: function onDrop(files) {
+                _this2.props.dispatchStepAddUpload(files);_this2.setState({ stepUploadOpen: false });
+              }
+            },
+            _react2.default.createElement(
+              'div',
+              { style: { padding: 16, textAlign: "center" } },
+              'Drop your file or click to select.'
+            )
+          )
         )
       );
     }
@@ -73605,7 +73737,7 @@ var PdStepList = function (_React$Component) {
 
 exports.default = PdStepList;
 
-},{"material-ui/Badge":202,"material-ui/Dialog":204,"material-ui/Divider":206,"material-ui/FlatButton":213,"material-ui/IconButton":217,"material-ui/List":223,"material-ui/Paper":230,"material-ui/Subheader":244,"material-ui/TextField":257,"react":496}],521:[function(require,module,exports){
+},{"material-ui/Badge":202,"material-ui/Dialog":204,"material-ui/Divider":206,"material-ui/FlatButton":213,"material-ui/IconButton":217,"material-ui/List":223,"material-ui/Paper":230,"material-ui/Subheader":244,"material-ui/TextField":257,"react":496,"react-dropzone":315}],521:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -74443,6 +74575,7 @@ var Store = function () {
       onStepChange: _actions2.default.stepChange,
       onCreateStep: _actions2.default.createStep,
       onSortStep: _actions2.default.sortStep,
+      onSortList: _actions2.default.sortList,
       onDeleteStep: _actions2.default.deleteStep,
       onProjectSave: _actions2.default.projectSave,
       onExportPipeline: _actions2.default.exportPipeline,
@@ -74453,7 +74586,9 @@ var Store = function () {
       onExportClose: _actions2.default.exportClose,
       onCreateList: _actions2.default.createList,
       onModifyList: _actions2.default.modifyList,
-      onEnterExample: _actions2.default.enterExample
+      onEnterExample: _actions2.default.enterExample,
+      onStepAddUpload: _actions2.default.stepAddUpload,
+      onListAddUpload: _actions2.default.listAddUpload
     });
     var localState = JSON.parse(localStorage.getItem('state'));
     if (localState && localState.version === getStartState().version) {
@@ -74504,6 +74639,14 @@ var Store = function () {
     value: function onSortStep() {
       this.state.steps.sort(function (a, b) {
         return Number(a.id.replace('-', '')) - Number(b.id.replace('-', ''));
+      });
+      this.setState({ editing: -1, tab: 0 });
+    }
+  }, {
+    key: 'onSortList',
+    value: function onSortList() {
+      this.state.flists.sort(function (a, b) {
+        return Number(a.name.toLowerCase().charCodeAt(0) - b.name.toLowerCase().charCodeAt(0));
       });
       this.setState({ editing: -1, tab: 0 });
     }
@@ -74594,9 +74737,18 @@ var Store = function () {
       var reader = new FileReader();
       reader.onloadend = function (e) {
         _this4.onEditorChange(reader.result);
-        _this4.onEditorParse(reader.result);
+        //Whether to parse the pipeline immdiately after upload or not
+        //this.onEditorParse(reader.result)
       };
       reader.readAsText(files[0]);
+    }
+  }, {
+    key: 'onStepAddUpload',
+    value: function onStepAddUpload(files) {
+      var filename = files[0].name;
+      this.onCreateStep();
+      this.onStepChange(this.state.steps.length - 1);
+      this.onStepUpload(files);
     }
   }, {
     key: 'onListUpload',
@@ -74609,6 +74761,14 @@ var Store = function () {
         _this5.onEditorParse(reader.result);
       };
       reader.readAsText(files[0]);
+    }
+  }, {
+    key: 'onListAddUpload',
+    value: function onListAddUpload(files) {
+      var filename = files[0].name;
+      this.onCreateList(filename);
+      this.onStepChange(-1 - this.state.flists.length);
+      this.onStepUpload(files);
     }
   }, {
     key: 'onEditorParse',
@@ -74656,6 +74816,7 @@ var Store = function () {
   }, {
     key: 'onStepChange',
     value: function onStepChange(index) {
+      console.log("editing", index);
       this.setState({ editing: index, tab: 0 });
     }
   }, {

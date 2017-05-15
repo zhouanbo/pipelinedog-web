@@ -8,6 +8,7 @@ class Actions {
       'createList',
       'deleteStep',
       'sortStep',
+      'sortList',
       'stepUpload',
       'editorChange',
       'enterMain',
@@ -23,7 +24,9 @@ class Actions {
       'setError',
       'exportClose',
       'modifyList',
-      'enterExample'
+      'enterExample',
+      'stepAddUpload',
+      'listAddUpload'
       )
   }
 }

@@ -86,6 +86,15 @@ class Main extends React.Component {
   dispatchSortStep() {
     Actions.sortStep()
   }
+  dispatchSortList() {
+    Actions.sortList()
+  }
+  dispatchStepAddUpload(file) {
+    Actions.stepAddUpload(file)
+  }
+  dispatchListAddUpload(file) {
+    Actions.listAddUpload(file)
+  }
   dispatchDeleteStep(index) {
     Actions.deleteStep(index)
   }
@@ -139,7 +148,10 @@ class Main extends React.Component {
               dispatchCreateList={this.dispatchCreateList}
               dispatchDeleteStep={this.dispatchDeleteStep}
               dispatchDeleteList={this.dispatchDeleteList}
+              dispatchStepAddUpload={this.dispatchStepAddUpload}
+              dispatchListAddUpload={this.dispatchListAddUpload}
               dispatchSortStep={this.dispatchSortStep}
+              dispatchSortList={this.dispatchSortList}
               dispatchModifyList={this.dispatchModifyList}
               editing={this.props.editing}
             />

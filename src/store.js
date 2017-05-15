@@ -50,6 +50,7 @@ class Store {
       onStepChange: Actions.stepChange,
       onCreateStep: Actions.createStep,
       onSortStep: Actions.sortStep,
+      onSortList: Actions.sortList,
       onDeleteStep: Actions.deleteStep,
       onProjectSave: Actions.projectSave,
       onExportPipeline: Actions.exportPipeline,
@@ -60,7 +61,9 @@ class Store {
       onExportClose: Actions.exportClose,
       onCreateList: Actions.createList,
       onModifyList: Actions.modifyList,
-      onEnterExample: Actions.enterExample
+      onEnterExample: Actions.enterExample,
+      onStepAddUpload: Actions.stepAddUpload,
+      onListAddUpload: Actions.listAddUpload
     })
     let localState = JSON.parse(localStorage.getItem('state'))
     if (localState && localState.version === getStartState().version) {
@@ -101,6 +104,12 @@ class Store {
   onSortStep() {
     this.state.steps.sort((a, b) => {
       return Number(a.id.replace('-', '')) - Number(b.id.replace('-', ''))
+    })
+    this.setState({ editing: -1, tab: 0 })
+  }
+  onSortList() {
+    this.state.flists.sort((a, b) => {
+      return Number(a.name.toLowerCase().charCodeAt(0) - b.name.toLowerCase().charCodeAt(0))
     })
     this.setState({ editing: -1, tab: 0 })
   }
@@ -165,9 +174,16 @@ class Store {
     const reader = new FileReader()
     reader.onloadend = (e) => {
       this.onEditorChange(reader.result)
-      this.onEditorParse(reader.result)
+      //Whether to parse the pipeline immdiately after upload or not
+      //this.onEditorParse(reader.result)
     }
     reader.readAsText(files[0])
+  }
+  onStepAddUpload(files) {
+    let filename = files[0].name
+    this.onCreateStep()
+    this.onStepChange( this.state.steps.length - 1 )
+    this.onStepUpload(files)
   }
   onListUpload(files) {
     const reader = new FileReader()
@@ -176,6 +192,12 @@ class Store {
       this.onEditorParse(reader.result)
     }
     reader.readAsText(files[0])
+  }
+  onListAddUpload(files) {
+    let filename = files[0].name
+    this.onCreateList(filename)
+    this.onStepChange( -1 - this.state.flists.length )
+    this.onStepUpload(files)
   }
   onEditorParse(text) {
     let editing = this.state.editing
@@ -217,6 +239,7 @@ class Store {
     }
   }
   onStepChange(index) {
+    console.log("editing", index)
     this.setState({ editing: index, tab: 0 })
   }
   onExportPipeline() {
