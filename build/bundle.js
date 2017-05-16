@@ -73112,7 +73112,7 @@ var PdEditorToolBar = function (_React$Component) {
             onChange: function onChange(event) {
               var pipelines = {};
               if (event.target.value !== '') Object.keys(_this2.state.database).map(function (id) {
-                if (_this2.state.database[id].name.includes(event.target.value)) pipelines[id] = _this2.state.database[id];
+                if (_this2.state.database[id].name.toLowerCase().includes(event.target.value.toLowerCase())) pipelines[id] = _this2.state.database[id];
               });
               _this2.setState({ pipelines: pipelines });
             },

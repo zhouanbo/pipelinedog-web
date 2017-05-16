@@ -119,7 +119,7 @@ export default class PdEditorToolBar extends React.Component {
               let pipelines = {}
               if (event.target.value !== '')
                 Object.keys(this.state.database).map(id => {
-                  if (this.state.database[id].name.includes(event.target.value))
+                  if (this.state.database[id].name.toLowerCase().includes(event.target.value.toLowerCase()))
                     pipelines[id] = this.state.database[id]
                 })
               this.setState({ pipelines })
