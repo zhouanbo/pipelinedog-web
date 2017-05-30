@@ -162,7 +162,7 @@ export default class PdAppBar extends React.Component {
             <MenuItem onTouchTap={()=>{this.setState({alertOpen: true})}}>New Project</MenuItem>
             <MenuItem onTouchTap={()=>{this.handleToggle();this.props.dispatchProjectSave();this.setState({saveOpen: true})}}>Save Project</MenuItem>
             <MenuItem onTouchTap={()=>{this.handleToggle(); this.props.dispatchExportPipeline(); this.setState({exportOpen: true})}}>Export Pipeline</MenuItem>
-            <MenuItem onTouchTap={()=>{this.handleToggle();window.open("https://repo.pipeline.dog","_blank")}}>Repository</MenuItem>
+            <MenuItem onTouchTap={()=>{this.handleToggle();window.open("http://repo.pipeline.dog","_blank")}}>Repository</MenuItem>
             <MenuItem onTouchTap={()=>{this.handleToggle();window.open("https://github.com/zhouanbo/pipelinedog-web","_blank")}}>Github</MenuItem>
             <MenuItem onTouchTap={()=>{this.handleToggle();this.setState({aboutOpen: true})}}>About PipelineDog</MenuItem>
         </Drawer>

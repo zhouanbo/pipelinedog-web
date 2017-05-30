@@ -72761,7 +72761,7 @@ var PdAppBar = function (_React$Component) {
           _react2.default.createElement(
             _MenuItem2.default,
             { onTouchTap: function onTouchTap() {
-                _this2.handleToggle();window.open("https://repo.pipeline.dog", "_blank");
+                _this2.handleToggle();window.open("http://repo.pipeline.dog", "_blank");
               } },
             'Repository'
           ),
