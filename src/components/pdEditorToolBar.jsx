@@ -24,6 +24,7 @@ export default class PdEditorToolBar extends React.Component {
       searchOpen: false,
       alertOpen: false,
       successOpen: false,
+      createTags: '',
       pipelines: '',
       database: ''
     }
@@ -86,6 +87,8 @@ export default class PdEditorToolBar extends React.Component {
                 this.props.firebase.database().ref('pipelines').push({
                   name: this.props.name,
                   content: this.props.text,
+                  tags: this.state.createTags,
+                  loggedin: false,
                   upvote: 0,
                   createdAt: this.props.firebase.database.ServerValue.TIMESTAMP
                 }).then(() => { this.setState({ alertOpen: false, successOpen: true }) })
@@ -97,6 +100,7 @@ export default class PdEditorToolBar extends React.Component {
           onRequestClose={() => { this.setState({ alertOpen: false }) } }
           >
           Are you sure to publish your step so everybody can search and use it?
+          <TextField floatingLabelText="Tags" hintText="Tags" onChange={event => { this.setState({ createTags: event.target.value }) }} />
         </Dialog>
 
         <Dialog
